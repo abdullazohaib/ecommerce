@@ -39,9 +39,11 @@ export default {
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif']
+        serif: ['Playfair Display', 'Georgia', 'serif'],
+        script: ['Alex Brush', 'Dancing Script', 'cursive']
       }
     },
   },
   plugins: [],
 }
+

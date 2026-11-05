@@ -3,11 +3,16 @@ import { useStore } from '../../context/StoreContext';
 import { MessageCircle, X } from 'lucide-react';
 
 export const WhatsAppFloating = () => {
-  const { storeInfo } = useStore();
+  const { storeInfo = {} } = useStore();
   const [showTooltip, setShowTooltip] = useState(true);
 
-  const cleanNumber = storeInfo.whatsappNumber.replace(/\D/g, '');
-  const defaultMsg = encodeURIComponent(`Hi ${storeInfo.storeName}, I want to know more about your authentic skin whitening products and delivery time.`);
+  if (storeInfo?.whatsappEnabled === false) return null;
+
+  const rawNumber = storeInfo?.whatsappNumber || "+91 98200 45678";
+  const cleanNumber = rawNumber.replace(/\D/g, '');
+  const storeName = storeInfo?.storeName || "Classic Glow";
+  const promptText = storeInfo?.whatsappPromptText || "Need help choosing a cream? Chat with us!";
+  const defaultMsg = encodeURIComponent(`Hi ${storeName}, I want to know more about your authentic skin whitening products and delivery time.`);
 
   return (
     <div className="fixed bottom-20 lg:bottom-6 right-5 z-40 flex items-end gap-3 select-none">
@@ -15,10 +20,10 @@ export const WhatsAppFloating = () => {
       {showTooltip && (
         <div className="hidden sm:flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl shadow-xl border border-slate-200 text-xs text-slate-800 animate-in slide-in-from-right-4 duration-300">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span>Need help choosing a cream? <strong>Chat with us!</strong></span>
+          <span>{promptText}</span>
           <button 
             onClick={() => setShowTooltip(false)}
-            className="text-slate-400 hover:text-slate-600 ml-1"
+            className="text-slate-400 hover:text-slate-600 ml-1 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>

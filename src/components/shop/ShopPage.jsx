@@ -9,14 +9,19 @@ export const ShopPage = () => {
     productsList, 
     selectedCategory, 
     setSelectedCategory,
+    navigateToCategory,
+    setViewWithUrl,
     searchQuery,
     setSearchQuery,
     selectedSort,
     setSelectedSort,
     priceFilter,
     setPriceFilter,
+    categoriesList,
     storeInfo
   } = useStore();
+
+  const cats = (categoriesList && categoriesList.length > 0) ? categoriesList : categories;
 
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [minRating, setMinRating] = useState(0);
@@ -63,14 +68,23 @@ export const ShopPage = () => {
         {/* Page Title & Breadcrumb */}
         <div className="mb-6">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <span>Home</span>
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('home');
+              }}
+              className="hover:text-black transition-colors"
+            >
+              Home
+            </a>
             <span>/</span>
             <span className="text-slate-800">Shop Catalog</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900">
             {selectedCategory === 'all' 
               ? 'Complete Beauty & Skincare Collection' 
-              : categories.find(c => c.id === selectedCategory)?.name || 'Products'}
+              : cats.find(c => c.id === selectedCategory)?.name || 'Products'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Showing {sortedProducts.length} authentic, tested, and hologram-certified products.
@@ -95,7 +109,7 @@ export const ShopPage = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 {selectedCategory !== 'all' && (
                   <span className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 text-xs font-bold px-3 py-1.5 rounded-xl border border-rose-200">
-                    Category: {categories.find(c => c.id === selectedCategory)?.name}
+                    Category: {cats.find(c => c.id === selectedCategory)?.name}
                     <button onClick={() => setSelectedCategory('all')} className="hover:text-rose-900">
                       <X className="w-3 h-3" />
                     </button>
@@ -156,21 +170,27 @@ export const ShopPage = () => {
                   Categories
                 </h3>
                 <div className="space-y-1">
-                  {categories.map(cat => (
-                    <button
+                  {cats.map(cat => (
+                    <a
                       key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
+                      href={cat.id === 'all' ? '/shop' : `/category/${cat.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateToCategory(cat.id);
+                      }}
                       className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-medium transition-colors text-left cursor-pointer ${
                         selectedCategory === cat.id
-                          ? 'bg-rose-50 text-rose-600 font-bold'
+                          ? 'bg-black text-white font-bold'
                           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                       }`}
                     >
                       <span>{cat.name}</span>
-                      <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                        selectedCategory === cat.id ? 'bg-neutral-800 text-white' : 'text-slate-400 bg-slate-100'
+                      }`}>
                         {cat.id === 'all' ? productsList.length : cat.count}
                       </span>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -179,7 +199,7 @@ export const ShopPage = () => {
               <div className="pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-900 mb-2">
                   <span>Max Price:</span>
-                  <span className="text-rose-600">₹{priceFilter}</span>
+                  <span className="text-black font-black">₹{priceFilter}</span>
                 </div>
                 <input
                   type="range"
@@ -209,7 +229,7 @@ export const ShopPage = () => {
                         name="rating"
                         checked={minRating === r}
                         onChange={() => setMinRating(r)}
-                        className="accent-rose-600"
+                        className="accent-black"
                       />
                       <span>{r === 0 ? 'All Ratings' : `${r} Stars & Above`}</span>
                     </label>
@@ -252,3 +272,4 @@ export const ShopPage = () => {
     </div>
   );
 };
+

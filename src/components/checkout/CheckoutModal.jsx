@@ -103,7 +103,7 @@ export const CheckoutModal = () => {
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-bold">
               ✓
             </div>
             <div>
@@ -339,22 +339,22 @@ export const CheckoutModal = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2 text-xs">
               <div className="flex justify-between text-slate-600">
                 <span>Subtotal ({cart.length} items):</span>
-                <span>{storeInfo.currency.symbol}{cartSubtotal.toLocaleString()}</span>
+                <span>{storeInfo?.currency?.symbol || '₹'}{cartSubtotal.toLocaleString()}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-emerald-600 font-semibold">
                   <span>Discount Applied:</span>
-                  <span>-{storeInfo.currency.symbol}{discountAmount.toLocaleString()}</span>
+                  <span>-{storeInfo?.currency?.symbol || '₹'}{discountAmount.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex justify-between text-slate-600">
                 <span>Shipping:</span>
-                <span>{isFreeShipping ? 'FREE' : `${storeInfo.currency.symbol}${shippingFee}`}</span>
+                <span>{isFreeShipping ? 'FREE' : `${storeInfo?.currency?.symbol || '₹'}${shippingFee}`}</span>
               </div>
               <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
                 <span>Total Amount Due:</span>
-                <span className="text-rose-600 font-black">
-                  {storeInfo.currency.symbol}{cartFinalTotal.toLocaleString()}
+                <span className="text-black font-black text-base">
+                  {storeInfo?.currency?.symbol || '₹'}{cartFinalTotal.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -363,13 +363,13 @@ export const CheckoutModal = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-sm py-4 rounded-2xl shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full bg-black hover:bg-neutral-800 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-black/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <span>Confirming Order...</span>
               ) : (
                 <>
-                  <span>Place Order • {storeInfo.currency.symbol}{cartFinalTotal.toLocaleString()} ({paymentMethod.includes('COD') ? 'Cash on Delivery' : 'Pay Now'})</span>
+                  <span>Place Order • {storeInfo?.currency?.symbol || '₹'}{cartFinalTotal.toLocaleString()} ({paymentMethod.includes('COD') ? 'Cash on Delivery' : 'Pay Now'})</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -406,8 +406,8 @@ export const CheckoutModal = () => {
 
                 <div className="text-right">
                   <span className="text-slate-400 block text-[10px]">TOTAL PAYABLE</span>
-                  <span className="font-black text-sm text-rose-600">
-                    {storeInfo.currency.symbol}{completedOrder.total.toLocaleString()}
+                  <span className="font-black text-sm text-black">
+                    {storeInfo?.currency?.symbol || '₹'}{completedOrder.total.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -468,3 +468,4 @@ export const CheckoutModal = () => {
     </div>
   );
 };
+

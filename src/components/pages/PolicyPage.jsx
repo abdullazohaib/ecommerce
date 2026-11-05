@@ -3,7 +3,7 @@ import { useStore } from '../../context/StoreContext';
 import { ArrowLeft, ShieldCheck, Truck, RotateCcw, FileText } from 'lucide-react';
 
 export const PolicyPage = ({ type }) => {
-  const { storeInfo, setCurrentView } = useStore();
+  const { storeInfo, setViewWithUrl } = useStore();
 
   const getContent = () => {
     switch (type) {
@@ -118,13 +118,17 @@ export const PolicyPage = ({ type }) => {
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button
-          onClick={() => setCurrentView('home')}
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors mb-6 cursor-pointer"
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            setViewWithUrl('home');
+          }}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
-        </button>
+        </a>
 
         <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
@@ -145,3 +149,4 @@ export const PolicyPage = ({ type }) => {
     </div>
   );
 };
+

@@ -1,55 +1,45 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useStore } from '../../context/StoreContext';
-import { categories } from '../../data/categories';
+import { useStore, slugify } from '../../context/StoreContext';
+import { BrandLogo } from '../ui/BrandLogo';
 import { 
   Search, 
-  ShoppingBag, 
-  Heart, 
   User, 
-  Menu, 
+  ShoppingBag, 
   X, 
-  Sparkles, 
-  Truck, 
-  ShieldCheck, 
-  PhoneCall, 
-  Settings,
-  ArrowRight
+  Menu, 
+  ArrowRight,
+  ChevronDown,
+  Sparkles,
+  Zap,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Header = () => {
   const { 
     storeInfo, 
     cartItemCount, 
-    cartSubtotal, 
     setIsCartOpen, 
-    wishlist, 
-    setCurrentView,
+    setViewWithUrl,
+    currentView,
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
     productsList,
+    categoriesList,
     navigateToProduct,
-    setIsTrackingModalOpen,
-    setIsAdminOpen
+    navigateToCategory,
+    setIsAuthModalOpen,
+    setAuthModalTab,
+    currentUser,
+    isAdminAuthenticated
   } = useStore();
 
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
 
-  // Live search filtered results
-  const liveResults = searchQuery.trim().length > 1
-    ? productsList.filter(p => {
-        const matchesQuery = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
-        return matchesQuery && matchesCat;
-      }).slice(0, 6)
-    : [];
-
-  // Close live search if clicked outside
+  // Close live search dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
@@ -60,277 +50,344 @@ export const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Live search autocomplete
+  const liveResults = searchQuery.trim().length > 1
+    ? productsList.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.shortDescription.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 5)
+    : [];
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setIsSearchFocused(false);
-      setCurrentView('shop');
+      setMobileSearchOpen(false);
+      setViewWithUrl('shop');
     }
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+        <div className="flex items-center justify-between h-16 sm:h-18">
           
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* ============================================================= */}
+          {/* LEFT: SIGNATURE LUXURY BRAND LOGO (GB Watermark + Script / Image) */}
+          {/* ============================================================= */}
+          <div className="flex items-center gap-6 lg:gap-8">
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('home');
+              }}
+              className="flex items-center gap-2 select-none group py-1 shrink-0"
+              title={storeInfo?.storeName || "Glow Basket"}
+            >
+              <BrandLogo size="normal" />
+            </a>
 
-          {/* Logo / Brand Name */}
-          <div 
-            onClick={() => {
-              setCurrentView('home');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-400 flex items-center justify-center shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-6 h-6 text-white animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-serif font-black text-2xl tracking-tight text-slate-900 group-hover:text-rose-600 transition-colors">
-                  {storeInfo.storeName}
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded">
-                  India
-                </span>
+            {/* ============================================================= */}
+            {/* CENTER-LEFT: NAVIGATION MENU (Home, Shop ⌵, About Us, Contact Us) */}
+            {/* ============================================================= */}
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 ml-2">
+              {/* Home */}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewWithUrl('home');
+                }}
+                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
+                  currentView === 'home' ? 'text-black' : 'text-slate-800 hover:text-black'
+                }`}
+              >
+                Home
+              </a>
+
+              {/* Shop Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setShopDropdownOpen(true)}
+                onMouseLeave={() => setShopDropdownOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setViewWithUrl('shop')}
+                  className={`flex items-center gap-1 text-[13px] font-bold transition-colors cursor-pointer py-2 ${
+                    currentView === 'shop' ? 'text-black' : 'text-slate-800 hover:text-black'
+                  }`}
+                >
+                  <span>Shop</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${shopDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu on hover - Dynamically synced with Admin Categories */}
+                {shopDropdownOpen && (
+                  <div className="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                    <a
+                      href="/shop"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShopDropdownOpen(false);
+                        navigateToCategory('all');
+                      }}
+                      className="block px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 hover:text-black rounded-lg transition-colors"
+                    >
+                      All Formulations
+                    </a>
+                    {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
+                      <a
+                        key={cat.id || cat.slug}
+                        href={`/category/${cat.slug || cat.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShopDropdownOpen(false);
+                          navigateToCategory(cat.slug || cat.id);
+                        }}
+                        className="block px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 hover:text-black rounded-lg transition-colors truncate"
+                      >
+                        {cat.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
-              <p className="text-[10px] text-slate-400 font-medium tracking-wide -mt-0.5 hidden sm:block">
-                100% Authentic Herbal & Beauty Store
-              </p>
-            </div>
+
+              {/* About Us */}
+              <a
+                href="/about-us"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewWithUrl('about');
+                }}
+                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
+                  currentView === 'about' ? 'text-black' : 'text-slate-800 hover:text-black'
+                }`}
+              >
+                About Us
+              </a>
+
+              {/* Contact Us */}
+              <a
+                href="/contact-us"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewWithUrl('contact');
+                }}
+                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
+                  currentView === 'contact' ? 'text-black' : 'text-slate-800 hover:text-black'
+                }`}
+              >
+                Contact Us
+              </a>
+            </nav>
           </div>
 
-          {/* Search Bar with Category Filter & Instant Results (Desktop & Tablet) */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-4" ref={searchContainerRef}>
-            <form onSubmit={handleSearchSubmit} className="relative w-full flex items-center">
-              {/* Category Dropdown */}
-              <div className="relative">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="h-12 pl-3 pr-8 bg-slate-100 border-r border-slate-200 rounded-l-2xl text-xs font-semibold text-slate-700 focus:outline-none hover:bg-slate-200/70 transition-colors cursor-pointer appearance-none"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.filter(c => c.id !== 'all').map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-slate-500 text-xs">
-                  ▼
+          {/* ============================================================= */}
+          {/* RIGHT: SEARCH BAR + LIGHTNING/USER ICON + CART (🛍️ [0]) */}
+          {/* ============================================================= */}
+          <div className="flex items-center gap-3 sm:gap-5">
+            {/* Embedded Dr. Sheth's Style Search Input */}
+            <div ref={searchContainerRef} className="relative hidden md:block">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <div className="flex items-center w-56 lg:w-72 xl:w-80 h-9 px-3 bg-white border border-slate-300 rounded-lg focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsSearchFocused(true)}
+                    placeholder="Search For Cleanser, Serum, Cream..."
+                    className="w-full text-xs text-slate-800 placeholder-slate-400 bg-transparent outline-none"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="p-0.5 text-slate-400 hover:text-slate-700"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
-              </div>
 
-              {/* Input */}
-              <div className="relative flex-1">
+                {/* Live search autocomplete dropdown */}
+                {isSearchFocused && liveResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
+                    <div className="p-2 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <span>Matching Products ({liveResults.length})</span>
+                      <button 
+                        type="button"
+                        onClick={() => setIsSearchFocused(false)} 
+                        className="text-slate-400 hover:text-slate-700"
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
+                      {liveResults.map(prod => (
+                        <div
+                          key={prod.id}
+                          onClick={() => {
+                            setIsSearchFocused(false);
+                            navigateToProduct(prod);
+                          }}
+                          className="flex items-center gap-3 p-2.5 hover:bg-slate-50 cursor-pointer"
+                        >
+                          <img src={prod.images[0]} alt={prod.name} className="w-9 h-9 object-cover rounded border border-slate-200 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-slate-900 truncate">{prod.name}</p>
+                            <span className="text-xs font-black text-black">₹{prod.price}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Mobile Search Button */}
+            <button
+              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+              className="md:hidden p-1.5 text-slate-800 hover:text-black transition-colors"
+              title="Search"
+            >
+              <Search className="w-5 h-5 stroke-[1.8]" />
+            </button>
+
+            {/* Lightning / User Account Icon (Matching Dr. Sheth's [👤⚡] profile icon) */}
+            <button
+              onClick={() => {
+                setAuthModalTab('login');
+                setIsAuthModalOpen(true);
+              }}
+              className="relative flex items-center p-1 text-slate-900 hover:text-black transition-colors cursor-pointer group"
+              title={currentUser ? `Signed in as ${currentUser.name}` : "Sign In / Register"}
+            >
+              <User className="w-5 h-5 stroke-[1.8]" />
+              <Zap className="w-3 h-3 text-amber-500 fill-amber-500 -ml-1 -mt-2 group-hover:scale-110 transition-transform" />
+              {currentUser && (
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+              )}
+              {isAdminAuthenticated && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-1 ring-white" title="Admin Active"></span>
+              )}
+            </button>
+
+            {/* Shopping Bag Icon with Dr. Sheth's Red Circular Badge [🛍️ 0] */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-1 text-slate-900 hover:text-black transition-colors cursor-pointer"
+              title="Shopping Cart"
+            >
+              <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
+              <span className="absolute -top-1.5 -right-2 bg-[#d12420] text-white text-[10px] font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-xs">
+                {cartItemCount}
+              </span>
+            </button>
+
+            {/* Mobile Menu Hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-1 text-slate-900 hover:text-black cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+
+        </div>
+
+        {/* Mobile Search Overlay Bar */}
+        {mobileSearchOpen && (
+          <div className="md:hidden py-2.5 border-t border-slate-100 animate-in slide-in-from-top-2">
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
+              <div className="flex-1 flex items-center h-9 px-3 bg-white border border-slate-300 rounded-lg">
+                <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setIsSearchFocused(true);
-                  }}
-                  onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Search Vita Glow, Glutathione creams, soaps, serums..."
-                  className="w-full h-12 pl-4 pr-11 bg-slate-100 border-none rounded-r-2xl text-sm placeholder-slate-400 text-slate-800 focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all outline-none"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search For Cleanser, Serum, Cream..."
+                  className="w-full text-xs text-slate-800 placeholder-slate-400 outline-none"
+                  autoFocus
                 />
-                <button
-                  type="submit"
-                  className="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-sm"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
               </div>
-
-              {/* Instant Search Results Dropdown */}
-              {isSearchFocused && liveResults.length > 0 && (
-                <div className="absolute top-14 left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-                  <div className="p-3 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
-                    <span>Products Matching "{searchQuery}"</span>
-                    <span className="text-rose-600">{liveResults.length} found</span>
-                  </div>
-                  <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                    {liveResults.map(prod => (
-                      <div
-                        key={prod.id}
-                        onClick={() => {
-                          setIsSearchFocused(false);
-                          navigateToProduct(prod);
-                        }}
-                        className="flex items-center gap-3 p-3 hover:bg-rose-50/60 transition-colors cursor-pointer group"
-                      >
-                        <img
-                          src={prod.images[0]}
-                          alt={prod.name}
-                          className="w-12 h-12 object-cover rounded-xl border border-slate-200 shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-rose-600 transition-colors">
-                            {prod.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs font-bold text-rose-600">
-                              {storeInfo.currency.symbol}{prod.price}
-                            </span>
-                            <span className="text-[10px] text-slate-400 line-through">
-                              {storeInfo.currency.symbol}{prod.originalPrice}
-                            </span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-bold">
-                              {prod.badge}
-                            </span>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-rose-600 transition-colors shrink-0" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-2.5 bg-slate-50 text-center border-t border-slate-100">
-                    <button
-                      type="submit"
-                      className="text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
-                    >
-                      View all results in Shop →
-                    </button>
-                  </div>
-                </div>
-              )}
+              <button
+                type="submit"
+                className="px-3.5 py-2 bg-black text-white text-xs font-bold rounded-lg shrink-0"
+              >
+                Search
+              </button>
             </form>
           </div>
-
-          {/* Right Action Icons (Wishlist, Admin, Cart) */}
-          <div className="flex items-center gap-1 sm:gap-3">
-            {/* Quick Admin Settings launcher */}
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 px-3 py-2 rounded-xl transition-all cursor-pointer"
-              title="Open Store Configuration & Orders Manager"
-            >
-              <Settings className="w-3.5 h-3.5 text-rose-500" />
-              <span>Store Admin</span>
-            </button>
-
-            {/* Wishlist */}
-            <button
-              onClick={() => setCurrentView('wishlist')}
-              className="relative p-2.5 rounded-xl text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-              title="My Wishlist"
-            >
-              <Heart className="w-5 h-5" />
-              {wishlist.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 bg-rose-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
-                  {wishlist.length}
-                </span>
-              )}
-            </button>
-
-            {/* Cart Button */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white pl-3.5 pr-4 py-2.5 rounded-2xl shadow-md shadow-rose-600/20 hover:shadow-lg hover:shadow-rose-600/30 transition-all cursor-pointer select-none group"
-            >
-              <div className="relative">
-                <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-amber-400 text-slate-950 text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white">
-                    {cartItemCount}
-                  </span>
-                )}
-              </div>
-              <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="text-[10px] text-rose-200 font-medium">My Cart</span>
-                <span className="text-xs font-bold text-white">
-                  {storeInfo.currency.symbol}{cartSubtotal.toLocaleString()}
-                </span>
-              </div>
-            </button>
-          </div>
-
-        </div>
-
-        {/* Mobile Search input bar */}
-        <div className="md:hidden pb-3">
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search whitening creams, soaps, serums..."
-              className="w-full h-11 pl-4 pr-10 bg-slate-100 border-none rounded-xl text-xs placeholder-slate-400 text-slate-800 focus:ring-2 focus:ring-rose-500 outline-none"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-2 bottom-2 px-2.5 bg-rose-600 text-white rounded-lg flex items-center justify-center"
-            >
-              <Search className="w-3.5 h-3.5" />
-            </button>
-          </form>
-        </div>
+        )}
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* MOBILE DRAWER NAVIGATION MENU */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white px-4 py-6 shadow-xl animate-in slide-in-from-top-2">
-          <div className="space-y-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-400 px-2">
-              Browse Categories
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    setSelectedCategory(cat.id);
-                    setCurrentView('shop');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`text-left p-3 rounded-xl text-xs font-semibold transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-rose-50 text-rose-600 font-bold border border-rose-200'
-                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 space-y-2">
-              <button
-                onClick={() => {
-                  setIsTrackingModalOpen(true);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-2 p-3 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl"
-              >
-                <Truck className="w-4 h-4 text-amber-500" />
-                <span>Track Your Order</span>
-              </button>
-              <button
-                onClick={() => {
-                  setIsAdminOpen(true);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-2 p-3 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl"
-              >
-                <Settings className="w-4 h-4 text-rose-500" />
-                <span>Store Admin & Customization</span>
-              </button>
-              <a
-                href={`tel:${storeInfo.supportPhone.replace(/\s+/g, '')}`}
-                className="w-full flex items-center gap-2 p-3 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-xl"
-              >
-                <PhoneCall className="w-4 h-4 text-emerald-600" />
-                <span>Call Helpline: {storeInfo.supportPhone}</span>
-              </a>
-            </div>
-          </div>
+        <div className="lg:hidden border-t border-slate-100 bg-white px-4 py-5 shadow-xl animate-in slide-in-from-top-2">
+          <nav className="space-y-3">
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('home');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-xs font-black text-black border-b border-slate-100"
+            >
+              HOME
+            </a>
+            <a
+              href="/shop"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('shop');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
+            >
+              SHOP
+            </a>
+            <a
+              href="/about-us"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('about');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
+            >
+              ABOUT US
+            </a>
+            <a
+              href="/contact-us"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('contact');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
+            >
+              CONTACT US
+            </a>
+            <a
+              href="/admin/dashboard"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('admin');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2.5 px-3 bg-slate-900 text-white rounded-xl text-xs font-bold"
+            >
+              Store Admin Portal (/admin)
+            </a>
+          </nav>
         </div>
       )}
     </header>

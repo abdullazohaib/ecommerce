@@ -3,7 +3,10 @@ import { ShieldCheck, Truck, Banknote, RotateCcw, MessageCircle } from 'lucide-r
 import { useStore } from '../../context/StoreContext';
 
 export const TrustBadges = () => {
-  const { storeInfo } = useStore();
+  const { storeInfo = {} } = useStore();
+
+  const currSymbol = storeInfo?.currency?.symbol || '₹';
+  const freeThreshold = storeInfo?.freeShippingThreshold || 999;
 
   const badges = [
     {
@@ -21,7 +24,7 @@ export const TrustBadges = () => {
     {
       icon: Truck,
       color: "text-rose-600 bg-rose-50",
-      title: `Free Shipping Above ${storeInfo.currency.symbol}${storeInfo.freeShippingThreshold}`,
+      title: `Free Shipping Above ${currSymbol}${freeThreshold}`,
       desc: "Delivered in 2-4 business days"
     },
     {

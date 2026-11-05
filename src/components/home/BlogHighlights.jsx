@@ -4,11 +4,7 @@ import { BookOpen, ArrowRight, Clock } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export const BlogHighlights = () => {
-  const { addToast } = useStore();
-
-  const handleReadArticle = (title) => {
-    addToast(`Opening article: "${title}"`, 'info');
-  };
+  const { setViewWithUrl } = useStore();
 
   return (
     <section id="skincare-guides" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -25,14 +21,30 @@ export const BlogHighlights = () => {
             Expert advice on nighttime routines, ingredients, and maintaining natural, lasting glow.
           </p>
         </div>
+
+        <a
+          href="/blog"
+          onClick={(e) => {
+            e.preventDefault();
+            setViewWithUrl('blog');
+          }}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-black hover:text-neutral-700 transition-colors cursor-pointer uppercase tracking-wider"
+        >
+          <span>View All Articles</span>
+          <ArrowRight className="w-4 h-4" />
+        </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {blogPosts.map(post => (
-          <div
+          <a
             key={post.id}
-            onClick={() => handleReadArticle(post.title)}
-            className="group bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+            href="/blog"
+            onClick={(e) => {
+              e.preventDefault();
+              setViewWithUrl('blog');
+            }}
+            className="group bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between block"
           >
             <div className="relative aspect-video overflow-hidden">
               <img
@@ -70,9 +82,10 @@ export const BlogHighlights = () => {
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </section>
   );
 };
+

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { categories } from '../../data/categories';
+import { BrandLogo } from '../ui/BrandLogo';
 import { 
   Sparkles, 
   Phone, 
@@ -16,7 +17,19 @@ import {
 } from 'lucide-react';
 
 export const Footer = () => {
-  const { storeInfo, setCurrentView, setSelectedCategory, addToast, setIsTrackingModalOpen } = useStore();
+  const { 
+    storeInfo, 
+    setCurrentView, 
+    setViewWithUrl,
+    navigateToCategory, 
+    categoriesList,
+    addToast, 
+    setIsTrackingModalOpen, 
+    setIsAuthModalOpen, 
+    setAuthModalTab 
+  } = useStore();
+
+  const cats = (categoriesList && categoriesList.length > 0) ? categoriesList : categories;
   const [emailSub, setEmailSub] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -82,12 +95,7 @@ export const Footer = () => {
           {/* Brand info (2 cols on lg) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 to-amber-400 flex items-center justify-center text-white shadow-lg">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <span className="font-serif font-black text-2xl tracking-tight text-white">
-                {storeInfo.storeName}
-              </span>
+              <BrandLogo size="footer" />
             </div>
             
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
@@ -111,18 +119,18 @@ export const Footer = () => {
               Categories
             </h4>
             <ul className="space-y-2.5 text-sm">
-              {categories.filter(c => c.id !== 'all').map(cat => (
+              {cats.filter(c => c.id !== 'all').map(cat => (
                 <li key={cat.id}>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory(cat.id);
-                      setCurrentView('shop');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                  <a
+                    href={`/category/${cat.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToCategory(cat.id);
                     }}
                     className="hover:text-rose-400 transition-colors text-slate-400 hover:translate-x-1 inline-block duration-200"
                   >
                     {cat.name}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -135,44 +143,77 @@ export const Footer = () => {
             </h4>
             <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
-                <button
-                  onClick={() => setIsTrackingModalOpen(true)}
-                  className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200"
+                <a
+                  href="/track-order"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsTrackingModalOpen(true);
+                  }}
+                  className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200 cursor-pointer"
                 >
                   Track Order Status
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => setCurrentView('shipping-policy')}
+                <a
+                  href="/shipping-policy"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setViewWithUrl('shipping-policy');
+                  }}
                   className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200"
                 >
                   Shipping & Delivery Info
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => setCurrentView('refund-policy')}
+                <a
+                  href="/refund-policy"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setViewWithUrl('refund-policy');
+                  }}
                   className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200"
                 >
                   Returns & Replacements
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => setCurrentView('privacy-policy')}
+                <a
+                  href="/privacy-policy"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setViewWithUrl('privacy-policy');
+                  }}
                   className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200"
                 >
                   Privacy Policy
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => setCurrentView('terms')}
+                <a
+                  href="/terms-and-conditions"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setViewWithUrl('terms');
+                  }}
                   className="hover:text-rose-400 transition-colors hover:translate-x-1 inline-block duration-200"
                 >
                   Terms & Conditions
-                </button>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/admin/dashboard"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setViewWithUrl('admin');
+                  }}
+                  className="hover:text-amber-400 transition-colors hover:translate-x-1 inline-flex items-center gap-1 duration-200 text-slate-500 pt-1"
+                >
+                  <span>Admin Gateway</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+                </a>
               </li>
             </ul>
           </div>
@@ -253,3 +294,4 @@ export const Footer = () => {
     </footer>
   );
 };
+

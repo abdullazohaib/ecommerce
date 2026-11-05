@@ -4,24 +4,28 @@ import { ProductCard } from '../home/ProductCard';
 import { Heart, ShoppingBag, ArrowLeft } from 'lucide-react';
 
 export const WishlistPage = () => {
-  const { wishlist, productsList, setCurrentView } = useStore();
+  const { wishlist, productsList, setViewWithUrl } = useStore();
 
   const wishlistedProducts = productsList.filter(p => wishlist.includes(p.id));
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <button
-              onClick={() => setCurrentView('home')}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors mb-2 cursor-pointer"
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('home');
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors mb-2 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Home</span>
-            </button>
+            </a>
             <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900">
               My Saved Wishlist
             </h1>
@@ -40,12 +44,16 @@ export const WishlistPage = () => {
             <p className="text-xs text-slate-500 mb-6 leading-relaxed">
               Explore our range of authentic skin whitening night creams, soaps, and serums and tap the heart icon to save your favorites.
             </p>
-            <button
-              onClick={() => setCurrentView('shop')}
-              className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-7 py-3.5 rounded-2xl shadow-lg shadow-rose-600/30 transition-all cursor-pointer"
+            <a
+              href="/shop"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('shop');
+              }}
+              className="inline-block bg-black hover:bg-neutral-800 text-white font-black text-xs px-8 py-3.5 rounded-xl shadow-lg shadow-black/20 uppercase tracking-widest transition-all cursor-pointer"
             >
               Browse Catalog
-            </button>
+            </a>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -59,3 +67,4 @@ export const WishlistPage = () => {
     </div>
   );
 };
+

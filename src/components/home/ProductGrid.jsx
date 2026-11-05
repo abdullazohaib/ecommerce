@@ -4,15 +4,13 @@ import { ProductCard } from './ProductCard';
 import { Sparkles, ArrowRight } from 'lucide-react';
 
 export const ProductGrid = () => {
-  const { productsList, setCurrentView, setSelectedCategory } = useStore();
+  const { productsList = [], categoriesList = [], setViewWithUrl } = useStore();
   const [activeTab, setActiveTab] = useState('bestsellers');
 
+  const activeCategories = (categoriesList && categoriesList.length > 0) ? categoriesList : [];
   const tabs = [
     { id: 'bestsellers', label: 'Best Sellers' },
-    { id: 'whitening-creams', label: 'Whitening Creams' },
-    { id: 'night-creams', label: 'Night Creams' },
-    { id: 'soaps', label: 'Herbal Soaps' },
-    { id: 'serums', label: 'Face Serums' },
+    ...activeCategories.filter(c => c.id !== 'all').map(c => ({ id: c.slug || c.id, label: c.name })),
     { id: 'all', label: 'View All' }
   ];
 
@@ -33,7 +31,7 @@ export const ProductGrid = () => {
       {/* Title & Tabs */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <div className="flex items-center gap-2 text-rose-600 text-xs font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-black text-xs font-black uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Featured Formulations</span>
           </div>
@@ -72,18 +70,19 @@ export const ProductGrid = () => {
 
       {/* Bottom CTA */}
       <div className="mt-12 text-center">
-        <button
-          onClick={() => {
-            setSelectedCategory('all');
-            setCurrentView('shop');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        <a
+          href="/shop"
+          onClick={(e) => {
+            e.preventDefault();
+            setViewWithUrl('shop');
           }}
           className="inline-flex items-center gap-2.5 bg-white border-2 border-slate-900 hover:bg-slate-900 text-slate-900 hover:text-white font-bold text-xs uppercase tracking-wider px-8 py-4 rounded-2xl transition-all shadow-sm hover:shadow-lg cursor-pointer"
         >
           <span>Explore Entire Catalog ({productsList.length} Items)</span>
           <ArrowRight className="w-4 h-4" />
-        </button>
+        </a>
       </div>
     </section>
   );
 };
+

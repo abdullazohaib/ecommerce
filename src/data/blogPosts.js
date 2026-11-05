@@ -27,3 +27,4 @@ export const blogPosts = [
     image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80"
   }
 ];
+

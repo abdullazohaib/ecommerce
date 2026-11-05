@@ -69,3 +69,4 @@ export const storeConfig = {
 };
 ```
 Alternatively, open the website, click **Store Admin** in the header, change the name in the input box, and click **Save Brand Updates**. The change takes effect across the entire site immediately!
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore, slugify } from '../../context/StoreContext';
 import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Tag, Check, Sparkles } from 'lucide-react';
 
 export const CartDrawer = () => {
@@ -19,6 +19,7 @@ export const CartDrawer = () => {
     applyCoupon, 
     removeCoupon,
     setIsCheckoutOpen,
+    navigateToProduct,
     setCurrentView 
   } = useStore();
 
@@ -51,9 +52,9 @@ export const CartDrawer = () => {
           {/* Header */}
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-rose-600" />
+              <ShoppingBag className="w-5 h-5 text-black" />
               <h2 className="text-base font-bold text-slate-900">Your Shopping Bag</h2>
-              <span className="text-xs bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-black text-white font-bold px-2 py-0.5 rounded-full">
                 {cart.reduce((s, i) => s + i.quantity, 0)} items
               </span>
             </div>
@@ -70,11 +71,11 @@ export const CartDrawer = () => {
             {remainingForFreeShipping > 0 ? (
               <div>
                 <p className="text-xs font-semibold text-amber-900 mb-1.5">
-                  Add <span className="font-bold text-rose-600">₹{remainingForFreeShipping}</span> more to get <span className="font-bold">FREE Express Delivery</span>!
+                  Add <span className="font-bold text-black">₹{remainingForFreeShipping}</span> more to get <span className="font-bold">FREE Express Delivery</span>!
                 </p>
                 <div className="w-full h-2 bg-amber-200/60 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-amber-400 to-rose-500 rounded-full transition-all duration-500"
+                    className="h-full bg-slate-900 rounded-full transition-all duration-500"
                     style={{ width: `${freeShippingProgress}%` }}
                   ></div>
                 </div>
@@ -91,7 +92,7 @@ export const CartDrawer = () => {
           <div className="flex-1 overflow-y-auto p-5 divide-y divide-slate-100">
             {cart.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-slate-100 text-black flex items-center justify-center mx-auto mb-4">
                   <ShoppingBag className="w-8 h-8" />
                 </div>
                 <h3 className="text-base font-bold text-slate-800 mb-1">Your bag is empty</h3>
@@ -103,24 +104,46 @@ export const CartDrawer = () => {
                     setIsCartOpen(false);
                     setCurrentView('shop');
                   }}
-                  className="bg-rose-600 text-white font-bold text-xs px-6 py-3 rounded-xl hover:bg-rose-700 transition-colors cursor-pointer"
+                  className="bg-black text-white font-black text-xs uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-neutral-800 transition-colors cursor-pointer"
                 >
                   Start Shopping Now
                 </button>
               </div>
             ) : (
-              cart.map(item => (
-                <div key={item.product.id} className="py-4 flex gap-4">
-                  <img
-                    src={item.product.images[0]}
-                    alt={item.product.name}
-                    className="w-18 h-18 object-cover rounded-2xl border border-slate-100 shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
-                      {item.product.name}
-                    </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{item.product.size}</p>
+              cart.map(item => {
+                const cleanSlug = item.product.slug || slugify(item.product.name || item.product.id);
+                const directUrl = `/product/${cleanSlug}`;
+
+                return (
+                  <div key={item.product.id} className="py-4 flex gap-4">
+                    <a
+                      href={directUrl}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsCartOpen(false);
+                        navigateToProduct(item.product);
+                      }}
+                      className="cursor-pointer shrink-0"
+                    >
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.name}
+                        className="w-18 h-18 object-cover rounded-2xl border border-slate-100 hover:opacity-90 transition-opacity"
+                      />
+                    </a>
+                    <div className="flex-1 min-w-0">
+                      <a
+                        href={directUrl}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsCartOpen(false);
+                          navigateToProduct(item.product);
+                        }}
+                        className="text-xs font-bold text-slate-900 hover:text-rose-600 transition-colors leading-snug line-clamp-2 block cursor-pointer"
+                      >
+                        {item.product.name}
+                      </a>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{item.product.size}</p>
 
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 text-xs">
@@ -141,11 +164,11 @@ export const CartDrawer = () => {
 
                       <div className="text-right">
                         <div className="text-xs font-black text-slate-900">
-                          {storeInfo.currency.symbol}{(item.product.price * item.quantity).toLocaleString()}
+                          {storeInfo?.currency?.symbol || '₹'}{(item.product.price * item.quantity).toLocaleString()}
                         </div>
                         {item.product.originalPrice > item.product.price && (
                           <div className="text-[10px] text-slate-400 line-through">
-                            {storeInfo.currency.symbol}{(item.product.originalPrice * item.quantity).toLocaleString()}
+                            {storeInfo?.currency?.symbol || '₹'}{(item.product.originalPrice * item.quantity).toLocaleString()}
                           </div>
                         )}
                       </div>
@@ -160,8 +183,8 @@ export const CartDrawer = () => {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-              ))
-            )}
+              );
+            }))}
           </div>
 
           {/* Footer & Checkout if items present */}
@@ -202,14 +225,14 @@ export const CartDrawer = () => {
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
                   <span className="font-bold text-slate-800">
-                    {storeInfo.currency.symbol}{cartSubtotal.toLocaleString()}
+                    {storeInfo?.currency?.symbol || '₹'}{cartSubtotal.toLocaleString()}
                   </span>
                 </div>
 
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600 font-semibold">
                     <span>Coupon Discount:</span>
-                    <span>-{storeInfo.currency.symbol}{discountAmount.toLocaleString()}</span>
+                    <span>-{storeInfo?.currency?.symbol || '₹'}{discountAmount.toLocaleString()}</span>
                   </div>
                 )}
 
@@ -219,15 +242,15 @@ export const CartDrawer = () => {
                     {isFreeShipping ? (
                       <span className="text-emerald-600 font-bold">FREE</span>
                     ) : (
-                      `${storeInfo.currency.symbol}${shippingFee}`
+                      `${storeInfo?.currency?.symbol || '₹'}${shippingFee}`
                     )}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
                   <span>Total Payable:</span>
-                  <span className="text-rose-600">
-                    {storeInfo.currency.symbol}{cartFinalTotal.toLocaleString()}
+                  <span className="text-black font-black text-base">
+                    {storeInfo?.currency?.symbol || '₹'}{cartFinalTotal.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -235,7 +258,7 @@ export const CartDrawer = () => {
               {/* Checkout CTA */}
               <button
                 onClick={handleProceedCheckout}
-                className="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-sm py-4 rounded-2xl shadow-xl shadow-rose-600/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] cursor-pointer"
+                className="w-full bg-black hover:bg-neutral-800 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-black/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] cursor-pointer"
               >
                 <span>Proceed to Checkout (COD / UPI)</span>
                 <ArrowRight className="w-4 h-4" />
@@ -253,3 +276,4 @@ export const CartDrawer = () => {
     </div>
   );
 };
+

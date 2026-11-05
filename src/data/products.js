@@ -1,10 +1,11 @@
 export const products = [
   {
     id: "prod-1",
+    slug: "vita-glow-advanced-night-cream",
     name: "Vita Glow Advanced Night Cream for Radiant Skin",
     brand: "Vita Glow",
     category: "night-creams",
-    subCategory: "Whitening Creams",
+    subCategory: "Skin Care",
     sku: "VG-ADV-50G",
     price: 1399,
     originalPrice: 1999,
@@ -15,10 +16,14 @@ export const products = [
     badge: "Best Seller",
     featured: true,
     isDealOfDay: true,
+    overlayText: "YOUTHFUL RADIANCE IN EVERY DROP",
+    keyActives: "Pure L-Glutathione + Kojic Acid Dipalmitate + Green Tea Extracts",
     images: [
       "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Formulated with pure Glutathione, Kojic Acid, and Green Tea extracts for overnight melanin control and illuminated glow.",
     description: "Vita Glow Advanced Night Cream is one of India's most trusted nighttime treatments for pigmentation, dark spots, sun damage, and uneven skin tone. Its concentrated active botanical blend penetrates deep within the epidermal layers overnight to revitalize skin cells and boost collagen production.",
@@ -35,10 +40,11 @@ export const products = [
   },
   {
     id: "prod-2",
+    slug: "glow-plus-gold-skin-whitening-cream",
     name: "Glow Plus Gold Skin Whitening Cream (Advanced Glow Formula)",
     brand: "Glow Plus",
     category: "whitening-creams",
-    subCategory: "Whitening Creams",
+    subCategory: "Skin Care",
     sku: "GP-GOLD-50G",
     price: 1549,
     originalPrice: 2200,
@@ -49,9 +55,14 @@ export const products = [
     badge: "Top Rated",
     featured: true,
     isDealOfDay: false,
+    overlayText: "24K GOLD RADIANCE FORMULA",
+    keyActives: "24K Colloidal Gold + L-Glutathione + Vitamin B3 Niacinamide",
     images: [
       "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1608248597359-25f0a8ea74f5?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Infused with 24K Gold particles and high-potency Glutathione for instant radiance and spot correction.",
     description: "Glow Plus Gold is a luxurious skin whitening formula that combines 24K micronized colloidal gold with high-purity L-Glutathione. Designed to boost skin elasticity, diminish stubborn pigmentation, and impart a golden glow.",
@@ -68,10 +79,11 @@ export const products = [
   },
   {
     id: "prod-3",
+    slug: "fair-plus-glow-night-cream",
     name: "Fair Plus Glow Herbal Skin Radiance Night Cream",
     brand: "Fair Plus",
     category: "night-creams",
-    subCategory: "Whitening Creams",
+    subCategory: "Herbal Care",
     sku: "FP-GLOW-45G",
     price: 1199,
     originalPrice: 1750,
@@ -82,9 +94,14 @@ export const products = [
     badge: "Trending",
     featured: true,
     isDealOfDay: true,
+    overlayText: "PURE AYURVEDIC KESAR & TURMERIC",
+    keyActives: "Kashmiri Kesar + Wild Turmeric + Squalane + Rosehip Extract",
     images: [
       "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Gentle herbal solution with saffron and turmeric extracts for natural fair tone and spot-free texture.",
     description: "Fair Plus Glow utilizes ancient Ayurvedic herbology merged with modern dermatological science to gently clear blemishes, freckles, and pigmentation without harsh chemicals.",
@@ -101,6 +118,7 @@ export const products = [
   },
   {
     id: "prod-4",
+    slug: "gluta-white-concentrated-serum",
     name: "Gluta White Concentrated Full Body Whitening Serum 50ml",
     brand: "Gluta White",
     category: "serums",
@@ -115,9 +133,14 @@ export const products = [
     badge: "High Potency",
     featured: true,
     isDealOfDay: false,
+    overlayText: "ACCELERATED SPOT REMOVAL IN 7 DAYS",
+    keyActives: "L-Glutathione 5% + Ethyl Ascorbic Acid 20% + Hyaluronic Acid",
     images: [
       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1608248597359-25f0a8ea74f5?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1608248597359-25f0a8ea74f5?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Ultra-concentrated Glutathione & 20% Vitamin C serum for accelerated pigmentation fading.",
     description: "This lightweight, rapidly absorbed serum delivers a potent concentration of Glutathione and active Vitamin C directly to skin cells, breaking down hyperpigmentation and boosting natural glow.",
@@ -134,6 +157,7 @@ export const products = [
   },
   {
     id: "prod-5",
+    slug: "chandni-whitening-soap",
     name: "Chandni Whitening Soap with Natural Milk & Fruit Extracts",
     brand: "Chandni",
     category: "soaps",
@@ -148,9 +172,14 @@ export const products = [
     badge: "Value Pick",
     featured: true,
     isDealOfDay: false,
+    overlayText: "FRESH MILK & PAPAYA ENZYMES",
+    keyActives: "Goat Milk + Papaya Papain Enzyme + Kojic Acid + Coconut Oil",
     images: [
       "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Handmade beauty bar with goat milk and fruit enzymes for everyday brightening and silky softness.",
     description: "Chandni Whitening Soap cleanses away deep impurities, excess sebum, and dead skin cells. Enriched with natural fruit AHA and fresh milk proteins, it leaves skin glowing and fresh after every bath.",
@@ -167,10 +196,11 @@ export const products = [
   },
   {
     id: "prod-6",
+    slug: "active-white-l-glutathione-cream",
     name: "Active White L-Glutathione Skin Whitening Cream 50g",
     brand: "Active White",
     category: "whitening-creams",
-    subCategory: "Whitening Creams",
+    subCategory: "Skin Care",
     sku: "AW-CRM-50G",
     price: 1699,
     originalPrice: 2400,
@@ -181,8 +211,14 @@ export const products = [
     badge: "Premium",
     featured: false,
     isDealOfDay: false,
+    overlayText: "SWISS DERMATOLOGY PEPTIDE COMPLEX",
+    keyActives: "Encapsulated L-Glutathione + Pure Vitamin E + Glycolic Acid",
     images: [
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "High-grade Swiss formulated whitening cream with micro-encapsulated Glutathione and Vitamin E.",
     description: "Active White utilizes micro-encapsulation technology to ensure skin whitening peptides reach deeper dermis layers without oxidizing, providing long-lasting clear radiance.",
@@ -198,6 +234,7 @@ export const products = [
   },
   {
     id: "prod-7",
+    slug: "dr-james-glutathione-whitening-soap",
     name: "Dr. James Glutathione Whitening Soap with Kojic & Vitamin C",
     brand: "Dr. James",
     category: "soaps",
@@ -212,8 +249,14 @@ export const products = [
     badge: "Doctor Formulated",
     featured: true,
     isDealOfDay: true,
+    overlayText: "TRIPLE ACTION GLOW FORMULA",
+    keyActives: "Glutathione + Kojic Acid + Vitamin C + Grape Seed Oil",
     images: [
-      "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Specialist dermatological whitening bar with Triple Glow formula for flawless even skin.",
     description: "Dr. James Glutathione Soap is widely acclaimed in the beauty community for its synergistic trio: pure Glutathione, Kojic Acid, and buffered Vitamin C.",
@@ -229,10 +272,11 @@ export const products = [
   },
   {
     id: "prod-8",
+    slug: "vita-glow-deep-radiance-face-wash",
     name: "Vita Glow Glutathione Deep Radiance Face Wash 100ml",
     brand: "Vita Glow",
     category: "lotions-cleansers",
-    subCategory: "Face Wash",
+    subCategory: "Cleansers",
     sku: "VG-FW-100ML",
     price: 599,
     originalPrice: 899,
@@ -243,8 +287,14 @@ export const products = [
     badge: "Daily Essential",
     featured: false,
     isDealOfDay: false,
+    overlayText: "DEEP PORE PURIFYING FRESHNESS",
+    keyActives: "Glutathione + Mulberry Leaf + Pro-Vitamin B5 + Glycerin",
     images: [
-      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1608248597359-25f0a8ea74f5?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Sulfate-free foaming cleanser that lifts dead cells, clears pores, and restores instant freshness.",
     description: "Start and end your day with this gentle, non-stripping brightening cleanser. Formulated to prepare your skin for night creams and serums to maximize absorption.",
@@ -260,10 +310,11 @@ export const products = [
   },
   {
     id: "prod-9",
+    slug: "fair-and-white-brightening-body-lotion",
     name: "Fair & White Brightening Body Lotion with AHA 500ml",
     brand: "Fair & White",
     category: "lotions-cleansers",
-    subCategory: "Body Lotions",
+    subCategory: "Body Care",
     sku: "FW-LOT-500ML",
     price: 1899,
     originalPrice: 2600,
@@ -274,8 +325,14 @@ export const products = [
     badge: "Full Body Care",
     featured: false,
     isDealOfDay: false,
+    overlayText: "48-HOUR ULTRA HYDRATION",
+    keyActives: "Lactic Acid (AHA) + Shea Butter + Sweet Almond Oil + Alpha Arbutin",
     images: [
-      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Luxurious jumbo 500ml body lotion that fades uneven tan and keeps skin soft for 48 hours.",
     description: "Formulated specifically to lighten stubborn body hyperpigmentation, Fair & White AHA Brightening Lotion clears discolored areas on arms, legs, back, and shoulders.",
@@ -291,10 +348,11 @@ export const products = [
   },
   {
     id: "prod-10",
+    slug: "health-tone-herbal-weight-gain-capsules",
     name: "Health Tone Herbal Weight Gain Capsules (90 Capsules)",
     brand: "Health Tone",
     category: "health-wellness",
-    subCategory: "Weight Gain",
+    subCategory: "Wellness",
     sku: "HT-CAP-90S",
     price: 1899,
     originalPrice: 2800,
@@ -305,9 +363,14 @@ export const products = [
     badge: "100% Herbal",
     featured: true,
     isDealOfDay: true,
+    overlayText: "100% HERBAL METABOLIC ENHANCER",
+    keyActives: "Ashwagandha + Shatavari + Safed Musli + Amla Extract",
     images: [
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Certified 100% Ayurvedic formula that boosts healthy appetite, metabolism, and natural muscle mass.",
     description: "Health Tone Weight Gain Capsules are formulated with powerful rejuvenating herbs like Ashwagandha, Shatavari, and Safed Musli to help both men and women achieve their ideal physique naturally.",
@@ -324,10 +387,11 @@ export const products = [
   },
   {
     id: "prod-11",
+    slug: "sada-bahar-natural-herbal-halwa",
     name: "Sada Bahar Natural Herbal Halwa 500g for Stamina & Health",
     brand: "Sada Bahar",
     category: "health-wellness",
-    subCategory: "Ayurvedic Health",
+    subCategory: "Wellness",
     sku: "SB-HLW-500G",
     price: 1299,
     originalPrice: 1800,
@@ -338,8 +402,14 @@ export const products = [
     badge: "Traditional Recipe",
     featured: false,
     isDealOfDay: false,
+    overlayText: "TRADITIONAL ROYAL HERBAL BLEND",
+    keyActives: "Kashmiri Kesar + Badam & Pista + Pure Desi Cow Ghee",
     images: [
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Rich traditional formulation of dry fruits, saffron, and pure herbs for vigor and overall wellness.",
     description: "Sada Bahar Halwa is crafted in accordance with timeless herbal unani recipes to combat fatigue, weakness, and support natural body strength.",
@@ -355,10 +425,11 @@ export const products = [
   },
   {
     id: "prod-12",
+    slug: "yc-melasma-dark-spot-whitening-cleanser",
     name: "YC Melasma & Dark Spot Whitening Cleanser 100ml",
     brand: "YC Cosmetics",
     category: "lotions-cleansers",
-    subCategory: "Face Wash",
+    subCategory: "Cleansers",
     sku: "YC-MEL-100ML",
     price: 499,
     originalPrice: 700,
@@ -369,8 +440,14 @@ export const products = [
     badge: "Specialized",
     featured: false,
     isDealOfDay: false,
+    overlayText: "TARGETED MELASMA & SPOT CLEANSING",
+    keyActives: "Green Tea + Niacinamide + Vitamin C + Menthol",
     images: [
-      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512290900672-1f55a1532402?auto=format&fit=crop&w=800&q=80"
     ],
     shortDescription: "Targeted cleanser formulated with green tea and vitamin C to target hormonal melasma and sun spots.",
     description: "YC Whitening Face Wash is enriched with natural herbal extracts and active brightening agents to effectively fade tough hyperpigmentation while protecting moisture balance.",

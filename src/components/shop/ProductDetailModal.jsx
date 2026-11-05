@@ -56,8 +56,8 @@ export const ProductDetailModal = () => {
               className="w-full h-full object-cover"
             />
             {product.discountPercentage && (
-              <span className="absolute top-3 left-3 bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
-                -{product.discountPercentage}% OFF
+              <span className="absolute top-3 left-3 bg-black text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 shadow-xs">
+                SAVE {product.discountPercentage}%
               </span>
             )}
           </div>
@@ -70,7 +70,7 @@ export const ProductDetailModal = () => {
                   key={idx}
                   onClick={() => setSelectedImgIdx(idx)}
                   className={`w-14 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                    selectedImgIdx === idx ? 'border-rose-600 scale-105' : 'border-transparent opacity-70 hover:opacity-100'
+                    selectedImgIdx === idx ? 'border-black scale-105' : 'border-transparent opacity-70 hover:opacity-100'
                   }`}
                 >
                   <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -91,7 +91,7 @@ export const ProductDetailModal = () => {
           <div>
             {/* Brand & Stock */}
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-black">
                 {product.brand}
               </span>
               <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
@@ -118,15 +118,15 @@ export const ProductDetailModal = () => {
             {/* Pricing */}
             <div className="flex items-baseline gap-3 mb-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
               <span className="text-2xl font-black text-slate-900">
-                {storeInfo.currency.symbol}{product.price.toLocaleString()}
+                {storeInfo?.currency?.symbol || '₹'}{Number(product.price || 0).toLocaleString()}
               </span>
-              {product.originalPrice > product.price && (
+              {Number(product.originalPrice || 0) > Number(product.price || 0) && (
                 <span className="text-sm text-slate-400 line-through">
-                  {storeInfo.currency.symbol}{product.originalPrice.toLocaleString()}
+                  {storeInfo?.currency?.symbol || '₹'}{Number(product.originalPrice || 0).toLocaleString()}
                 </span>
               )}
               <span className="text-xs font-bold text-emerald-600 ml-auto">
-                Save {storeInfo.currency.symbol}{(product.originalPrice - product.price).toLocaleString()}
+                Save {storeInfo?.currency?.symbol || '₹'}{(Number(product.originalPrice || product.price) - Number(product.price)).toLocaleString()}
               </span>
             </div>
 
@@ -170,19 +170,19 @@ export const ProductDetailModal = () => {
                 onClick={() => toggleWishlist(product)}
                 className={`ml-auto p-2.5 rounded-xl border transition-all cursor-pointer ${
                   inWishlist
-                    ? 'border-rose-200 bg-rose-50 text-rose-600'
-                    : 'border-slate-200 text-slate-600 hover:text-rose-600 hover:bg-slate-50'
+                    ? 'border-black bg-black text-white'
+                    : 'border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50'
                 }`}
                 title="Add to Wishlist"
               >
-                <Heart className={`w-4 h-4 ${inWishlist ? 'fill-rose-600' : ''}`} />
+                <Heart className={`w-4 h-4 ${inWishlist ? 'fill-white text-white' : ''}`} />
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={handleAddToCart}
-                className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3 px-4 rounded-xl transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 bg-white border-2 border-black text-black hover:bg-slate-50 font-black text-xs uppercase tracking-widest py-3.5 px-4 rounded-md shadow-xs transition-all cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>Add to Bag</span>
@@ -190,7 +190,7 @@ export const ProductDetailModal = () => {
 
               <button
                 onClick={handleBuyNow}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md shadow-rose-600/30 transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 bg-black hover:bg-neutral-800 text-white font-black text-xs uppercase tracking-widest py-3.5 px-4 rounded-md shadow-md shadow-black/20 transition-all cursor-pointer"
               >
                 <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
                 <span>Buy Now (COD)</span>
@@ -203,7 +203,7 @@ export const ProductDetailModal = () => {
                   setQuickViewProduct(null);
                   navigateToProduct(product);
                 }}
-                className="text-xs font-bold text-rose-600 hover:text-rose-700 underline cursor-pointer"
+                className="text-xs font-bold text-black hover:underline cursor-pointer uppercase tracking-wider"
               >
                 View Full Product Page & Ingredients →
               </button>
@@ -215,3 +215,4 @@ export const ProductDetailModal = () => {
     </div>
   );
 };
+

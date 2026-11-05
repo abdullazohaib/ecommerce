@@ -35,13 +35,13 @@ export const FlashSaleCountdown = () => {
 
   return (
     <section id="flash-deals" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="bg-gradient-to-r from-amber-50 via-rose-50 to-orange-50 rounded-3xl p-6 sm:p-8 border border-rose-200/80 shadow-sm">
+      <div className="bg-neutral-50 rounded-2xl p-6 sm:p-8 border border-neutral-200/90 shadow-xs">
         
         {/* Header with Countdown timer */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-rose-600 text-xs font-black uppercase tracking-wider">
-              <Flame className="w-4 h-4 fill-rose-600 animate-pulse" />
+            <div className="flex items-center gap-2 text-black text-xs font-black uppercase tracking-widest">
+              <Flame className="w-4 h-4 fill-black text-black" />
               <span>Limited Time Offer</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
@@ -83,3 +83,4 @@ export const FlashSaleCountdown = () => {
     </section>
   );
 };
+

@@ -1,6 +1,6 @@
-import React from 'react';
-import { useStore } from '../../context/StoreContext';
-import { Star, Heart, Eye, ShoppingBag, ShieldCheck, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { useStore, slugify } from '../../context/StoreContext';
+import { Star, Heart, ShoppingBag, Check } from 'lucide-react';
 
 export const ProductCard = ({ product }) => {
   const { 
@@ -8,22 +8,30 @@ export const ProductCard = ({ product }) => {
     addToCart, 
     toggleWishlist, 
     isInWishlist, 
-    setQuickViewProduct,
-    navigateToProduct,
-    setIsCheckoutOpen
+    navigateToProduct
   } = useStore();
 
-  const inWishlist = isInWishlist(product.id);
+  const [selectedShade, setSelectedShade] = useState(0);
+  const [justAdded, setJustAdded] = useState(false);
 
-  const handleBuyNow = (e) => {
-    e.stopPropagation();
-    addToCart(product, 1);
-    setIsCheckoutOpen(true);
-  };
+  const inWishlist = isInWishlist(product.id);
+  const cleanSlug = product.slug || slugify(product.name || product.id);
+  const directProductUrl = `/products/${cleanSlug}`;
+
+  // Shade palettes matching cosmetic products
+  const shadeSwatches = product.shades || [
+    { color: '#e8be9b', name: 'Fair Ivory' },
+    { color: '#dca47e', name: 'Natural Beige' },
+    { color: '#b96c4b', name: 'Warm Tan' },
+    { color: '#9d3d3c', name: 'Coral Spice' },
+    { color: '#74232c', name: 'Plum Crimson' }
+  ];
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart(product, 1);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1400);
   };
 
   const handleWishlist = (e) => {
@@ -31,131 +39,157 @@ export const ProductCard = ({ product }) => {
     toggleWishlist(product);
   };
 
-  const handleQuickView = (e) => {
-    e.stopPropagation();
-    setQuickViewProduct(product);
-  };
+  const discount = product.discountPercentage || 
+    (product.originalPrice && product.originalPrice > product.price 
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+      : 30);
 
   return (
     <div
       onClick={() => navigateToProduct(product)}
-      className="group relative bg-white rounded-3xl border border-slate-100/90 shadow-sm hover:shadow-2xl hover:border-rose-200 transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
+      className="group relative bg-white rounded-lg border border-slate-200/90 hover:border-black transition-all duration-200 flex flex-col justify-between overflow-hidden cursor-pointer p-3 sm:p-4 hover:shadow-md"
     >
-      {/* Top Image & Badges */}
-      <div className="relative aspect-square overflow-hidden bg-slate-50">
+      {/* Top Image Container & Badges */}
+      <div className="relative aspect-square overflow-hidden bg-white mb-2 flex items-center justify-center">
         <img
-          src={product.images[0]}
+          src={(product.images && product.images[0]) || product.imageUrl || "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80"}
           alt={product.name}
-          className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
+          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80";
+          }}
         />
 
-        {/* Badges Overlay */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          {product.discountPercentage && (
-            <span className="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm">
-              -{product.discountPercentage}% OFF
-            </span>
-          )}
-          {product.badge && (
-            <span className="bg-slate-900/90 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
-              {product.badge}
+        {/* Top-Left Pure Black Badges (Matching Screenshot) */}
+        <div className="absolute top-1 left-1 flex flex-col items-start gap-1 z-10 pointer-events-none">
+          <span className="bg-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 shadow-xs">
+            {product.badge || 'BESTSELLER'}
+          </span>
+          {discount > 0 && (
+            <span className="bg-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 shadow-xs">
+              SAVE {discount}%
             </span>
           )}
         </div>
 
-        {/* Action icons (Wishlist & Quick View) */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+        {/* Top-Right Wishlist Heart */}
+        <div className="absolute top-1 right-1 z-10">
           <button
             onClick={handleWishlist}
-            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-sm ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center bg-white/90 backdrop-blur-xs transition-all shadow-xs ${
               inWishlist
-                ? 'bg-rose-600 text-white'
-                : 'bg-white/90 text-slate-700 hover:text-rose-600 hover:bg-white'
+                ? 'text-black'
+                : 'text-slate-400 hover:text-black hover:scale-110'
             }`}
             title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <Heart className={`w-4 h-4 ${inWishlist ? 'fill-white' : ''}`} />
+            <Heart className={`w-4 h-4 ${inWishlist ? 'fill-black text-black' : ''}`} />
           </button>
-
-          <button
-            onClick={handleQuickView}
-            className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-rose-600 flex items-center justify-center backdrop-blur-md transition-all shadow-sm opacity-0 group-hover:opacity-100"
-            title="Quick view"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Authentic badge on image */}
-        <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur-sm text-slate-200 text-[9px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3 text-emerald-400" />
-          <span>Original Hologram</span>
         </div>
       </div>
 
       {/* Product Content Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="flex-1 flex flex-col justify-between pt-1">
         <div>
-          {/* Brand & Rating */}
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
-              {product.brand}
-            </span>
-
-            <div className="flex items-center gap-1 text-[11px] text-amber-500 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-              <span>{product.rating}</span>
-              <span className="text-slate-400 text-[10px]">({product.reviewsCount})</span>
+          {/* Shades Swatches Selector (Matching Screenshot) */}
+          <div className="flex items-center gap-1.5 my-2">
+            <div className="flex items-center gap-1.5">
+              {shadeSwatches.map((shade, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedShade(idx);
+                  }}
+                  className={`w-3.5 h-3.5 rounded-full transition-all cursor-pointer ${
+                    selectedShade === idx
+                      ? 'ring-2 ring-black ring-offset-2 scale-110'
+                      : 'hover:scale-110 opacity-80 hover:opacity-100'
+                  }`}
+                  style={{ backgroundColor: shade.color || shade }}
+                  title={shade.name || `Shade ${idx + 1}`}
+                />
+              ))}
             </div>
+            <span className="text-[11px] font-bold text-slate-800 ml-1">
+              +{product.shadesCount || 6} Shades
+            </span>
           </div>
 
-          {/* Title */}
-          <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 group-hover:text-rose-600 transition-colors leading-snug">
+          {/* Title - clickable direct anchor with URL */}
+          <a
+            href={directProductUrl}
+            onClick={(e) => {
+              e.preventDefault();
+              navigateToProduct(product);
+            }}
+            className="text-xs sm:text-[13px] font-bold text-black uppercase tracking-wide line-clamp-1 hover:underline cursor-pointer block leading-snug mb-1.5"
+            title={product.name}
+          >
             {product.name}
-          </h3>
+          </a>
 
-          {/* Size / Short spec */}
-          <p className="text-[11px] text-slate-400 mt-1 line-clamp-1">
-            {product.size} • {product.shortDescription}
-          </p>
-        </div>
-
-        {/* Pricing & CTA */}
-        <div className="mt-3.5 pt-3 border-t border-slate-100">
-          <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-base sm:text-lg font-black text-slate-900">
-              {storeInfo.currency.symbol}{product.price.toLocaleString()}
+          {/* Rating with solid black stars and review count in parentheses */}
+          <div className="flex items-center gap-1.5 text-xs mb-2">
+            <div className="flex text-black">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-3.5 h-3.5 ${
+                    i < Math.floor(product.rating || 5)
+                      ? 'fill-black text-black'
+                      : 'text-slate-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-slate-700 text-xs font-semibold">
+              ({product.reviewsCount || 1479})
             </span>
-            {product.originalPrice > product.price && (
+          </div>
+
+          {/* Pricing Row: Rs. 617.00  Rs. 949.00 | 35% Off */}
+          <div className="flex items-baseline gap-2 flex-wrap text-xs mb-3">
+            <span className="text-sm sm:text-base font-black text-black">
+              Rs. {Number(product.price || 0).toFixed(2)}
+            </span>
+            {Number(product.originalPrice || 0) > Number(product.price || 0) && (
               <span className="text-xs text-slate-400 line-through">
-                {storeInfo.currency.symbol}{product.originalPrice.toLocaleString()}
+                Rs. {Number(product.originalPrice || 0).toFixed(2)}
               </span>
             )}
-            <span className="text-[10px] text-emerald-600 font-bold ml-auto">
-              Save {storeInfo.currency.symbol}{(product.originalPrice - product.price).toLocaleString()}
-            </span>
-          </div>
-
-          {/* Dual Action Buttons */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={handleAddToCart}
-              className="flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-rose-50 text-slate-800 hover:text-rose-700 font-bold text-xs py-2.5 px-2 rounded-xl transition-all border border-slate-200 hover:border-rose-200 cursor-pointer"
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Add to Bag</span>
-            </button>
-
-            <button
-              onClick={handleBuyNow}
-              className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold text-xs py-2.5 px-2 rounded-xl shadow-md shadow-rose-600/20 transition-all hover:scale-[1.02] cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span>Buy Now</span>
-            </button>
+            {discount > 0 && (
+              <span className="text-xs text-emerald-600 font-bold">
+                | {discount}% Off
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Bottom Full-Width Solid Black ADD TO CART Button */}
+        <button
+          onClick={handleAddToCart}
+          className={`w-full font-black text-xs uppercase tracking-widest py-3 px-4 rounded-md transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer ${
+            justAdded
+              ? 'bg-emerald-600 text-white'
+              : 'bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white'
+          }`}
+        >
+          {justAdded ? (
+            <>
+              <Check className="w-3.5 h-3.5 stroke-[3]" />
+              <span>ADDED TO CART</span>
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="w-3.5 h-3.5 stroke-[2.2]" />
+              <span>ADD TO CART</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
