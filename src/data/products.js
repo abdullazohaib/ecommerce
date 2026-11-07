@@ -19,6 +19,7 @@ export const products = [
     badge: "Trending",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     hasShades: true,
     shadeCountText: "+6 Shades",
     shades: [
@@ -151,6 +152,7 @@ export const products = [
     badge: "Trending",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     hasShades: true,
     shadeCountText: "+8 Shades",
     shades: [
@@ -492,6 +494,7 @@ export const products = [
     badge: "Top Rated",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     hasShades: true,
     shadeCountText: "+6 Shades",
     shades: [
@@ -536,6 +539,7 @@ export const products = [
     badge: "Hot Deal",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     hasShades: true,
     shadeCountText: "+5 Shades",
     shades: [
@@ -584,6 +588,7 @@ export const products = [
     badge: "New",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     hasShades: true,
     shadeCountText: "+12 Shades",
     shades: [
@@ -699,9 +704,10 @@ export const products = [
     rating: 4.8,
     reviewsCount: 195,
     stock: 45,
-    badge: "Fast Acting",
+    badge: "New Launch",
     featured: true,
     isDealOfDay: false,
+    isNewLaunch: true,
     overlayText: "TRIPLE-STRENGTH ANTIOXIDANT DROPS",
     keyActives: "10% Pure L-Glutathione + 15% Vitamin C + Hyaluronic Acid",
     images: [

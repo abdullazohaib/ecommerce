@@ -9,6 +9,7 @@ import { HeroSlider } from './components/home/HeroSlider';
 import { CategoryGrid } from './components/home/CategoryGrid';
 import { BestsellersRow } from './components/home/BestsellersRow';
 import { FlashSaleCountdown } from './components/home/FlashSaleCountdown';
+import { NewLaunchesRow } from './components/home/NewLaunchesRow';
 import { ProductGrid } from './components/home/ProductGrid';
 import { WhyChooseUs } from './components/home/WhyChooseUs';
 import { CustomerReviews } from './components/home/CustomerReviews';
@@ -80,6 +81,7 @@ const MainContent = () => {
               <CategoryGrid />
               <BestsellersRow />
               <FlashSaleCountdown />
+              <NewLaunchesRow />
               <ProductGrid />
               <WhyChooseUs />
               <CustomerReviews />

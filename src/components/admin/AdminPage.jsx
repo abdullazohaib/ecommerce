@@ -121,6 +121,7 @@ export const AdminPage = () => {
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'Active' | 'Scheduled' | 'Draft'
   const [dealFilter, setDealFilter] = useState('all'); // 'all' | 'deal'
   const [bestsellerFilter, setBestsellerFilter] = useState('all'); // 'all' | 'bestseller'
+  const [launchFilter, setLaunchFilter] = useState('all'); // 'all' | 'launch'
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -158,6 +159,7 @@ export const AdminPage = () => {
     featured: true,
     isBestseller: true,
     isDealOfDay: false,
+    isNewLaunch: false,
     hasShades: false,
     shades: [],
     shadeCountText: '+6 Shades'
@@ -347,6 +349,9 @@ export const AdminPage = () => {
       status: productForm.status,
       imageUrl: finalImages[0],
       images: finalImages,
+      isDealOfDay: Boolean(productForm.isDealOfDay),
+      isBestseller: Boolean(productForm.isBestseller),
+      isNewLaunch: Boolean(productForm.isNewLaunch),
       hasShades: Boolean(productForm.hasShades),
       shades: productForm.hasShades && Array.isArray(productForm.shades) ? productForm.shades : [],
       shadeCountText: productForm.hasShades ? (productForm.shadeCountText || '+6 Shades') : ''
@@ -386,6 +391,14 @@ export const AdminPage = () => {
       featured: Boolean(prod.featured || prod.isBestseller),
       isBestseller: Boolean(prod.isBestseller || prod.featured),
       isDealOfDay: Boolean(prod.isDealOfDay),
+      isNewLaunch: Boolean(
+        prod.isNewLaunch || 
+        (prod.badge && (
+          prod.badge.toLowerCase().includes('new') || 
+          prod.badge.toLowerCase().includes('launch') || 
+          prod.badge.toLowerCase().includes('arrival')
+        ))
+      ),
       hasShades: hasShadesEnabled,
       shades: Array.isArray(prod.shades) ? prod.shades : [],
       shadeCountText: prod.shadeCountText || (prod.shades && prod.shades.length > 0 ? `+${prod.shades.length} Shades` : '+6 Shades')
@@ -567,7 +580,15 @@ export const AdminPage = () => {
     const matchesStatus = statusFilter === 'all' || (prod.status || 'Active') === statusFilter;
     const matchesDeal = dealFilter === 'all' || (dealFilter === 'deal' && Boolean(prod.isDealOfDay));
     const matchesBestseller = bestsellerFilter === 'all' || (bestsellerFilter === 'bestseller' && Boolean(prod.isBestseller || prod.featured));
-    return matchesSearch && matchesCat && matchesSubCat && matchesStatus && matchesDeal && matchesBestseller;
+    const matchesLaunch = launchFilter === 'all' || (launchFilter === 'launch' && Boolean(
+      prod.isNewLaunch || 
+      (prod.badge && (
+        prod.badge.toLowerCase().includes('new') || 
+        prod.badge.toLowerCase().includes('launch') || 
+        prod.badge.toLowerCase().includes('arrival')
+      ))
+    ));
+    return matchesSearch && matchesCat && matchesSubCat && matchesStatus && matchesDeal && matchesBestseller && matchesLaunch;
   });
 
   // Filtered Orders
@@ -1213,6 +1234,24 @@ export const AdminPage = () => {
                         {safeProducts.filter(p => p.isBestseller || p.featured).length}
                       </span>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setLaunchFilter(prev => prev === 'launch' ? 'all' : 'launch')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                        launchFilter === 'launch'
+                          ? 'bg-rose-600 text-white border-rose-700 shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      }`}
+                      title="Filter products by New Launches"
+                    >
+                      <span>🚀 New Launches</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                        launchFilter === 'launch' ? 'bg-white text-rose-700' : 'bg-rose-100 text-rose-900'
+                      }`}>
+                        {safeProducts.filter(p => p.isNewLaunch || (p.badge && (p.badge.toLowerCase().includes('new') || p.badge.toLowerCase().includes('launch')))).length}
+                      </span>
+                    </button>
                   </div>
                 )}
 
@@ -1246,6 +1285,9 @@ export const AdminPage = () => {
                         </th>
                         <th className="py-3 px-3 font-semibold text-slate-500 text-center">
                           Bestseller
+                        </th>
+                        <th className="py-3 px-3 font-semibold text-slate-500 text-center">
+                          New Launch
                         </th>
                         <th className="py-3 px-3 font-semibold text-slate-500">
                           Status <span className="inline-block text-[10px]">˅</span>
@@ -1381,6 +1423,43 @@ export const AdminPage = () => {
                               >
                                 <span>⭐</span>
                                 <span>{prod.isBestseller || prod.featured ? 'Bestseller' : '+ Best'}</span>
+                              </button>
+                            </td>
+
+                            <td className="py-3.5 px-3 text-center">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const isCurrentLaunch = Boolean(
+                                    prod.isNewLaunch || 
+                                    (prod.badge && (
+                                      prod.badge.toLowerCase().includes('new') || 
+                                      prod.badge.toLowerCase().includes('launch') || 
+                                      prod.badge.toLowerCase().includes('arrival')
+                                    ))
+                                  );
+                                  const updatedLaunch = !isCurrentLaunch;
+                                  updateProduct(prod.id, { 
+                                    isNewLaunch: updatedLaunch,
+                                    badge: updatedLaunch ? (prod.badge || 'New Launch') : (prod.badge === 'New Launch' || prod.badge === 'New Arrival' ? '' : prod.badge)
+                                  });
+                                  addToast(
+                                    updatedLaunch 
+                                      ? `Added "${prod.name}" to New Launches!` 
+                                      : `Removed "${prod.name}" from New Launches`,
+                                    'success'
+                                  );
+                                }}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1 ${
+                                  prod.isNewLaunch || (prod.badge && (prod.badge.toLowerCase().includes('new') || prod.badge.toLowerCase().includes('launch')))
+                                    ? 'bg-rose-100 text-rose-900 border border-rose-300 hover:bg-rose-200 shadow-2xs'
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
+                                }`}
+                                title={prod.isNewLaunch ? 'Featured in New Launches row on homepage. Click to remove.' : 'Click to feature in New Launches row on homepage'}
+                              >
+                                <span>🚀</span>
+                                <span>{prod.isNewLaunch || (prod.badge && (prod.badge.toLowerCase().includes('new') || prod.badge.toLowerCase().includes('launch'))) ? 'New Launch' : '+ Launch'}</span>
                               </button>
                             </td>
 
@@ -3067,6 +3146,31 @@ export const AdminPage = () => {
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                  </label>
+                </div>
+
+                {/* New Launch Toggle */}
+                <div className="p-4 bg-rose-50/80 border border-rose-200/90 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <span className="font-bold text-rose-950 text-xs flex items-center gap-1.5">
+                      <span>🚀</span> Feature in "New Launches" Row on Homepage
+                    </span>
+                    <p className="text-[11px] text-rose-800/80 mt-0.5">
+                      Showcase this product in the New Launches carousel row with official "NEW LAUNCH" branding.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(productForm.isNewLaunch)}
+                      onChange={(e) => setProductForm({ 
+                        ...productForm, 
+                        isNewLaunch: e.target.checked,
+                        badge: e.target.checked ? (productForm.badge || 'New Launch') : productForm.badge
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
                   </label>
                 </div>
 
