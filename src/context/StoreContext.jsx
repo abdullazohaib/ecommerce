@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { products as initialProducts } from '../data/products';
 import { categories as initialCategories } from '../data/categories';
 import { storeConfig, initialAboutSection, initialPolicies } from '../config/storeConfig';
