@@ -94,10 +94,8 @@ export const Header = () => {
             e.preventDefault();
             navigateToCategory(catSlug, 'all');
           }}
-          className={`px-2.5 py-0.5 border transition-all cursor-pointer block select-none ${
-            isActive
-              ? 'border-black text-black font-semibold'
-              : 'border-transparent hover:border-black text-black'
+          className={`py-0.5 px-1.5 transition-colors cursor-pointer block select-none hover:text-black ${
+            isActive ? 'text-black font-bold' : 'text-neutral-900'
           }`}
         >
           {displayName}
@@ -539,12 +537,12 @@ export const Header = () => {
 
       {/* ============================================================= */}
       {/* LUXURY CATEGORY STRIP: SALE | LIPS | EYES | SKIN | FACE | NAILS */}
-      {/* (Centered Geometric Sans Strip Matching User UI Reference) */}
+      {/* (Centered Theme Line with Gold Shimmer SALE matching Lakmé UI Reference) */}
       {/* ============================================================= */}
-      <div className="w-full border-t border-b border-slate-100 bg-white py-2.5 sm:py-3 shadow-3xs">
+      <div className="w-full border-t border-b border-slate-200/80 bg-white py-2.5 sm:py-3 shadow-3xs transition-all">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-center overflow-x-auto no-scrollbar">
-          <nav className="flex items-center justify-center gap-0 font-sans text-[11px] sm:text-xs font-medium tracking-[0.24em] uppercase text-black shrink-0">
-            {/* 1. SALE with Gold A */}
+          <nav className="flex items-center justify-center gap-0 font-cinzel text-xs sm:text-[13.5px] font-semibold tracking-[0.18em] uppercase text-neutral-900 shrink-0">
+            {/* 1. SALE with Shimmer Color Change */}
             <a
               href="/shop?sort=bestsellers"
               onClick={(e) => {
@@ -553,38 +551,38 @@ export const Header = () => {
                 navigateToCategory('all');
                 setViewWithUrl('shop');
               }}
-              className="border border-transparent hover:border-black px-2 sm:px-2.5 py-0.5 transition-all cursor-pointer select-none shrink-0"
+              className="py-0.5 px-1.5 transition-all cursor-pointer select-none shrink-0"
               title="Shop Special Sale & Trending Offers"
             >
-              S<span className="text-amber-500 font-bold">A</span>LE
+              <span className="animate-gold-shimmer font-bold">SALE</span>
             </a>
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
+            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
 
             {/* 2. LIPS */}
             {renderCategoryStripItem('lips', 'LIPS', 'lips')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
+            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
 
             {/* 3. EYES */}
             {renderCategoryStripItem('eyes', 'EYES', 'eyes')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
+            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
 
             {/* 4. SKIN */}
             {renderCategoryStripItem('skincare', 'SKIN', 'skincare')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
+            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
 
             {/* 5. FACE */}
             {renderCategoryStripItem('face', 'FACE', 'face')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
+            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
 
             {/* 6. NAILS */}
             {renderCategoryStripItem('nails', 'NAILS', 'nails')}
