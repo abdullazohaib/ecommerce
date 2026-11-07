@@ -188,3 +188,48 @@ export const initialAboutSection = {
   ctaButtonText: "Chat with Beauty Advisor"
 };
 
+export const initialPolicies = {
+  shippingPolicy: {
+    title: "Shipping & Delivery Policy",
+    lastUpdated: "November 2026",
+    introText: "At our store, we strive to deliver your orders in the quickest and safest possible manner across India with tamper-proof security packaging.",
+    dispatchTimeline: "Orders are processed and dispatched within 24 to 48 hours of order confirmation.",
+    courierPartners: "Delhivery, BlueDart, XpressBees, DTDC Express",
+    deliveryMetro: "2 to 3 business days (Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Kolkata)",
+    deliveryNonMetro: "3 to 5 business days (Tier 2 & Tier 3 Cities / Rest of India)",
+    deliveryRemote: "5 to 7 business days (Northeast & Remote Pin Codes)",
+    freeShippingThreshold: 999,
+    standardShippingFee: 79,
+    codVerificationNote: "To prevent false delivery attempts, our automated system or support executive may verify your delivery address via WhatsApp or a short phone call before releasing the consignment for dispatch.",
+    packagingNote: "All shipments are packed in tamper-proof bubble security packaging with genuine batch holograms to ensure untampered product purity."
+  },
+  returnPolicy: {
+    title: "Return & Replacement Policy",
+    lastUpdated: "November 2026",
+    introText: "We take extreme care in packaging your cosmetic, skincare, and beauty formulations. In the unlikely event that you receive a damaged, leaked, expired, or incorrect item:",
+    returnWindowDays: 7,
+    windowNote: "Please notify our customer care team on WhatsApp or email within 7 days of receiving your package.",
+    conditions: "The item must be reported with unboxing pictures or a short unboxing video showing the damage, leakage, or seal issue. Products that have been used or opened (broken seal) are non-returnable due to strict hygiene and health safety protocols.",
+    refundTimeline: "Approved refunds for prepaid orders (UPI / Card / NetBanking) are credited back to your original source account within 3 to 5 business days. For COD orders, refund is processed directly via instant UPI transfer or bank NEFT.",
+    replacementProcess: "Free doorstep pickup & immediate replacement dispatch upon verification by our support desk.",
+    supportContact: "WhatsApp Live Chat or email support"
+  },
+  privacyPolicy: {
+    title: "Privacy Policy",
+    lastUpdated: "November 2026",
+    introText: "This Privacy Policy describes how we collect, use, and protect the personal details you provide while placing orders on our website.",
+    dataCollection: "We collect your name, phone number, shipping address, and email solely for order delivery fulfillment, courier airway bills, and invoice communication.",
+    dataSecurity: "We never sell, rent, or trade your personal information to third-party marketers. Your delivery address is shared only with our trusted courier logistics partners (e.g. Delhivery, BlueDart).",
+    contactEmail: "care@glowbasket.in"
+  },
+  termsPolicy: {
+    title: "Terms & Conditions",
+    lastUpdated: "November 2026",
+    introText: "Welcome to our store. By accessing our platform and placing an order, you agree to comply with and be bound by the following terms of service.",
+    authenticityClause: "All products sold on our platform are 100% genuine with verified manufacturer holograms and security seals.",
+    usageAdvisory: "Since individual skin types vary, we strongly advise performing a patch test on a small area behind your ear or inner forearm prior to full facial application of any whitening cream or serum.",
+    jurisdiction: "Any legal disputes shall be subject to the exclusive jurisdiction of the courts of Mumbai, India."
+  }
+};
+
+

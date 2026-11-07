@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { products as initialProducts } from '../data/products';
 import { categories as initialCategories } from '../data/categories';
-import { storeConfig, initialAboutSection } from '../config/storeConfig';
+import { storeConfig, initialAboutSection, initialPolicies } from '../config/storeConfig';
 import { testimonials as initialReviews } from '../data/testimonials';
 import { slugify, safeStorageSet } from '../utils/helpers';
 
@@ -66,6 +66,8 @@ const parseUrlPath = (pathname = '') => {
       tab = 'settings';
     } else if (['about', 'about-us', 'brand-story'].includes(rawSub)) {
       tab = 'about';
+    } else if (['policies', 'policy', 'shipping-policy', 'refund-policy', 'legal'].includes(rawSub)) {
+      tab = 'policies';
     } else if (['reviews', 'review', 'testimonials', 'ratings'].includes(rawSub)) {
       tab = 'reviews';
     } else {
@@ -288,6 +290,25 @@ export const StoreProvider = ({ children }) => {
     return initialAboutSection;
   });
 
+  // Store Policies & Legal State (Controlled & Editable from Admin)
+  const [policies, setPolicies] = useState(() => {
+    try {
+      const saved = localStorage.getItem('glowbasket_policies');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            shippingPolicy: { ...initialPolicies.shippingPolicy, ...(parsed.shippingPolicy || {}) },
+            returnPolicy: { ...initialPolicies.returnPolicy, ...(parsed.returnPolicy || {}) },
+            privacyPolicy: { ...initialPolicies.privacyPolicy, ...(parsed.privacyPolicy || {}) },
+            termsPolicy: { ...initialPolicies.termsPolicy, ...(parsed.termsPolicy || {}) }
+          };
+        }
+      }
+    } catch (e) {}
+    return initialPolicies;
+  });
+
   // Initial Route parsed synchronously from address bar
   const initialRoute = typeof window !== 'undefined' 
     ? parseUrlPath(window.location.pathname) 
@@ -504,6 +525,9 @@ export const StoreProvider = ({ children }) => {
         } else if (e.key === 'glowbasket_about_section') {
           const parsed = JSON.parse(e.newValue);
           if (parsed && typeof parsed === 'object') setAboutSection(parsed);
+        } else if (e.key === 'glowbasket_policies') {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed && typeof parsed === 'object') setPolicies(parsed);
         } else if (e.key === 'glowbasket_reviews') {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) setReviewsList(parsed);
@@ -521,6 +545,7 @@ export const StoreProvider = ({ children }) => {
       else if (key === 'storeInfo') setStoreInfo(data);
       else if (key === 'categories') setCategoriesList(data);
       else if (key === 'aboutSection') setAboutSection(data);
+      else if (key === 'policies') setPolicies(data);
       else if (key === 'reviews') setReviewsList(data);
     };
 
@@ -1101,6 +1126,8 @@ export const StoreProvider = ({ children }) => {
       targetTab = 'settings';
     } else if (['about', 'about-us', 'brand-story'].includes(rawTab)) {
       targetTab = 'about';
+    } else if (['policies', 'policy', 'shipping-policy', 'refund-policy', 'legal'].includes(rawTab)) {
+      targetTab = 'policies';
     } else if (['reviews', 'review', 'testimonials', 'ratings'].includes(rawTab)) {
       targetTab = 'reviews';
     } else {
@@ -1122,6 +1149,7 @@ export const StoreProvider = ({ children }) => {
       notifications: 'Notifications',
       settings: 'Store Logo & Branding',
       about: 'About Us Content',
+      policies: 'Policies & Legal',
       reviews: 'Customer Reviews'
     };
     const docTitle = `${tabTitles[targetTab] || 'Admin Studio'} | ${storeInfo.storeName} Admin Suite`;
@@ -1414,6 +1442,21 @@ export const StoreProvider = ({ children }) => {
     addToast('About Us section updated successfully!', 'success');
   };
 
+  const updatePolicies = (newPoliciesData) => {
+    setPolicies(prev => {
+      const next = {
+        ...prev,
+        ...newPoliciesData
+      };
+      safeStorageSet('glowbasket_policies', next);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'policies', data: next } }));
+      }
+      return next;
+    });
+    addToast('Store Policies updated and live on website!', 'success');
+  };
+
   const addReview = (newReviewData) => {
     const id = `rev-${Date.now()}`;
     const review = {
@@ -1580,6 +1623,9 @@ export const StoreProvider = ({ children }) => {
         aboutSection,
         setAboutSection,
         updateAboutSection,
+        policies,
+        setPolicies,
+        updatePolicies,
         reviewsList,
         setReviewsList,
         reviewsHeader,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStore, slugify } from '../../context/StoreContext';
 import { categories as defaultCategories } from '../../data/categories';
-import { initialAboutSection } from '../../config/storeConfig';
+import { initialAboutSection, initialPolicies } from '../../config/storeConfig';
 import ImageUploadField from './ImageUploadField';
 import MultiImageUploadField from './MultiImageUploadField';
 import { 
@@ -51,6 +51,7 @@ import {
   Radio,
   Sliders,
   BookOpen,
+  FileText,
   Star
 } from 'lucide-react';
 
@@ -84,6 +85,8 @@ export const AdminPage = () => {
     deleteCategory,
     aboutSection,
     updateAboutSection,
+    policies,
+    updatePolicies,
     reviewsList,
     reviewsHeader,
     addReview,
@@ -263,6 +266,17 @@ export const AdminPage = () => {
       setAboutFormData(aboutSection);
     }
   }, [aboutSection]);
+
+  // Store Policies & Legal State (Editable from Admin)
+  const [policiesFormData, setPoliciesFormData] = useState(() => policies || initialPolicies);
+  const [policyEditorTab, setPolicyEditorTab] = useState('shipping'); // 'shipping' | 'return' | 'privacy' | 'terms'
+
+  // Sync with policies from store if changed
+  React.useEffect(() => {
+    if (policies && typeof policies === 'object') {
+      setPoliciesFormData(policies);
+    }
+  }, [policies]);
 
   // Customer Reviews State (Editable from Admin)
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -524,6 +538,15 @@ export const AdminPage = () => {
   const handleSaveAbout = (e) => {
     e.preventDefault();
     updateAboutSection(aboutFormData);
+  };
+
+  const handleSavePolicies = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    updatePolicies(policiesFormData);
+    // If shipping threshold was customized, also keep storeInfo in sync
+    if (policiesFormData?.shippingPolicy?.freeShippingThreshold) {
+      updateStoreInfo({ freeShippingThreshold: Number(policiesFormData.shippingPolicy.freeShippingThreshold) }, false);
+    }
   };
 
   // Customer Reviews Handlers
@@ -971,6 +994,28 @@ export const AdminPage = () => {
               </div>
               <span className="text-[10px] text-slate-500 font-semibold bg-slate-100 px-1.5 py-0.5 rounded-md">
                 Page
+              </span>
+            </a>
+
+            {/* Store Policies & Legal Terms (Shipping, Returns, Privacy, Terms) */}
+            <a
+              href="/admin/policies"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('policies');
+              }}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all cursor-pointer ${
+                activeTab === 'policies'
+                  ? 'bg-indigo-50 text-[#5B4DF5] font-bold'
+                  : 'hover:bg-slate-50 hover:text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <FileText className="w-4 h-4 text-slate-500" />
+                <span>Store Policies</span>
+              </div>
+              <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                Legal
               </span>
             </a>
 
@@ -2481,6 +2526,605 @@ export const AdminPage = () => {
                 >
                   <Save className="w-4 h-4" />
                   <span>Save All Changes to About Us Page</span>
+                </button>
+              </div>
+
+            </form>
+          )}
+
+          {/* ================================================================= */}
+          {/* TAB: STORE POLICIES & LEGAL TERMS (USER'S REQUEST)               */}
+          {/* ================================================================= */}
+          {activeTab === 'policies' && (
+            <form onSubmit={handleSavePolicies} className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 space-y-8 shadow-xs text-xs">
+              
+              {/* Header Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-[#5B4DF5]" />
+                    <h2 className="text-lg font-bold text-slate-900">Store Policies & Customer Legal Terms</h2>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Edit your live Shipping & Delivery timelines, Return & Replacement windows, Privacy policy, and Terms. Updates appear immediately on customer-facing pages.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href="/shipping-policy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Shipping Page</span>
+                  </a>
+                  <a
+                    href="/refund-policy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Returns Page</span>
+                  </a>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1.5 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold px-4 py-2 rounded-xl shadow-xs cursor-pointer"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Save Policies</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Sub-Tabs Switcher */}
+              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-4">
+                {[
+                  { id: 'shipping', label: '🚚 Shipping & Delivery Policy' },
+                  { id: 'return', label: '🔄 Return & Replacement Policy' },
+                  { id: 'privacy', label: '🛡️ Privacy Policy' },
+                  { id: 'terms', label: '📄 Terms & Conditions' }
+                ].map(sub => (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    onClick={() => setPolicyEditorTab(sub.id)}
+                    className={`px-4 py-2.5 rounded-xl font-bold transition-all text-xs cursor-pointer ${
+                      policyEditorTab === sub.id
+                        ? 'bg-[#5B4DF5] text-white shadow-xs'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {sub.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* 1. SHIPPING & DELIVERY SUB-EDITOR */}
+              {policyEditorTab === 'shipping' && (
+                <div className="space-y-6">
+                  <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-xs">Shipping & Delivery Policy Settings</h4>
+                      <p className="text-[11px] text-slate-500">Live URL: <code>/shipping-policy</code></p>
+                    </div>
+                    <span className="text-[10px] font-bold bg-white text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg">
+                      Live Storefront
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Page Title Heading</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.title || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), title: e.target.value }
+                        })}
+                        placeholder="Shipping & Delivery Policy"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Last Updated Tag</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.lastUpdated || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), lastUpdated: e.target.value }
+                        })}
+                        placeholder="November 2026"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Policy Intro Statement</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.shippingPolicy?.introText || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), introText: e.target.value }
+                        })}
+                        placeholder="Introductory paragraph displayed at the top of the Shipping Policy page..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Dispatch Timeline Headline</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.dispatchTimeline || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), dispatchTimeline: e.target.value }
+                        })}
+                        placeholder="e.g. Orders dispatched within 24 to 48 hours"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Courier Partners Names</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.courierPartners || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), courierPartners: e.target.value }
+                        })}
+                        placeholder="e.g. Delhivery, BlueDart, XpressBees, DTDC Express"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Dispatch Details & Tracking Instructions</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.shippingPolicy?.dispatchDetails || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), dispatchDetails: e.target.value }
+                        })}
+                        placeholder="Details about warehouse processing, cut-off times, and SMS tracking notifications..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Metro Delivery Duration</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.deliveryMetro || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), deliveryMetro: e.target.value }
+                        })}
+                        placeholder="e.g. 2 to 3 business days"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tier 2 & 3 Delivery Duration</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.deliveryNonMetro || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), deliveryNonMetro: e.target.value }
+                        })}
+                        placeholder="e.g. 3 to 5 business days"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Remote / Northeast Duration</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.shippingPolicy?.deliveryRemote || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), deliveryRemote: e.target.value }
+                        })}
+                        placeholder="e.g. 5 to 7 business days"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Free Shipping Order Threshold (₹)</label>
+                      <input
+                        type="number"
+                        value={policiesFormData?.shippingPolicy?.freeShippingThreshold || 999}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), freeShippingThreshold: Number(e.target.value) }
+                        })}
+                        placeholder="999"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Standard Delivery Fee (₹)</label>
+                      <input
+                        type="number"
+                        value={policiesFormData?.shippingPolicy?.standardShippingFee || 79}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), standardShippingFee: Number(e.target.value) }
+                        })}
+                        placeholder="79"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Cash On Delivery (COD) Verification Note</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.shippingPolicy?.codVerificationNote || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), codVerificationNote: e.target.value }
+                        })}
+                        placeholder="Verification notice before dispatching COD orders..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Tamper-Proof Packaging & Hologram Protection Note</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.shippingPolicy?.packagingNote || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          shippingPolicy: { ...(policiesFormData.shippingPolicy || {}), packagingNote: e.target.value }
+                        })}
+                        placeholder="Security bubble packaging and hologram seals notice..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. RETURN & REPLACEMENT SUB-EDITOR */}
+              {policyEditorTab === 'return' && (
+                <div className="space-y-6">
+                  <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-xs">Return & Replacement Policy Settings</h4>
+                      <p className="text-[11px] text-slate-500">Live URL: <code>/refund-policy</code></p>
+                    </div>
+                    <span className="text-[10px] font-bold bg-white text-amber-800 border border-amber-300 px-2.5 py-1 rounded-lg">
+                      {policiesFormData?.returnPolicy?.returnWindowDays || 7} Days Window
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Page Title Heading</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.returnPolicy?.title || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), title: e.target.value }
+                        })}
+                        placeholder="Return & Replacement Policy"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Return Window (Days)</label>
+                      <input
+                        type="number"
+                        value={policiesFormData?.returnPolicy?.returnWindowDays || 7}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), returnWindowDays: Number(e.target.value) }
+                        })}
+                        placeholder="7"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Introductory Statement</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.returnPolicy?.introText || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), introText: e.target.value }
+                        })}
+                        placeholder="Brief opening statement about product hygiene and safe packaging..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Return Window Note / Instructions</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.returnPolicy?.windowNote || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), windowNote: e.target.value }
+                        })}
+                        placeholder="e.g. Please notify our customer care team on WhatsApp or email within 7 days of receiving your package."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Conditions for Replacement & Hygiene Notice</label>
+                      <textarea
+                        rows={3}
+                        value={policiesFormData?.returnPolicy?.conditions || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), conditions: e.target.value }
+                        })}
+                        placeholder="Requirements: unboxing clip, broken seals, hygienic non-returnable criteria..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Doorstep Pickup & Replacement Process</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.returnPolicy?.replacementProcess || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), replacementProcess: e.target.value }
+                        })}
+                        placeholder="Steps for courier pickup and replacement dispatch..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Refund Processing Timeline</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.returnPolicy?.refundTimeline || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), refundTimeline: e.target.value }
+                        })}
+                        placeholder="Timeline for prepaid source refund (3-5 days) and COD UPI/NEFT transfers..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Customer Support Channel Note</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.returnPolicy?.supportContact || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          returnPolicy: { ...(policiesFormData.returnPolicy || {}), supportContact: e.target.value }
+                        })}
+                        placeholder="e.g. Instant WhatsApp support at +91 98200 45678 or email care@glowbasket.in"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. PRIVACY POLICY SUB-EDITOR */}
+              {policyEditorTab === 'privacy' && (
+                <div className="space-y-6">
+                  <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-xs">Privacy Policy Settings</h4>
+                      <p className="text-[11px] text-slate-500">Live URL: <code>/privacy-policy</code></p>
+                    </div>
+                    <span className="text-[10px] font-bold bg-white text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-lg">
+                      Data Protection
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Page Title Heading</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.privacyPolicy?.title || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          privacyPolicy: { ...(policiesFormData.privacyPolicy || {}), title: e.target.value }
+                        })}
+                        placeholder="Privacy Policy"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Grievance / Contact Email</label>
+                      <input
+                        type="email"
+                        value={policiesFormData?.privacyPolicy?.contactEmail || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          privacyPolicy: { ...(policiesFormData.privacyPolicy || {}), contactEmail: e.target.value }
+                        })}
+                        placeholder="care@glowbasket.in"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Introductory Statement</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.privacyPolicy?.introText || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          privacyPolicy: { ...(policiesFormData.privacyPolicy || {}), introText: e.target.value }
+                        })}
+                        placeholder="General overview of data protection..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Information Collected Clause</label>
+                      <textarea
+                        rows={3}
+                        value={policiesFormData?.privacyPolicy?.dataCollection || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          privacyPolicy: { ...(policiesFormData.privacyPolicy || {}), dataCollection: e.target.value }
+                        })}
+                        placeholder="Details of information collected for order fulfillment..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Data Security & Third Parties Clause</label>
+                      <textarea
+                        rows={3}
+                        value={policiesFormData?.privacyPolicy?.dataSecurity || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          privacyPolicy: { ...(policiesFormData.privacyPolicy || {}), dataSecurity: e.target.value }
+                        })}
+                        placeholder="Commitment never to sell data and sharing only with couriers..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. TERMS & CONDITIONS SUB-EDITOR */}
+              {policyEditorTab === 'terms' && (
+                <div className="space-y-6">
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-xs">Terms & Conditions Settings</h4>
+                      <p className="text-[11px] text-slate-500">Live URL: <code>/terms</code></p>
+                    </div>
+                    <span className="text-[10px] font-bold bg-white text-slate-700 border border-slate-200 px-2.5 py-1 rounded-lg">
+                      Legal
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Page Title Heading</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.termsPolicy?.title || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          termsPolicy: { ...(policiesFormData.termsPolicy || {}), title: e.target.value }
+                        })}
+                        placeholder="Terms & Conditions"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Governing Jurisdiction</label>
+                      <input
+                        type="text"
+                        value={policiesFormData?.termsPolicy?.jurisdiction || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          termsPolicy: { ...(policiesFormData.termsPolicy || {}), jurisdiction: e.target.value }
+                        })}
+                        placeholder="e.g. Courts of Mumbai, India"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Introductory Statement</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.termsPolicy?.introText || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          termsPolicy: { ...(policiesFormData.termsPolicy || {}), introText: e.target.value }
+                        })}
+                        placeholder="Welcome and terms binding note..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">100% Genuine Authenticity Clause</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.termsPolicy?.authenticityClause || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          termsPolicy: { ...(policiesFormData.termsPolicy || {}), authenticityClause: e.target.value }
+                        })}
+                        placeholder="Manufacturer holograms and authenticity guarantees..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">Usage & Skin Patch Test Advisory</label>
+                      <textarea
+                        rows={2}
+                        value={policiesFormData?.termsPolicy?.usageAdvisory || ''}
+                        onChange={(e) => setPoliciesFormData({
+                          ...policiesFormData,
+                          termsPolicy: { ...(policiesFormData.termsPolicy || {}), usageAdvisory: e.target.value }
+                        })}
+                        placeholder="Advisory for performing patch tests prior to cosmetic use..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SAVE BUTTON & RESET */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Reset all store policies back to initial beauty store templates?')) {
+                      setPoliciesFormData(initialPolicies);
+                      updatePolicies(initialPolicies);
+                    }
+                  }}
+                  className="text-xs text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                >
+                  Reset Policies to Default Template
+                </button>
+
+                <button
+                  type="submit"
+                  className="bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold px-8 py-3 rounded-xl shadow-md shadow-indigo-500/25 transition-all cursor-pointer text-xs flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Save All Store Policies</span>
                 </button>
               </div>
 
