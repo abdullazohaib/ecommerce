@@ -39,6 +39,8 @@ export default {
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        jost: ['Jost', 'Plus Jakarta Sans', 'sans-serif'],
+        montserrat: ['Montserrat', 'Plus Jakarta Sans', 'sans-serif'],
         serif: ['Playfair Display', 'Georgia', 'serif'],
         script: ['Alex Brush', 'Dancing Script', 'cursive']
       }

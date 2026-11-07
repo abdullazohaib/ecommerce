@@ -81,12 +81,12 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18 gap-4">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
           
           {/* ============================================================= */}
-          {/* LEFT: SIGNATURE LUXURY BRAND LOGO */}
+          {/* LEFT: BRAND LOGO + CONNECTED LUXURY NAVIGATION */}
           {/* ============================================================= */}
-          <div className="flex items-center shrink-0">
+          <div className="flex items-center gap-6 xl:gap-9 shrink-0">
             <a
               href="/"
               onClick={(e) => {
@@ -98,272 +98,270 @@ export const Header = () => {
             >
               <BrandLogo size="normal" />
             </a>
+
+            {/* Primary Navigation Menu with Jost Luxury Typography & 15px Size */}
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 font-jost text-[15px] font-semibold tracking-[0.03em]">
+              {/* 1. Home */}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setViewWithUrl('home');
+                }}
+                className={`transition-colors whitespace-nowrap py-1.5 cursor-pointer ${
+                  currentView === 'home' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
+                }`}
+              >
+                Home
+              </a>
+
+              {/* 2. Categories Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setCategoriesDropdownOpen(true)}
+                onMouseLeave={() => setCategoriesDropdownOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setViewWithUrl('shop')}
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 ${
+                    currentView === 'shop' || currentView === 'category' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
+                  }`}
+                >
+                  <span>Categories</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                </button>
+
+                {/* Luxury 5-Column Mega Menu - Proportionally Positioned */}
+                {categoriesDropdownOpen && (
+                  <div className="absolute top-full -left-20 xl:-left-24 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                    <div className="grid grid-cols-5 gap-6">
+                      {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
+                        <div key={cat.id || cat.slug} className="space-y-3">
+                          {/* Column Parent Category Header (Uppercase Bold) */}
+                          <a
+                            href={`/category/${cat.slug || cat.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCategoriesDropdownOpen(false);
+                              navigateToCategory(cat.slug || cat.id, 'all');
+                            }}
+                            className="block font-jost text-xs font-bold uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
+                          >
+                            {cat.name}
+                          </a>
+
+                          {/* Subcategories (Inside it all products) */}
+                          <div className="space-y-2">
+                            {(cat.subcategories || []).map(sub => (
+                              <a
+                                key={sub.id || sub.slug}
+                                href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCategoriesDropdownOpen(false);
+                                  navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
+                                }}
+                                className="block font-sans text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
+                              >
+                                {sub.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bottom Utility Bar */}
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs bg-slate-50/70 -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl">
+                      <div className="flex items-center gap-2 text-slate-500 font-medium">
+                        <Sparkles className="w-3.5 h-3.5 text-black" />
+                        <span>Curated Luxury Cosmetics & Dermatological Formulations</span>
+                      </div>
+                      <a
+                        href="/shop"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCategoriesDropdownOpen(false);
+                          navigateToCategory('all', 'all');
+                        }}
+                        className="font-bold text-black hover:underline flex items-center gap-1 group"
+                      >
+                        <span>View All Products ({productsList.length})</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Trends (Clean Text, No Red Flame Icon) */}
+              <a
+                href="/shop?sort=bestsellers"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedSort('bestsellers');
+                  navigateToCategory('all');
+                  setViewWithUrl('shop');
+                }}
+                className={`transition-colors whitespace-nowrap py-1.5 cursor-pointer ${
+                  currentView === 'shop' && selectedSort === 'bestsellers' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
+                }`}
+              >
+                Trends
+              </a>
+
+              {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setOrdersDropdownOpen(true)}
+                onMouseLeave={() => setOrdersDropdownOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
+                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1.5"
+                >
+                  <span>Orders</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                </button>
+
+                {ordersDropdownOpen && (
+                  <div className="absolute top-full -left-6 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrdersDropdownOpen(false);
+                        openTrackingModal('track');
+                      }}
+                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block group-hover:text-black">Track Order</span>
+                        <span className="text-[11px] text-slate-500 block leading-tight">Live shipment status & courier AWB</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrdersDropdownOpen(false);
+                        openTrackingModal('cancel');
+                      }}
+                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-rose-50/60 transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <XCircle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-700">Cancel Order</span>
+                        <span className="text-[11px] text-slate-500 block leading-tight">Cancel before dispatch or return items</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Help Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setHelpDropdownOpen(true)}
+                onMouseLeave={() => setHelpDropdownOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1.5"
+                >
+                  <span>Help</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                </button>
+
+                {helpDropdownOpen && (
+                  <div className="absolute top-full -left-6 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                    <a
+                      href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => setHelpDropdownOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <span className="text-xs font-bold block">WhatsApp 24/7 Support</span>
+                        <span className="text-[10px] text-slate-400 block">Instant chat with specialist</span>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/contact-us"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('contact');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <PhoneCall className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">Contact Us</span>
+                    </a>
+
+                    <a
+                      href="/about-us"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('about');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <Info className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">About Us</span>
+                    </a>
+
+                    <a
+                      href="/shipping-policy"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('shipping-policy');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">Shipping & Return Policy</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+            </nav>
           </div>
 
           {/* ============================================================= */}
-          {/* CENTER: BALANCED NAVIGATION MENU (Evenly distributed) */}
+          {/* RIGHT: EXPANDING PILL SEARCH BAR + USER ICON + CART */}
           {/* ============================================================= */}
-          <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1 px-4">
-            {/* 1. Home */}
-            <a
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                setViewWithUrl('home');
-              }}
-              className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
-                currentView === 'home' ? 'text-black' : 'text-slate-800 hover:text-black'
-              }`}
-            >
-              Home
-            </a>
-
-            {/* 2. Categories Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setCategoriesDropdownOpen(true)}
-              onMouseLeave={() => setCategoriesDropdownOpen(false)}
-            >
-              <button
-                type="button"
-                onClick={() => setViewWithUrl('shop')}
-                className={`flex items-center gap-1 text-[13px] font-bold transition-colors cursor-pointer py-2 ${
-                  currentView === 'shop' || currentView === 'category' ? 'text-black' : 'text-slate-800 hover:text-black'
-                }`}
-              >
-                <span>Categories</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Luxury 5-Column Mega Menu - Centered below Categories */}
-              {categoriesDropdownOpen && (
-                <div className="absolute top-full -left-48 xl:-left-60 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
-                  <div className="grid grid-cols-5 gap-6">
-                    {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
-                      <div key={cat.id || cat.slug} className="space-y-3">
-                        {/* Column Parent Category Header (Uppercase Bold) */}
-                        <a
-                          href={`/category/${cat.slug || cat.id}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCategoriesDropdownOpen(false);
-                            navigateToCategory(cat.slug || cat.id, 'all');
-                          }}
-                          className="block text-[13px] font-black uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
-                        >
-                          {cat.name}
-                        </a>
-
-                        {/* Subcategories (Inside it all products) */}
-                        <div className="space-y-2">
-                          {(cat.subcategories || []).map(sub => (
-                            <a
-                              key={sub.id || sub.slug}
-                              href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setCategoriesDropdownOpen(false);
-                                navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
-                              }}
-                              className="block text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
-                            >
-                              {sub.name}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Bottom Utility Bar */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs bg-slate-50/70 -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl">
-                    <div className="flex items-center gap-2 text-slate-500 font-medium">
-                      <Sparkles className="w-3.5 h-3.5 text-black" />
-                      <span>Curated Luxury Cosmetics & Dermatological Formulations</span>
-                    </div>
-                    <a
-                      href="/shop"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCategoriesDropdownOpen(false);
-                        navigateToCategory('all', 'all');
-                      }}
-                      className="font-bold text-black hover:underline flex items-center gap-1 group"
-                    >
-                      <span>View All Products ({productsList.length})</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 3. Trends (Clean Text, No Red Flame Icon) */}
-            <a
-              href="/shop?sort=bestsellers"
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectedSort('bestsellers');
-                navigateToCategory('all');
-                setViewWithUrl('shop');
-              }}
-              className={`text-[13px] font-bold transition-colors whitespace-nowrap py-2 cursor-pointer ${
-                currentView === 'shop' && selectedSort === 'bestsellers' ? 'text-black' : 'text-slate-800 hover:text-black'
-              }`}
-            >
-              Trends
-            </a>
-
-            {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setOrdersDropdownOpen(true)}
-              onMouseLeave={() => setOrdersDropdownOpen(false)}
-            >
-              <button
-                type="button"
-                onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
-                className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
-              >
-                <span>Orders</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {ordersDropdownOpen && (
-                <div className="absolute top-full -left-10 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOrdersDropdownOpen(false);
-                      openTrackingModal('track');
-                    }}
-                    className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left cursor-pointer group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                      <Truck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block group-hover:text-black">Track Order</span>
-                      <span className="text-[11px] text-slate-500 block leading-tight">Live shipment status & courier AWB</span>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOrdersDropdownOpen(false);
-                      openTrackingModal('cancel');
-                    }}
-                    className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-rose-50/60 transition-colors text-left cursor-pointer group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                      <XCircle className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-700">Cancel Order</span>
-                      <span className="text-[11px] text-slate-500 block leading-tight">Cancel before dispatch or return items</span>
-                    </div>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* 5. Help Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setHelpDropdownOpen(true)}
-              onMouseLeave={() => setHelpDropdownOpen(false)}
-            >
-              <button
-                type="button"
-                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
-                className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
-              >
-                <span>Help</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {helpDropdownOpen && (
-                <div className="absolute top-full -left-10 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
-                  <a
-                    href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setHelpDropdownOpen(false)}
-                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <span className="text-xs font-bold block">WhatsApp 24/7 Support</span>
-                      <span className="text-[10px] text-slate-400 block">Instant chat with specialist</span>
-                    </div>
-                  </a>
-
-                  <a
-                    href="/contact-us"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setHelpDropdownOpen(false);
-                      setViewWithUrl('contact');
-                    }}
-                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                  >
-                    <PhoneCall className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span className="text-xs font-bold">Contact Us</span>
-                  </a>
-
-                  <a
-                    href="/about-us"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setHelpDropdownOpen(false);
-                      setViewWithUrl('about');
-                    }}
-                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                  >
-                    <Info className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span className="text-xs font-bold">About Us</span>
-                  </a>
-
-                  <a
-                    href="/shipping-policy"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setHelpDropdownOpen(false);
-                      setViewWithUrl('shipping-policy');
-                    }}
-                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span className="text-xs font-bold">Shipping & Return Policy</span>
-                  </a>
-                </div>
-              )}
-            </div>
-          </nav>
-
-          {/* ============================================================= */}
-          {/* RIGHT: SEARCH BAR + LIGHTNING/USER ICON + CART (🛍️ [0]) */}
-          {/* ============================================================= */}
-          <div className="flex items-center gap-3 sm:gap-5">
-            {/* Embedded Dr. Sheth's Style Search Input */}
-            <div ref={searchContainerRef} className="relative hidden md:block">
+          <div className="flex items-center gap-3 sm:gap-4 flex-1 justify-end max-w-sm lg:max-w-md xl:max-w-lg ml-auto">
+            {/* Embedded Dr. Sheth's Style Pill Search Input */}
+            <div ref={searchContainerRef} className="relative hidden md:block flex-1 min-w-[200px]">
               <form onSubmit={handleSearchSubmit} className="relative">
-                <div className="flex items-center w-56 lg:w-72 xl:w-80 h-9 px-3 bg-white border border-slate-300 rounded-lg focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
-                  <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
+                <div className="flex items-center w-full h-10 px-3.5 bg-slate-50/90 hover:bg-slate-50 border border-slate-300 rounded-full focus-within:bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all shadow-2xs">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2.5" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
                     placeholder="Search For Cleanser, Serum, Cream..."
-                    className="w-full text-xs text-slate-800 placeholder-slate-400 bg-transparent outline-none"
+                    className="w-full text-xs xl:text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none font-sans"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="p-0.5 text-slate-400 hover:text-slate-700"
+                      className="p-1 text-slate-400 hover:text-slate-700"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
