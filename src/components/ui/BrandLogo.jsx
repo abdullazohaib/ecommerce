@@ -1,27 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-
-/**
- * Derives uppercase brand initials / monogram from store brand name.
- * e.g. "Classic Glow" -> "CG", "Glow Basket" -> "GB", "Fair Plus" -> "FP"
- */
-export const getAutoMonogram = (name, customMonogram) => {
-  // If user explicitly provided a custom monogram that is NOT a stale default 'GB' on a non-Glow Basket name
-  if (customMonogram && customMonogram.trim()) {
-    const isStaleGB = customMonogram.trim().toUpperCase() === 'GB' && name && !name.toLowerCase().includes('glow basket');
-    if (!isStaleGB) {
-      return customMonogram.trim().toUpperCase();
-    }
-  }
-  // Auto-generate monogram initials from store name
-  if (!name || typeof name !== 'string') return 'CG';
-  const clean = name.trim();
-  const words = clean.split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-  return clean.slice(0, 2).toUpperCase();
-};
+import { getAutoMonogram } from '../../utils/helpers';
 
 /**
  * BrandLogo Component
