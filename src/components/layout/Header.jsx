@@ -138,9 +138,13 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-2xs transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
+    <header className="sticky top-0 z-40 bg-white transition-all">
+      {/* ============================================================= */}
+      {/* ROW 1: LOGO, SEARCH, NAV & USER ACTIONS */}
+      {/* ============================================================= */}
+      <div className="relative z-20 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
           
           {/* ============================================================= */}
           {/* LEFT: BRAND LOGO + CONNECTED LUXURY NAVIGATION */}
@@ -534,12 +538,18 @@ export const Header = () => {
           </div>
         )}
       </div>
+      </div>
 
       {/* ============================================================= */}
-      {/* LUXURY CATEGORY STRIP: SALE | LIPS | EYES | SKIN | FACE | NAILS */}
+      {/* LINE & SOFT DROPSHADOW SHADE (Between Logo Row and Sale Row) */}
+      {/* ============================================================= */}
+      <div className="w-full h-2.5 bg-gradient-to-b from-black/[0.08] via-black/[0.03] to-transparent pointer-events-none -mb-2.5 z-10 relative"></div>
+
+      {/* ============================================================= */}
+      {/* ROW 2: LUXURY CATEGORY STRIP: SALE | LIPS | EYES | SKIN | FACE | NAILS */}
       {/* (Centered Theme Line with Gold Shimmer SALE matching Lakmé UI Reference) */}
       {/* ============================================================= */}
-      <div className="w-full border-t border-b border-slate-200/80 bg-white py-2.5 sm:py-3 shadow-3xs transition-all">
+      <div className="relative z-0 w-full border-b border-slate-200/80 bg-white py-2.5 sm:py-3 transition-all">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-center overflow-x-auto no-scrollbar">
           <nav className="flex items-center justify-center gap-0 font-cinzel text-xs sm:text-[13.5px] font-semibold tracking-[0.18em] uppercase text-neutral-900 shrink-0">
             {/* 1. SALE with Shimmer Color Change */}
