@@ -7,7 +7,6 @@ import { MobileBottomNav } from './components/layout/MobileBottomNav';
 
 import { HeroSlider } from './components/home/HeroSlider';
 import { CategoryGrid } from './components/home/CategoryGrid';
-import { TrustBadges } from './components/home/TrustBadges';
 import { FlashSaleCountdown } from './components/home/FlashSaleCountdown';
 import { ProductGrid } from './components/home/ProductGrid';
 import { WhyChooseUs } from './components/home/WhyChooseUs';
@@ -78,7 +77,6 @@ const MainContent = () => {
             <>
               <HeroSlider />
               <CategoryGrid />
-              <TrustBadges />
               <FlashSaleCountdown />
               <ProductGrid />
               <WhyChooseUs />
