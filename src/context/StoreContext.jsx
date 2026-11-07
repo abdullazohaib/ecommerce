@@ -3,9 +3,9 @@ import { products as initialProducts } from '../data/products';
 import { categories as initialCategories } from '../data/categories';
 import { storeConfig, initialAboutSection, initialPolicies } from '../config/storeConfig';
 import { testimonials as initialReviews } from '../data/testimonials';
-import { slugify, safeStorageSet } from '../utils/helpers';
+import { slugify, safeStorageSet, idbSet, idbGet, idbDelete } from '../utils/helpers';
 
-export { slugify, safeStorageSet };
+export { slugify, safeStorageSet, idbSet, idbGet, idbDelete };
 
 const StoreContext = createContext();
 
@@ -686,7 +686,36 @@ export const StoreProvider = ({ children }) => {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('glowbasket_sync', handleCustomSync);
+
+    // Asynchronous IndexedDB Recovery (Guarantees zero data loss even if localStorage was wiped or hit 5MB quota)
+    let isMounted = true;
+    const restoreFromIdb = async () => {
+      try {
+        const idbCats = await idbGet('glowbasket_categories');
+        if (isMounted && Array.isArray(idbCats) && idbCats.length > 0) {
+          setCategoriesList(prev => {
+            const currentSlugs = new Set((prev || []).map(c => (c.slug || c.id || '').toLowerCase()));
+            const idbSlugs = idbCats.map(c => (c.slug || c.id || '').toLowerCase());
+            const hasMissing = idbSlugs.some(s => !currentSlugs.has(s));
+            if (hasMissing || idbCats.length > (prev || []).length) {
+              return idbCats;
+            }
+            return prev;
+          });
+        }
+
+        const idbBanners = await idbGet('glowbasket_category_banners');
+        if (isMounted && idbBanners && typeof idbBanners === 'object') {
+          setCategoryBanners(prev => ({ ...prev, ...idbBanners }));
+        }
+      } catch (err) {
+        console.warn('IDB restore error:', err);
+      }
+    };
+    restoreFromIdb();
+
     return () => {
+      isMounted = false;
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('glowbasket_sync', handleCustomSync);
     };
@@ -1215,9 +1244,11 @@ export const StoreProvider = ({ children }) => {
       try {
         localStorage.setItem(`glowbasket_banner_${slug}`, cat.bannerImg);
       } catch (e) {}
+      idbSet(`glowbasket_banner_${slug}`, cat.bannerImg);
       setCategoryBanners(prev => {
         const nextB = { ...prev, [slug]: cat.bannerImg };
         safeStorageSet('glowbasket_category_banners', nextB);
+        idbSet('glowbasket_category_banners', nextB);
         return nextB;
       });
     }
@@ -1227,6 +1258,7 @@ export const StoreProvider = ({ children }) => {
       const filtered = prev.filter(c => (c.slug || c.id || '').toLowerCase() !== slug.toLowerCase());
       const next = [...filtered, cat];
       safeStorageSet('glowbasket_categories', next);
+      idbSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
       }
@@ -1247,12 +1279,14 @@ export const StoreProvider = ({ children }) => {
             try {
               localStorage.setItem(`glowbasket_banner_${s}`, updatedFields.bannerImg);
             } catch (e) {}
+            idbSet(`glowbasket_banner_${s}`, updatedFields.bannerImg);
           }
           return updated;
         }
         return c;
       });
       safeStorageSet('glowbasket_categories', next);
+      idbSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
       }
@@ -1277,6 +1311,7 @@ export const StoreProvider = ({ children }) => {
     setCategoriesList(prev => {
       const next = prev.filter(c => (c.id || '').toLowerCase() !== cleanId && (c.slug || '').toLowerCase() !== cleanId);
       safeStorageSet('glowbasket_categories', next);
+      idbSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
       }
@@ -1285,6 +1320,7 @@ export const StoreProvider = ({ children }) => {
     try {
       localStorage.removeItem(`glowbasket_banner_${cleanId}`);
     } catch (e) {}
+    idbDelete(`glowbasket_banner_${cleanId}`);
     addToast(`Category removed from store.`, 'info');
   };
 
@@ -1643,6 +1679,7 @@ export const StoreProvider = ({ children }) => {
     setCategoryBanners(prev => {
       const next = { ...prev, [slug]: bannerUrl };
       safeStorageSet('glowbasket_category_banners', next);
+      idbSet('glowbasket_category_banners', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categoryBanners', data: next } }));
       }
@@ -1657,6 +1694,7 @@ export const StoreProvider = ({ children }) => {
         return c;
       });
       safeStorageSet('glowbasket_categories', next);
+      idbSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
       }

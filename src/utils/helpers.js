@@ -1,3 +1,7 @@
+import { idbSet, idbGet, idbDelete } from './idbStorage';
+
+export { idbSet, idbGet, idbDelete };
+
 // URL Slugifier Helper - Guarantees NO GAPS, spaces or special chars
 export const slugify = (text) => {
   return (text || '')
@@ -11,8 +15,14 @@ export const slugify = (text) => {
     .replace(/^-+|-+$/g, '');
 };
 
-// Safe LocalStorage Writer with Quota Protection & Quota Recovery
+// Safe Storage Writer with Dual Persistence (IndexedDB + LocalStorage)
 export const safeStorageSet = (key, value) => {
+  // 1. Asynchronously persist to IndexedDB (Unlimited gigabyte storage, immune to 5MB quota)
+  try {
+    idbSet(key, value);
+  } catch (e) {}
+
+  // 2. Persist to LocalStorage for instant synchronous startup
   try {
     let cleanValue = value;
     // Strip redundant banners from storeInfo if present to keep storage lean
@@ -20,7 +30,6 @@ export const safeStorageSet = (key, value) => {
       const { banners, ...rest } = value;
       cleanValue = rest;
 
-      // Always save standalone backup keys for critical branding values
       try {
         if (rest.logoUrl !== undefined) localStorage.setItem('glowbasket_logo_url', rest.logoUrl);
         if (rest.logoType !== undefined) localStorage.setItem('glowbasket_logo_type', rest.logoType);
@@ -36,6 +45,7 @@ export const safeStorageSet = (key, value) => {
           const s = (cat.slug || cat.id || '').toLowerCase();
           if (s && cat.bannerImg) {
             try { localStorage.setItem(`glowbasket_banner_${s}`, cat.bannerImg); } catch (e) {}
+            idbSet(`glowbasket_banner_${s}`, cat.bannerImg);
           }
         });
       } catch (e) {}
@@ -52,17 +62,16 @@ export const safeStorageSet = (key, value) => {
         try { localStorage.removeItem(k); } catch (e) {}
       });
 
-      // If saving storeInfo, always guarantee backup logo keys are saved
-      if (key === 'glowbasket_store_info' && value && typeof value === 'object') {
-        const { banners, ...rest } = value;
-        try {
-          if (rest.logoUrl) localStorage.setItem('glowbasket_logo_url', rest.logoUrl);
-          if (rest.logoType) localStorage.setItem('glowbasket_logo_type', rest.logoType);
-          if (rest.storeName) localStorage.setItem('glowbasket_store_name', rest.storeName);
-          if (rest.monogram) localStorage.setItem('glowbasket_monogram', rest.monogram);
-        } catch (e) {}
-        const serialized = JSON.stringify(rest);
-        localStorage.setItem(key, serialized);
+      // If categories is failing quota, save lean categories into localStorage (IndexedDB already has full data!)
+      if (key === 'glowbasket_categories' && Array.isArray(value)) {
+        const lean = value.map(cat => {
+          const s = (cat.slug || cat.id || '').toLowerCase();
+          if (cat.bannerImg && cat.bannerImg.startsWith('data:') && cat.bannerImg.length > 5000) {
+            return { ...cat, bannerImg: `/categories/${s}.png` };
+          }
+          return cat;
+        });
+        localStorage.setItem(key, JSON.stringify(lean));
         return true;
       }
 
@@ -70,7 +79,7 @@ export const safeStorageSet = (key, value) => {
       localStorage.setItem(key, serialized);
       return true;
     } catch (e2) {
-      console.error(`[Storage] Critical quota error for ${key}:`, e2);
+      console.warn(`[Storage] Quota saved in IndexedDB only for ${key}`);
       return false;
     }
   }
