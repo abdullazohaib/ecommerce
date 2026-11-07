@@ -19,7 +19,7 @@ export const ContactUsPage = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Back Link */}
         <a
           href="/"
@@ -34,7 +34,7 @@ export const ContactUsPage = () => {
         </a>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Left Info Column */}
           <div className="lg:col-span-5 bg-slate-900 text-white rounded-3xl p-8 space-y-6 flex flex-col justify-between">
             <div className="space-y-4">

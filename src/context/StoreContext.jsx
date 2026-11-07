@@ -101,28 +101,11 @@ export const StoreProvider = ({ children }) => {
       }
 
       // Respect user's explicit saved choices first, fallback to backup keys, then storeConfig
-      let storeName = parsed.storeName || backupStoreName || storeConfig.storeName || 'Glow Basket';
-      let logoText = parsed.logoText || backupStoreName || storeName;
-      let monogram = parsed.monogram || backupMonogram || storeConfig.monogram || 'GB';
-      let logoType = parsed.logoType || backupLogoType || storeConfig.logoType || 'image';
-      let logoUrl = parsed.logoUrl || backupLogoUrl || storeConfig.logoUrl || '/logo.png';
-
-      // Automatically migrate legacy placeholders (Classic Glow / Aura Glow / CG) to Glow Basket (GB)
-      const isLegacyBrand = /classic\s*glow/i.test(storeName) || /aura\s*glow/i.test(storeName) || monogram === 'CG';
-      if (isLegacyBrand) {
-        storeName = 'Glow Basket';
-        logoText = 'Glow Basket';
-        monogram = 'GB';
-        logoType = 'image';
-        logoUrl = '/logo.png';
-        try {
-          localStorage.setItem('glowbasket_store_name', 'Glow Basket');
-          localStorage.setItem('glowbasket_monogram', 'GB');
-          localStorage.setItem('glowbasket_logo_type', 'image');
-          localStorage.setItem('glowbasket_logo_url', '/logo.png');
-          localStorage.removeItem('auraglow_store_info');
-        } catch (e) {}
-      }
+      const storeName = parsed.storeName || backupStoreName || storeConfig.storeName || 'Glow Basket';
+      const logoText = parsed.logoText || backupStoreName || storeName;
+      const monogram = parsed.monogram || backupMonogram || storeConfig.monogram || 'GB';
+      const logoType = parsed.logoType || backupLogoType || storeConfig.logoType || 'text';
+      const logoUrl = parsed.logoUrl || backupLogoUrl || storeConfig.logoUrl || '/logo.png';
 
       // Strip duplicate banners from storeInfo to prevent localStorage quota exhaustion
       const { banners: _unused, ...cleanParsed } = parsed;
@@ -1318,7 +1301,7 @@ export const StoreProvider = ({ children }) => {
     addToast('Product updated successfully!', 'success');
   };
 
-  const updateStoreInfo = (newInfo) => {
+  const updateStoreInfo = (newInfo, showToast = false) => {
     setStoreInfo(prev => {
       const next = { ...prev, ...newInfo };
       // Strip redundant banners from storeInfo to prevent storage exhaustion
@@ -1329,7 +1312,9 @@ export const StoreProvider = ({ children }) => {
       }
       return cleanNext;
     });
-    addToast('Store Logo & Branding updated live!', 'success');
+    if (showToast) {
+      addToast('Store Logo & Branding updated live!', 'success');
+    }
   };
 
   const updateAboutSection = (newAboutData) => {

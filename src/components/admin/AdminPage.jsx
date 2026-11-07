@@ -212,6 +212,15 @@ export const AdminPage = () => {
     freeShippingThreshold: storeInfo?.freeShippingThreshold || 999
   });
 
+  // Live auto-save handler: updates component state, context store, and localStorage instantly
+  const handleBrandingFieldChange = (field, value) => {
+    setBrandingForm(prev => {
+      const updated = { ...prev, [field]: value };
+      updateStoreInfo(updated, false);
+      return updated;
+    });
+  };
+
   // Keep branding form synchronized with store changes
   useEffect(() => {
     if (storeInfo && typeof storeInfo === 'object') {
@@ -464,7 +473,7 @@ export const AdminPage = () => {
 
   const handleSaveBranding = (e) => {
     e.preventDefault();
-    updateStoreInfo(brandingForm);
+    updateStoreInfo(brandingForm, true);
   };
 
   const handleSaveAbout = (e) => {
@@ -1659,7 +1668,7 @@ export const AdminPage = () => {
             <form onSubmit={handleSaveBranding} className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 space-y-8 shadow-xs text-xs">
               
               {/* Logo Customizer Section */}
-              <div className="space-y-4 pb-6 border-b border-slate-100">
+              <div className="space-y-5 pb-6 border-b border-slate-100">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
@@ -1667,158 +1676,153 @@ export const AdminPage = () => {
                       <h2 className="text-lg font-bold text-slate-900">Website Logo & Branding</h2>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Choose between an image logo or an elegant cursive handwritten script logo with watermark monogram.
+                      Changes save automatically in real time and sync across storefront header, footer, and mobile nav.
                     </p>
                   </div>
 
                   {/* Immediate Save & Apply Logo Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateStoreInfo({
-                        logoType: brandingForm.logoType,
-                        logoUrl: brandingForm.logoUrl,
-                        storeName: brandingForm.storeName,
-                        monogram: brandingForm.monogram
-                      });
-                    }}
-                    className="flex items-center gap-2 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-indigo-500/25 transition-all cursor-pointer self-start sm:self-auto shrink-0"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Apply & Save Logo Live</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Auto-Save Active
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateStoreInfo({
+                          logoType: brandingForm.logoType,
+                          logoUrl: brandingForm.logoUrl,
+                          storeName: brandingForm.storeName,
+                          monogram: brandingForm.monogram
+                        }, true);
+                      }}
+                      className="flex items-center gap-1.5 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md shadow-indigo-500/25 transition-all cursor-pointer shrink-0"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Save Live</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Logo Type Selector */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <label className={`p-4 rounded-2xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
-                    brandingForm.logoType === 'text' ? 'border-[#5B4DF5] bg-indigo-50/40' : 'border-slate-200 hover:border-slate-300'
-                  }`}>
+                {/* Primary Brand Name & Monogram inputs (ALWAYS VISIBLE for all modes!) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">
+                      Store Brand Name <span className="text-rose-500">*</span>
+                    </label>
                     <input
-                      type="radio"
-                      name="logoType"
-                      value="text"
-                      checked={brandingForm.logoType === 'text'}
-                      onChange={() => {
-                        const updated = { ...brandingForm, logoType: 'text' };
-                        setBrandingForm(updated);
-                        updateStoreInfo(updated);
-                      }}
-                      className="accent-[#5B4DF5] mt-1"
+                      type="text"
+                      value={brandingForm.storeName}
+                      onChange={(e) => handleBrandingFieldChange('storeName', e.target.value)}
+                      placeholder="e.g. Glow Basket"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold text-slate-900 focus:ring-2 focus:ring-[#5B4DF5] outline-none text-xs"
                     />
-                    <div>
-                      <span className="font-bold text-slate-900 block">Cursive Script Logo + Monogram</span>
-                      <span className="text-[11px] text-slate-500 block mt-0.5">
-                        Handcrafted luxury aesthetic with a soft pink watermark background monogram (e.g. GB).
-                      </span>
-                    </div>
-                  </label>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Reflects instantly across the header, footer, page titles, and live logo.
+                    </p>
+                  </div>
 
-                  <label className={`p-4 rounded-2xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
-                    brandingForm.logoType === 'image' ? 'border-[#5B4DF5] bg-indigo-50/40' : 'border-slate-200 hover:border-slate-300'
-                  }`}>
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">
+                      Monogram Letters (Watermark)
+                    </label>
                     <input
-                      type="radio"
-                      name="logoType"
-                      value="image"
-                      checked={brandingForm.logoType === 'image'}
-                      onChange={() => {
-                        const updated = { ...brandingForm, logoType: 'image' };
-                        setBrandingForm(updated);
-                        updateStoreInfo(updated);
-                      }}
-                      className="accent-[#5B4DF5] mt-1"
+                      type="text"
+                      maxLength={4}
+                      value={brandingForm.monogram}
+                      onChange={(e) => handleBrandingFieldChange('monogram', e.target.value.toUpperCase())}
+                      placeholder="GB"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 font-mono font-bold uppercase text-slate-900 focus:ring-2 focus:ring-[#5B4DF5] outline-none text-xs"
                     />
-                    <div>
-                      <span className="font-bold text-slate-900 block">Custom Image Logo (URL / Upload)</span>
-                      <span className="text-[11px] text-slate-500 block mt-0.5">
-                        Display your own custom brand logo image file across the header and footer.
-                      </span>
-                    </div>
-                  </label>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      2-3 initials shown as soft blush watermark letters behind script name (e.g. GB, DS).
+                    </p>
+                  </div>
                 </div>
 
-                {/* If Image Logo is Selected */}
+                {/* Logo Presentation Style Selector */}
+                <div>
+                  <label className="font-bold text-slate-700 block mb-2">Logo Presentation Style</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label className={`p-4 rounded-2xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
+                      brandingForm.logoType === 'text' ? 'border-[#5B4DF5] bg-indigo-50/40 ring-2 ring-indigo-100' : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="logoType"
+                        value="text"
+                        checked={brandingForm.logoType === 'text'}
+                        onChange={() => handleBrandingFieldChange('logoType', 'text')}
+                        className="accent-[#5B4DF5] mt-1"
+                      />
+                      <div>
+                        <span className="font-bold text-slate-900 block">Cursive Script Logo + Monogram</span>
+                        <span className="text-[11px] text-slate-500 block mt-0.5">
+                          Signature luxury look: elegant cursive brand signature with soft pink watermark monogram.
+                        </span>
+                      </div>
+                    </label>
+
+                    <label className={`p-4 rounded-2xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
+                      brandingForm.logoType === 'image' ? 'border-[#5B4DF5] bg-indigo-50/40 ring-2 ring-indigo-100' : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="logoType"
+                        value="image"
+                        checked={brandingForm.logoType === 'image'}
+                        onChange={() => handleBrandingFieldChange('logoType', 'image')}
+                        className="accent-[#5B4DF5] mt-1"
+                      />
+                      <div>
+                        <span className="font-bold text-slate-900 block">Custom Image Logo (Upload / Link)</span>
+                        <span className="text-[11px] text-slate-500 block mt-0.5">
+                          Display your own brand logo file (transparent PNG, WebP, or SVG recommended).
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* If Custom Image Logo is Selected */}
                 {brandingForm.logoType === 'image' && (
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
                     <ImageUploadField
-                      label="Store Brand Logo (Upload or Paste Link)"
+                      label="Upload or Paste Brand Logo Image"
                       value={brandingForm.logoUrl}
-                      onChange={(newVal) => {
-                        const updated = { ...brandingForm, logoUrl: newVal, logoType: 'image' };
-                        setBrandingForm(updated);
-                        updateStoreInfo(updated);
-                      }}
+                      onChange={(newVal) => handleBrandingFieldChange('logoUrl', newVal)}
                       aspect="contain"
                       presets={logoPresets.filter(p => p.type === 'image')}
-                      helperText="Direct upload from gallery or device files (transparent PNG or SVG recommended)."
+                      helperText="Supports transparent PNG, WebP, SVG, and high-res image links."
                     />
 
-                    {/* Live Preview */}
+                    {/* Live Image Logo Preview */}
                     {brandingForm.logoUrl && (
-                      <div className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
+                      <div className="p-3.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
                         <span className="text-[11px] text-slate-500 font-semibold">Live Storefront Header Preview:</span>
-                        <div className="bg-slate-100 px-4 py-2 rounded-xl flex items-center gap-2">
-                          <img src={brandingForm.logoUrl} alt="Logo Preview" className="h-9 object-contain" />
-                          <span className="text-xs font-bold text-slate-700">{brandingForm.storeName}</span>
+                        <div className="bg-slate-50 px-4 py-2 rounded-xl flex items-center gap-3 border border-slate-100">
+                          <img src={brandingForm.logoUrl} alt="Logo Preview" className="h-10 w-auto object-contain" />
+                          <span className="text-xs font-bold text-slate-800">{brandingForm.storeName}</span>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* If Script Text Logo is Selected */}
+                {/* If Cursive Script Logo is Selected */}
                 {brandingForm.logoType === 'text' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                    <div>
-                      <label className="font-bold text-slate-700 block mb-1">Store Brand Name (Script Text)</label>
-                      <input
-                        type="text"
-                        value={brandingForm.storeName}
-                        onChange={(e) => setBrandingForm({ ...brandingForm, storeName: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="font-bold text-slate-700 block mb-1">Background Monogram Letters</label>
-                      <input
-                        type="text"
-                        maxLength={4}
-                        value={brandingForm.monogram}
-                        onChange={(e) => setBrandingForm({ ...brandingForm, monogram: e.target.value.toUpperCase() })}
-                        placeholder="GB"
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold uppercase focus:ring-2 focus:ring-[#5B4DF5] outline-none"
-                      />
-                    </div>
-
-                    {/* Live Script Logo Preview */}
-                    <div className="sm:col-span-2 p-4 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
-                      <div className="flex-1 flex items-center justify-center relative overflow-hidden h-20">
-                        <span className="absolute text-6xl font-serif font-black text-[#fce5e8] pointer-events-none select-none">
-                          {brandingForm.monogram || 'GB'}
-                        </span>
-                        <span 
-                          className="relative z-10 text-3xl text-[#c85a6e]"
-                          style={{ fontFamily: "'Alex Brush', 'Dancing Script', cursive" }}
-                        >
-                          {brandingForm.storeName || 'Glow Basket'}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          updateStoreInfo({
-                            logoType: 'text',
-                            storeName: brandingForm.storeName || 'Glow Basket',
-                            monogram: brandingForm.monogram || 'GB'
-                          });
-                        }}
-                        className="ml-4 flex items-center gap-1.5 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-all cursor-pointer shrink-0"
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <span className="text-[11px] font-bold text-slate-600 block">Live Script Logo Preview (As Rendered in Header):</span>
+                    <div className="p-4 bg-white border border-slate-200 rounded-xl flex items-center justify-center relative overflow-hidden h-24 shadow-2xs">
+                      <span className="absolute text-6xl font-serif font-black text-[#fce5e8] pointer-events-none select-none tracking-tight">
+                        {brandingForm.monogram || 'GB'}
+                      </span>
+                      <span 
+                        className="relative z-10 text-3xl sm:text-4xl text-[#ba5d5d] drop-shadow-2xs select-none"
+                        style={{ fontFamily: "'Alex Brush', 'Dancing Script', cursive" }}
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Apply Script Logo</span>
-                      </button>
+                        {brandingForm.storeName || 'Glow Basket'}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -1840,7 +1844,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.whatsappNumber}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, whatsappNumber: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('whatsappNumber', e.target.value)}
                       placeholder="+91 98200 45678"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
@@ -1851,7 +1855,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.whatsappPromptText}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, whatsappPromptText: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('whatsappPromptText', e.target.value)}
                       placeholder="Need help choosing a cream? Chat with us!"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
@@ -1869,7 +1873,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.supportPhone}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, supportPhone: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('supportPhone', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -1879,7 +1883,7 @@ export const AdminPage = () => {
                     <input
                       type="email"
                       value={brandingForm.supportEmail}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, supportEmail: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('supportEmail', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -1889,7 +1893,7 @@ export const AdminPage = () => {
                     <input
                       type="number"
                       value={brandingForm.freeShippingThreshold}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, freeShippingThreshold: Number(e.target.value) })}
+                      onChange={(e) => handleBrandingFieldChange('freeShippingThreshold', Number(e.target.value))}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -1899,7 +1903,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.storeTagline}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, storeTagline: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('storeTagline', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -1909,7 +1913,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.domainName || ''}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, domainName: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('domainName', e.target.value)}
                       placeholder="glowbasket.in"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-mono focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
@@ -1920,7 +1924,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.siteUrl || ''}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, siteUrl: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('siteUrl', e.target.value)}
                       placeholder="https://glowbasket.in"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-mono focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
@@ -1931,7 +1935,7 @@ export const AdminPage = () => {
                     <input
                       type="text"
                       value={brandingForm.businessAddress}
-                      onChange={(e) => setBrandingForm({ ...brandingForm, businessAddress: e.target.value })}
+                      onChange={(e) => handleBrandingFieldChange('businessAddress', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>

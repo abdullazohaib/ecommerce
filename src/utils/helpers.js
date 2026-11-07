@@ -22,10 +22,10 @@ export const safeStorageSet = (key, value) => {
 
       // Always save standalone backup keys for critical branding values
       try {
-        if (rest.logoUrl) localStorage.setItem('glowbasket_logo_url', rest.logoUrl);
-        if (rest.logoType) localStorage.setItem('glowbasket_logo_type', rest.logoType);
-        if (rest.storeName) localStorage.setItem('glowbasket_store_name', rest.storeName);
-        if (rest.monogram) localStorage.setItem('glowbasket_monogram', rest.monogram);
+        if (rest.logoUrl !== undefined) localStorage.setItem('glowbasket_logo_url', rest.logoUrl);
+        if (rest.logoType !== undefined) localStorage.setItem('glowbasket_logo_type', rest.logoType);
+        if (rest.storeName !== undefined) localStorage.setItem('glowbasket_store_name', rest.storeName);
+        if (rest.monogram !== undefined) localStorage.setItem('glowbasket_monogram', rest.monogram);
       } catch (e) {}
     }
 

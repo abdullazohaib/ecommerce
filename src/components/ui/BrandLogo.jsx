@@ -30,19 +30,26 @@ export const BrandLogo = ({ className = "", size = "normal" }) => {
     footer: 'h-11 sm:h-12'
   };
 
-  // If Image Logo is active (using the exact uploaded Glow Basket GB logo)
+  // If Image Logo is active
   if (logoType === 'image' && logoUrl && !imgError) {
-    return (
-      <div className={`inline-flex items-center select-none ${className}`}>
-        <img
-          key={logoUrl}
-          src={logoUrl}
-          alt={storeName}
-          className={`${imgHeights[size] || imgHeights.normal} w-auto object-contain transition-transform group-hover:scale-102`}
-          onError={() => setImgError(true)}
-        />
-      </div>
-    );
+    const isDefaultGlowBasketImage = logoUrl === '/logo.png' || logoUrl === '/glow-basket-logo.png';
+    const hasCustomStoreName = storeName && storeName.trim().toLowerCase() !== 'glow basket';
+
+    // If still using default /logo.png but user changed store name to another brand,
+    // show dynamic typographic logo with their new name instead of showing old "Glow Basket" image pixels
+    if (!isDefaultGlowBasketImage || !hasCustomStoreName) {
+      return (
+        <div className={`inline-flex items-center select-none ${className}`}>
+          <img
+            key={logoUrl}
+            src={logoUrl}
+            alt={storeName}
+            className={`${imgHeights[size] || imgHeights.normal} w-auto object-contain transition-transform group-hover:scale-102`}
+            onError={() => setImgError(true)}
+          />
+        </div>
+      );
+    }
   }
 
   // Text + Watermark Monogram Luxury Typographic Logo (Pixel-matched to user's uploaded image)
