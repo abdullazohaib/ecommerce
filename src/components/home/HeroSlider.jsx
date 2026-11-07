@@ -77,20 +77,20 @@ export const HeroSlider = () => {
   const isGraphicBanner = slide.isGraphicBanner !== false && slide.bannerType !== 'split';
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-      <div className={`relative rounded-3xl overflow-hidden ${isGraphicBanner ? 'bg-white shadow-xl border border-slate-100' : slide.bgClass} shadow-lg min-h-[300px] sm:min-h-[460px] flex items-center transition-all duration-700`}>
+    <section className="relative w-full overflow-hidden bg-white">
+      <div className={`relative w-full overflow-hidden ${isGraphicBanner ? 'bg-white' : slide.bgClass} flex items-center transition-all duration-700`}>
         
-        {/* Full Graphic Image Banner (Matches user's exact uploaded 9 TO 5 HYA GLAM & Dr. Sheth's banners) */}
+        {/* Full Graphic Image Banner (Edge-to-edge full width with NO side gaps) */}
         {isGraphicBanner ? (
           <div 
             onClick={() => handleUrlNavigation(primaryTargetUrl)}
-            className="w-full relative group cursor-pointer overflow-hidden rounded-3xl"
+            className="w-full relative group cursor-pointer overflow-hidden"
           >
-            <div className="w-full aspect-[16/9] sm:aspect-[2.1/1] max-h-[520px] bg-white flex items-center justify-center overflow-hidden">
+            <div className="w-full aspect-[16/9] sm:aspect-[2.2/1] md:aspect-[2.6/1] lg:aspect-[3/1] min-h-[240px] sm:min-h-[380px] md:min-h-[460px] max-h-[620px] bg-neutral-100 flex items-center justify-center overflow-hidden">
               <img
                 src={slide.image}
-                alt={slide.title || "Classic Glow Banner"}
-                className="w-full h-full object-cover sm:object-contain object-center transform group-hover:scale-[1.01] transition-transform duration-700"
+                alt={slide.title || "Banner"}
+                className="w-full h-full object-cover object-center transform group-hover:scale-[1.01] transition-transform duration-700"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/banners/classic-glow-hero-clean.jpg";
@@ -244,6 +244,6 @@ export const HeroSlider = () => {
         </div>
 
       </div>
-    </div>
+    </section>
   );
 };
