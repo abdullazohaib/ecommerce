@@ -95,3 +95,4 @@ export const idbDelete = async (key) => {
     return false;
   }
 };
+

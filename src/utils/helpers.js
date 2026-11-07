@@ -51,6 +51,19 @@ export const safeStorageSet = (key, value) => {
       } catch (e) {}
     }
 
+    // Always backup homepage hero slider banners into isolated crash-proof keys
+    if (key === 'glowbasket_banners' && Array.isArray(value)) {
+      try {
+        value.forEach((b, idx) => {
+          const bId = b.id || `banner-${idx + 1}`;
+          if (b.image) {
+            try { localStorage.setItem(`glowbasket_home_banner_${bId}`, b.image); } catch (e) {}
+            idbSet(`glowbasket_home_banner_${bId}`, b.image);
+          }
+        });
+      } catch (e) {}
+    }
+
     const serialized = typeof cleanValue === 'string' ? cleanValue : JSON.stringify(cleanValue);
     localStorage.setItem(key, serialized);
     return true;
@@ -62,6 +75,21 @@ export const safeStorageSet = (key, value) => {
         try { localStorage.removeItem(k); } catch (e) {}
       });
 
+      // If home banners is failing quota, save lean banners into localStorage (IndexedDB already has full high-res data!)
+      if (key === 'glowbasket_banners' && Array.isArray(value)) {
+        const lean = value.map((b, idx) => {
+          if (b.image && b.image.startsWith('data:') && b.image.length > 5000) {
+            return { 
+              ...b, 
+              image: idx === 1 ? "/banners/dr-sheths-am-pm-routine.jpg" : "/banners/classic-glow-hero-clean.jpg" 
+            };
+          }
+          return b;
+        });
+        localStorage.setItem(key, JSON.stringify(lean));
+        return true;
+      }
+
       // If categories is failing quota, save lean categories into localStorage (IndexedDB already has full data!)
       if (key === 'glowbasket_categories' && Array.isArray(value)) {
         const lean = value.map(cat => {
@@ -70,6 +98,22 @@ export const safeStorageSet = (key, value) => {
             return { ...cat, bannerImg: `/categories/${s}.png` };
           }
           return cat;
+        });
+        localStorage.setItem(key, JSON.stringify(lean));
+        return true;
+      }
+
+      // If products is failing quota, save lean products into localStorage (IndexedDB already has full images!)
+      if (key === 'glowbasket_products' && Array.isArray(value)) {
+        const lean = value.map(p => {
+          let leanP = { ...p };
+          if (leanP.image && leanP.image.startsWith('data:') && leanP.image.length > 5000) {
+            leanP.image = '/banners/classic-glow-hero-clean.jpg';
+          }
+          if (Array.isArray(leanP.images)) {
+            leanP.images = leanP.images.filter(img => !img.startsWith('data:') || img.length < 5000);
+          }
+          return leanP;
         });
         localStorage.setItem(key, JSON.stringify(lean));
         return true;
@@ -112,7 +156,7 @@ export const getAutoMonogram = (name, customMonogram) => {
  * Converts to optimized JPEG (~50KB - 80KB) so it saves instantly,
  * never triggers browser localStorage quota errors, and renders sharply across mobile & desktop.
  */
-export const compressBannerImage = (file, maxWidth = 1200, maxHeight = 450, quality = 0.78) => {
+export const compressBannerImage = (file, maxWidth = 1920, maxHeight = 600, quality = 0.8) => {
   return new Promise((resolve, reject) => {
     if (!file) return reject(new Error('No file provided'));
 

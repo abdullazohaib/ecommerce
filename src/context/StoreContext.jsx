@@ -225,23 +225,57 @@ export const StoreProvider = ({ children }) => {
   // Website Homepage Banners State (Controlled from Admin with Instant Reactive Sync)
   const [banners, setBanners] = useState(() => {
     try {
+      // 1. Read deleted banner IDs
+      let deletedBannerIds = new Set();
+      try {
+        const d = JSON.parse(localStorage.getItem('glowbasket_deleted_banners') || '[]');
+        if (Array.isArray(d)) deletedBannerIds = new Set(d);
+      } catch (e) {}
+
+      // 2. Read individual guaranteed home banner keys (crash-proof persistence)
+      const customImages = {};
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('glowbasket_home_banner_')) {
+            const bId = key.replace('glowbasket_home_banner_', '');
+            const val = localStorage.getItem(key);
+            if (val) customImages[bId] = val;
+          }
+        }
+      } catch (e) {}
+
       const saved = localStorage.getItem('glowbasket_banners');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Keep user's custom changes, uploads, and additions exactly as saved
-          return parsed.map((b, idx) => ({
-            ...b,
-            id: b.id || `banner-${idx + 1}`,
-            active: b.active !== false && b.status !== 'Draft',
-            status: b.status || (b.active !== false ? 'Active' : 'Draft'),
-            isGraphicBanner: b.isGraphicBanner !== false,
-            bannerType: b.bannerType || (b.isGraphicBanner !== false ? 'image' : 'split'),
-            image: b.image || (idx === 1 ? "/banners/dr-sheths-am-pm-routine.jpg" : "/banners/classic-glow-hero-clean.jpg"),
-            ctaLink: b.ctaLink || '/shop'
-          }));
+          return parsed
+            .filter(b => !deletedBannerIds.has(b.id))
+            .map((b, idx) => {
+              const bId = b.id || `banner-${idx + 1}`;
+              return {
+                ...b,
+                id: bId,
+                active: b.active !== false && b.status !== 'Draft',
+                status: b.status || (b.active !== false ? 'Active' : 'Draft'),
+                isGraphicBanner: b.isGraphicBanner !== false,
+                bannerType: b.bannerType || (b.isGraphicBanner !== false ? 'image' : 'split'),
+                image: customImages[bId] || b.image || (idx === 1 ? "/banners/dr-sheths-am-pm-routine.jpg" : "/banners/classic-glow-hero-clean.jpg"),
+                ctaLink: b.ctaLink || '/shop'
+              };
+            });
         }
       }
+
+      // Check default banners against custom individual image keys and deletions
+      const defaults = storeConfig.banners || [];
+      return defaults
+        .filter(b => !deletedBannerIds.has(b.id))
+        .map(b => ({
+          ...b,
+          image: customImages[b.id] || b.image
+        }));
     } catch (e) {
       console.warn("Error parsing stored banners:", e);
     }
@@ -569,6 +603,9 @@ export const StoreProvider = ({ children }) => {
   // Toast Notifications
   const [toasts, setToasts] = useState([]);
 
+  // Tracks whether initial async IndexedDB hydration has finished to prevent race condition overwrites
+  const hasHydratedIdb = useRef(false);
+
   // Persistence with Safe Storage Quota Protection
   useEffect(() => {
     safeStorageSet('glowbasket_cart', cart);
@@ -579,26 +616,32 @@ export const StoreProvider = ({ children }) => {
   }, [wishlist]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_orders', orders);
   }, [orders]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_products', productsList);
   }, [productsList]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_store_info', storeInfo);
   }, [storeInfo]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_banners', banners);
   }, [banners]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_categories', categoriesList);
   }, [categoriesList]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_category_banners', categoryBanners);
     if (categoryBanners && typeof categoryBanners === 'object') {
       Object.entries(categoryBanners).forEach(([slug, url]) => {
@@ -612,14 +655,17 @@ export const StoreProvider = ({ children }) => {
   }, [categoryBanners]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_about_section', aboutSection);
   }, [aboutSection]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_reviews', reviewsList);
   }, [reviewsList]);
 
   useEffect(() => {
+    if (!hasHydratedIdb.current) return;
     safeStorageSet('glowbasket_reviews_header', reviewsHeader);
   }, [reviewsHeader]);
 
@@ -691,6 +737,13 @@ export const StoreProvider = ({ children }) => {
     let isMounted = true;
     const restoreFromIdb = async () => {
       try {
+        // 1. Homepage Hero Slider Banners
+        const idbHomeBanners = await idbGet('glowbasket_banners');
+        if (isMounted && Array.isArray(idbHomeBanners) && idbHomeBanners.length > 0) {
+          setBanners(idbHomeBanners);
+        }
+
+        // 2. Categories
         const idbCats = await idbGet('glowbasket_categories');
         if (isMounted && Array.isArray(idbCats) && idbCats.length > 0) {
           setCategoriesList(prev => {
@@ -704,12 +757,48 @@ export const StoreProvider = ({ children }) => {
           });
         }
 
+        // 3. Category Banners
         const idbBanners = await idbGet('glowbasket_category_banners');
         if (isMounted && idbBanners && typeof idbBanners === 'object') {
           setCategoryBanners(prev => ({ ...prev, ...idbBanners }));
         }
+
+        // 4. Products List
+        const idbProducts = await idbGet('glowbasket_products');
+        if (isMounted && Array.isArray(idbProducts) && idbProducts.length > 0) {
+          setProductsList(prev => {
+            if (idbProducts.length >= (prev || []).length) return idbProducts;
+            return prev;
+          });
+        }
+
+        // 5. Store Branding & Info
+        const idbStoreInfo = await idbGet('glowbasket_store_info');
+        if (isMounted && idbStoreInfo && typeof idbStoreInfo === 'object') {
+          setStoreInfo(prev => ({ ...prev, ...idbStoreInfo }));
+        }
+
+        // 6. About Section
+        const idbAbout = await idbGet('glowbasket_about_section');
+        if (isMounted && idbAbout && typeof idbAbout === 'object') {
+          setAboutSection(prev => ({ ...prev, ...idbAbout }));
+        }
+
+        // 7. Customer Reviews
+        const idbReviews = await idbGet('glowbasket_reviews');
+        if (isMounted && Array.isArray(idbReviews) && idbReviews.length > 0) {
+          setReviewsList(idbReviews);
+        }
+
+        // 8. Store Policies
+        const idbPolicies = await idbGet('glowbasket_policies');
+        if (isMounted && idbPolicies && typeof idbPolicies === 'object') {
+          setPolicies(prev => ({ ...prev, ...idbPolicies }));
+        }
       } catch (err) {
         console.warn('IDB restore error:', err);
+      } finally {
+        hasHydratedIdb.current = true;
       }
     };
     restoreFromIdb();
@@ -1137,6 +1226,12 @@ export const StoreProvider = ({ children }) => {
       badgeClass: newBanner.badgeClass || "bg-rose-100/90 text-rose-800 border-rose-200",
       image: newBanner.image || "/banners/classic-glow-hero-clean.jpg"
     };
+
+    if (banner.image) {
+      try { localStorage.setItem(`glowbasket_home_banner_${id}`, banner.image); } catch (e) {}
+      idbSet(`glowbasket_home_banner_${id}`, banner.image);
+    }
+
     setBanners(prev => {
       const next = [...prev, banner];
       safeStorageSet('glowbasket_banners', next);
@@ -1150,6 +1245,11 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateBanner = (bannerId, updatedFields) => {
+    if (updatedFields.image) {
+      try { localStorage.setItem(`glowbasket_home_banner_${bannerId}`, updatedFields.image); } catch (e) {}
+      idbSet(`glowbasket_home_banner_${bannerId}`, updatedFields.image);
+    }
+
     setBanners(prev => {
       const next = prev.map(b => (b.id === bannerId ? { ...b, ...updatedFields } : b));
       safeStorageSet('glowbasket_banners', next);
@@ -1162,6 +1262,17 @@ export const StoreProvider = ({ children }) => {
   };
 
   const deleteBanner = (bannerId) => {
+    try {
+      const savedDeleted = JSON.parse(localStorage.getItem('glowbasket_deleted_banners') || '[]');
+      if (Array.isArray(savedDeleted) && !savedDeleted.includes(bannerId)) {
+        savedDeleted.push(bannerId);
+        localStorage.setItem('glowbasket_deleted_banners', JSON.stringify(savedDeleted));
+        idbSet('glowbasket_deleted_banners', savedDeleted);
+      }
+    } catch (e) {}
+    try { localStorage.removeItem(`glowbasket_home_banner_${bannerId}`); } catch (e) {}
+    idbDelete(`glowbasket_home_banner_${bannerId}`);
+
     setBanners(prev => {
       const next = prev.filter(b => b.id !== bannerId);
       safeStorageSet('glowbasket_banners', next);

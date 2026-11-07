@@ -88,7 +88,7 @@ export const HeroSlider = () => {
           >
             <div className="w-full aspect-[16/9] sm:aspect-[2.2/1] md:aspect-[2.6/1] lg:aspect-[3/1] min-h-[240px] sm:min-h-[380px] md:min-h-[460px] max-h-[620px] bg-neutral-100 flex items-center justify-center overflow-hidden">
               <img
-                src={slide.image}
+                src={slide.image?.trim() || "/banners/classic-glow-hero-clean.jpg"}
                 alt={slide.title || "Banner"}
                 className="w-full h-full object-cover object-center transform group-hover:scale-[1.01] transition-transform duration-700"
                 onError={(e) => {
@@ -185,7 +185,7 @@ export const HeroSlider = () => {
                 >
                   <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-xl max-w-sm sm:max-w-md bg-white p-2">
                     <img
-                      src={slide.image}
+                      src={slide.image?.trim() || "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=800&q=80"}
                       alt={slide.title}
                       className="w-full h-64 sm:h-80 object-cover rounded-2xl transform hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
