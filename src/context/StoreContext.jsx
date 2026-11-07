@@ -130,6 +130,10 @@ export const StoreProvider = ({ children }) => {
         announcement: {
           ...storeConfig.announcement,
           ...(cleanParsed.announcement || {})
+        },
+        dealOfTheDay: {
+          ...storeConfig.dealOfTheDay,
+          ...(cleanParsed.dealOfTheDay || {})
         }
       };
 

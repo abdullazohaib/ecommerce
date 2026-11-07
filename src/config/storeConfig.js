@@ -34,6 +34,14 @@ export const storeConfig = {
     tickerNotice: "⚡ Free Cash on Delivery (COD) & Fast 2-4 Days Express Dispatch across India"
   },
 
+  // Deal of the Day Configuration (Editable from Admin Profile)
+  dealOfTheDay: {
+    enabled: true,
+    title: "DEALS OF THE DAY.",
+    badge: "FLASH OFFER",
+    countdownHours: 12
+  },
+
   // Homepage Hero Banners (Editable from Admin)
   banners: [
     {
