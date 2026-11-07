@@ -29,6 +29,18 @@ export const safeStorageSet = (key, value) => {
       } catch (e) {}
     }
 
+    // Always backup category banners into isolated crash-proof keys
+    if (key === 'glowbasket_categories' && Array.isArray(value)) {
+      try {
+        value.forEach(cat => {
+          const s = (cat.slug || cat.id || '').toLowerCase();
+          if (s && cat.bannerImg) {
+            try { localStorage.setItem(`glowbasket_banner_${s}`, cat.bannerImg); } catch (e) {}
+          }
+        });
+      } catch (e) {}
+    }
+
     const serialized = typeof cleanValue === 'string' ? cleanValue : JSON.stringify(cleanValue);
     localStorage.setItem(key, serialized);
     return true;

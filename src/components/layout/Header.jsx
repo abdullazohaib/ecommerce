@@ -80,14 +80,26 @@ export const Header = () => {
     }
   };
 
-  // Render department item in the luxury category strip (SALE | LIPS | EYES | SKIN | FACE | NAILS)
+  const navCategories = (Array.isArray(categoriesList) && categoriesList.length > 0 ? categoriesList : [])
+    .filter(c => c && c.id !== 'all');
+
+  // Render department item in the luxury category strip (SALE | LIPS | EYES | SKIN | FACE | NAILS + User Custom Categories)
   const renderCategoryStripItem = (catId, displayName, catSlug) => {
-    const catData = (categoriesList || []).find(c => c.id === catId || c.slug === catSlug);
+    const cleanId = (catId || '').toLowerCase();
+    const cleanSlug = (catSlug || '').toLowerCase();
+    const catData = (categoriesList || []).find(c => 
+      (c.id && c.id.toLowerCase() === cleanId) || 
+      (c.slug && c.slug.toLowerCase() === cleanSlug) ||
+      (c.id && c.id.toLowerCase() === cleanSlug) ||
+      (c.slug && c.slug.toLowerCase() === cleanId)
+    );
     const subList = catData?.subcategories || [];
-    const isActive = currentView === 'category' && (selectedCategory === catSlug || selectedCategory === catId);
+    const isCatSelected = (selectedCategory || '').toLowerCase();
+    const isActive = (currentView === 'shop' || currentView === 'category') && 
+      (isCatSelected === cleanSlug || isCatSelected === cleanId);
 
     return (
-      <div key={catId} className="relative group shrink-0">
+      <div key={catId || catSlug} className="relative group shrink-0">
         <a
           href={`/category/${catSlug}`}
           onClick={(e) => {
@@ -95,7 +107,7 @@ export const Header = () => {
             navigateToCategory(catSlug, 'all');
           }}
           className={`py-0.5 px-1.5 transition-colors cursor-pointer block select-none hover:text-black ${
-            isActive ? 'text-black font-bold' : 'text-neutral-900'
+            isActive ? 'text-black font-extrabold border-b-2 border-black' : 'text-neutral-900'
           }`}
         >
           {displayName}
@@ -113,12 +125,12 @@ export const Header = () => {
                 }}
                 className="block px-3 py-1.5 text-xs font-bold text-slate-900 hover:text-[#ba5d5d] hover:bg-slate-50 rounded-lg transition-colors border-b border-slate-100 mb-1"
               >
-                All {displayName === 'SKIN' ? 'Skincare' : displayName} ({subList.length})
+                All {catData?.name || displayName} ({productsList.filter(p => p.category === catId || p.category === catSlug || slugify(p.category) === cleanSlug).length})
               </a>
               <div className="space-y-0.5 max-h-60 overflow-y-auto">
                 {subList.map(sub => (
                   <a
-                    key={sub.id || sub.slug}
+                    key={sub.id || sub.slug || sub.name}
                     href={`/category/${catSlug}/${sub.slug || sub.id}`}
                     onClick={(e) => {
                       e.preventDefault();
@@ -195,12 +207,12 @@ export const Header = () => {
                   <ChevronDown className={`w-3.5 h-3.5 stroke-[1.8] text-slate-500 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180 text-black' : ''}`} />
                 </button>
 
-                {/* Luxury 5-Column Mega Menu - Proportionally Positioned */}
+                {/* Luxury Mega Menu - Proportionally Positioned for Any Number of Categories */}
                 {categoriesDropdownOpen && (
-                  <div className="absolute top-full -left-20 xl:-left-24 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50 normal-case tracking-normal">
-                    <div className="grid grid-cols-5 gap-6">
-                      {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
-                        <div key={cat.id || cat.slug} className="space-y-3">
+                  <div className="absolute top-full -left-20 xl:-left-24 max-w-[95vw] w-max bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50 normal-case tracking-normal">
+                    <div className="flex flex-wrap gap-6 sm:gap-8 max-w-[950px]">
+                      {navCategories.map(cat => (
+                        <div key={cat.id || cat.slug} className="min-w-[125px] max-w-[165px] space-y-3">
                           {/* Column Parent Category Header (Uppercase Bold) */}
                           <a
                             href={`/category/${cat.slug || cat.id}`}
@@ -218,7 +230,7 @@ export const Header = () => {
                           <div className="space-y-2">
                             {(cat.subcategories || []).map(sub => (
                               <a
-                                key={sub.id || sub.slug}
+                                key={sub.id || sub.slug || sub.name}
                                 href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -567,35 +579,18 @@ export const Header = () => {
               <span className="animate-gold-shimmer font-bold">SALE</span>
             </a>
 
-            {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
-
-            {/* 2. LIPS */}
-            {renderCategoryStripItem('lips', 'LIPS', 'lips')}
-
-            {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
-
-            {/* 3. EYES */}
-            {renderCategoryStripItem('eyes', 'EYES', 'eyes')}
-
-            {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
-
-            {/* 4. SKIN */}
-            {renderCategoryStripItem('skincare', 'SKIN', 'skincare')}
-
-            {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
-
-            {/* 5. FACE */}
-            {renderCategoryStripItem('face', 'FACE', 'face')}
-
-            {/* Separator */}
-            <span className="text-slate-300 font-light select-none mx-3.5 sm:mx-6 md:mx-8 lg:mx-9 text-xs shrink-0">|</span>
-
-            {/* 6. NAILS */}
-            {renderCategoryStripItem('nails', 'NAILS', 'nails')}
+            {/* Dynamic Store Categories */}
+            {navCategories.map((cat) => {
+              const catSlug = cat.slug || cat.id;
+              const displayName = (cat.name || catSlug).toUpperCase();
+              return (
+                <React.Fragment key={cat.id || catSlug}>
+                  {/* Separator */}
+                  <span className="text-slate-300 font-light select-none mx-2.5 sm:mx-4 md:mx-5 lg:mx-7 text-xs shrink-0">|</span>
+                  {renderCategoryStripItem(cat.id || catSlug, displayName, catSlug)}
+                </React.Fragment>
+              );
+            })}
           </nav>
         </div>
       </div>

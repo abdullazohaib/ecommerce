@@ -44,14 +44,12 @@ export const CategoryGrid = () => {
         {/* ============================================================= */}
         {/* DYNAMIC CATEGORY CARDS (Live from Store & Admin Profile)      */}
         {/* ============================================================= */}
-        <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4 md:gap-5 overflow-x-auto no-scrollbar scroll-smooth pb-2 sm:pb-0 px-1">
+        <div className="flex items-center justify-start xl:justify-center gap-3 sm:gap-4 md:gap-5 overflow-x-auto no-scrollbar scroll-smooth pb-2 sm:pb-0 px-1">
           {activeCategories.map((cat) => {
             const catSlug = cat.slug || cat.id;
             
-            // If admin uploaded or changed bannerImg, use it; otherwise use category artwork
-            const imageSrc = cat.bannerImg && !cat.bannerImg.includes('unsplash.com')
-              ? cat.bannerImg
-              : (artworkFallbackMap[catSlug] || cat.bannerImg || '/categories/skin.png');
+            // If admin uploaded or changed bannerImg, use it; otherwise fallback to artwork
+            const imageSrc = cat.bannerImg || artworkFallbackMap[catSlug] || '/categories/skin.png';
 
             const gradient = gradientMap[catSlug] || 'from-[#a855f7] via-[#7c3aed] to-[#4c1d95]';
 
@@ -78,9 +76,7 @@ export const CategoryGrid = () => {
                   loading="eager"
                   onError={(e) => {
                     e.target.onerror = null;
-                    if (artworkFallbackMap[catSlug]) {
-                      e.target.src = artworkFallbackMap[catSlug];
-                    }
+                    e.target.src = artworkFallbackMap[catSlug] || '/categories/skin.png';
                   }}
                 />
 
