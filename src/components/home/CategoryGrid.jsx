@@ -32,12 +32,12 @@ export const CategoryGrid = () => {
   };
 
   return (
-    <section className="w-full bg-[#f3f4f6]/70 sm:bg-[#f4f4f5] py-8 sm:py-10 transition-colors">
+    <section className="w-full bg-[#f3f4f6]/70 sm:bg-[#f4f4f5] pt-6 sm:pt-7 pb-5 sm:pb-6 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ============================================================= */}
         {/* SECTION TITLE: SHOP BY CATEGORY. (Centered Modern Bold)       */}
         {/* ============================================================= */}
-        <h2 className="text-center font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 font-sans">
+        <h2 className="text-center font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl mb-3.5 sm:mb-4 font-sans">
           SHOP BY CATEGORY.
         </h2>
 

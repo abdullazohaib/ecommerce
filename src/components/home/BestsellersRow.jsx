@@ -60,13 +60,13 @@ export const BestsellersRow = () => {
   };
 
   return (
-    <section className="w-full bg-white py-10 sm:py-14 transition-colors">
+    <section className="w-full bg-white pt-6 sm:pt-8 pb-5 sm:pb-7 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* ============================================================= */}
         {/* SECTION TITLE: BESTSELLERS (Centered Modern Clean Sans-Serif) */}
         {/* ============================================================= */}
-        <h2 className="text-center font-bold tracking-[0.18em] sm:tracking-[0.24em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl mb-8 sm:mb-10 font-sans">
+        <h2 className="text-center font-bold tracking-[0.18em] sm:tracking-[0.24em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl mb-4 sm:mb-5 font-sans">
           BESTSELLERS
         </h2>
 
@@ -96,7 +96,7 @@ export const BestsellersRow = () => {
           {/* Products Horizontal Slider */}
           <div
             ref={scrollContainerRef}
-            className="flex items-stretch gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+            className="flex items-stretch gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-1"
           >
             {displayProducts.map((product) => {
               const discount = product.discountPercentage || 
