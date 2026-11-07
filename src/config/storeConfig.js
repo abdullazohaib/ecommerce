@@ -43,6 +43,7 @@ export const storeConfig = {
   },
 
   // Homepage Hero Banners (Editable from Admin)
+  categoryBannerImage: "/banners/classic-glow-hero-clean.jpg",
   banners: [
     {
       id: "banner-1",

@@ -1439,7 +1439,7 @@ export const StoreProvider = ({ children }) => {
       return cleanNext;
     });
     if (showToast) {
-      addToast('Store Logo & Branding updated live!', 'success');
+      addToast(typeof showToast === 'string' ? showToast : 'Store settings updated live!', 'success');
     }
   };
 

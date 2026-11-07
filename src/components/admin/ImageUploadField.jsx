@@ -109,9 +109,9 @@ export default function ImageUploadField({
 
     try {
       // Optimize image for fast rendering and local storage compatibility
-      const maxW = aspect === 'contain' ? 600 : 1200;
-      const maxH = aspect === 'contain' ? 240 : 1200;
-      const compressedDataUrl = await compressImageFile(file, maxW, maxH, 0.85);
+      const maxW = aspect === 'contain' ? 600 : (aspect === 'banner' ? 1920 : 1200);
+      const maxH = aspect === 'contain' ? 240 : (aspect === 'banner' ? 750 : 1200);
+      const compressedDataUrl = await compressImageFile(file, maxW, maxH, aspect === 'banner' ? 0.82 : 0.85);
       onChange(compressedDataUrl);
     } catch (err) {
       console.error("Image processing error:", err);
@@ -332,7 +332,9 @@ export default function ImageUploadField({
       {hasValue && (
         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-14 h-14 rounded-xl bg-white border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0 shadow-2xs">
+            <div className={`rounded-xl bg-white border border-slate-200/80 overflow-hidden flex items-center justify-center shrink-0 shadow-2xs ${
+              aspect === 'banner' ? 'w-24 h-12' : 'w-14 h-14'
+            }`}>
               <img
                 src={value}
                 alt="Uploaded preview"
