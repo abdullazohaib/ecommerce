@@ -101,9 +101,14 @@ export const StoreProvider = ({ children }) => {
       }
 
       // Respect user's explicit saved choices first, fallback to backup keys, then storeConfig
-      const storeName = parsed.storeName || backupStoreName || storeConfig.storeName || 'Glow Basket';
+      const storeName = parsed.storeName || backupStoreName || storeConfig.storeName || 'Classic Glow';
       const logoText = parsed.logoText || backupStoreName || storeName;
-      const monogram = parsed.monogram || backupMonogram || storeConfig.monogram || 'GB';
+      let monogram = parsed.monogram || backupMonogram || storeConfig.monogram || 'CG';
+      // If brand name is changed (e.g. Classic Glow) but monogram was still stale 'GB', auto-heal to brand initials
+      if (monogram === 'GB' && storeName && !storeName.toLowerCase().includes('glow basket')) {
+        const words = storeName.trim().split(/\s+/).filter(Boolean);
+        monogram = words.length >= 2 ? (words[0][0] + words[1][0]).toUpperCase() : storeName.trim().slice(0, 2).toUpperCase();
+      }
       const logoType = parsed.logoType || backupLogoType || storeConfig.logoType || 'text';
       const logoUrl = parsed.logoUrl || backupLogoUrl || storeConfig.logoUrl || '/logo.png';
 
@@ -349,8 +354,15 @@ export const StoreProvider = ({ children }) => {
   // Modals & Drawers
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
+  const [trackingModalMode, setTrackingModalMode] = useState('track'); // 'track' | 'cancel'
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [activeTrackingQuery, setActiveTrackingQuery] = useState('');
+
+  const openTrackingModal = (mode = 'track', orderId = '') => {
+    setTrackingModalMode(mode);
+    if (orderId) setActiveTrackingQuery(orderId);
+    setIsTrackingModalOpen(true);
+  };
 
   // Authentication State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -791,6 +803,26 @@ export const StoreProvider = ({ children }) => {
       })
     );
     addToast(`Order ${orderId} marked as ${returnStatus}!`, 'info');
+  };
+
+  const cancelOrder = (orderId, reason = 'Customer requested cancellation') => {
+    const currentTime = new Date().toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
+    setOrders(prev =>
+      prev.map(order => {
+        if (order.orderId === orderId || order.id === orderId) {
+          return {
+            ...order,
+            status: 'Cancelled',
+            timeline: [
+              ...(order.timeline || []),
+              { title: `Order Cancelled: ${reason}`, time: currentTime, completed: true }
+            ]
+          };
+        }
+        return order;
+      })
+    );
+    addToast(`Order ${orderId} has been successfully cancelled!`, 'info');
   };
 
   const deleteOrder = (orderId) => {
@@ -1443,6 +1475,10 @@ export const StoreProvider = ({ children }) => {
         setIsCheckoutOpen,
         isTrackingModalOpen,
         setIsTrackingModalOpen,
+        trackingModalMode,
+        setTrackingModalMode,
+        openTrackingModal,
+        cancelOrder,
         isAdminOpen,
         setIsAdminOpen,
         activeTrackingQuery,

@@ -98,20 +98,22 @@ export const HeroSlider = () => {
               />
             </div>
 
-            {/* Subtle floating CTA button */}
-            <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-10 z-10 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleUrlNavigation(primaryTargetUrl);
-                }}
-                className="bg-black hover:bg-neutral-800 text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-xl shadow-xl flex items-center gap-2 transition-all hover:scale-105 cursor-pointer border border-white/20"
-              >
-                <span>{slide.ctaText || "Shop Collection"}</span>
-                <ArrowRight className="w-4 h-4 text-white" />
-              </button>
-            </div>
+            {/* Subtle floating CTA button (only if explicitly enabled on graphic banner) */}
+            {slide.showCtaOverlay && (
+              <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-10 z-10 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUrlNavigation(primaryTargetUrl);
+                  }}
+                  className="bg-black hover:bg-neutral-800 text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-xl shadow-xl flex items-center gap-2 transition-all hover:scale-105 cursor-pointer border border-white/20"
+                >
+                  <span>{slide.ctaText || "Shop Collection"}</span>
+                  <ArrowRight className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <>

@@ -2,18 +2,40 @@ import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 
 /**
+ * Derives uppercase brand initials / monogram from store brand name.
+ * e.g. "Classic Glow" -> "CG", "Glow Basket" -> "GB", "Fair Plus" -> "FP"
+ */
+export const getAutoMonogram = (name, customMonogram) => {
+  // If user explicitly provided a custom monogram that is NOT a stale default 'GB' on a non-Glow Basket name
+  if (customMonogram && customMonogram.trim()) {
+    const isStaleGB = customMonogram.trim().toUpperCase() === 'GB' && name && !name.toLowerCase().includes('glow basket');
+    if (!isStaleGB) {
+      return customMonogram.trim().toUpperCase();
+    }
+  }
+  // Auto-generate monogram initials from store name
+  if (!name || typeof name !== 'string') return 'CG';
+  const clean = name.trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase();
+};
+
+/**
  * BrandLogo Component
  * Renders the signature luxury aesthetic requested by the user:
- * - Soft blush/pink uppercase Serif monogram in the background (GB)
- * - Flowing rose-terracotta cursive handwriting script overlaid across it (Glow Basket)
+ * - Soft blush/pink uppercase Serif monogram in the background (e.g. CG for Classic Glow, GB for Glow Basket)
+ * - Flowing rose-terracotta cursive handwriting script overlaid across it (e.g. classic glow)
  * - Or uploaded logo image if logoType is set to 'image' (with graceful typographic fallback)
  */
 export const BrandLogo = ({ className = "", size = "normal" }) => {
   const { storeInfo = {} } = useStore();
   const [imgError, setImgError] = useState(false);
 
-  const storeName = storeInfo?.storeName || 'Glow Basket';
-  const monogram = storeInfo?.monogram || 'GB';
+  const storeName = storeInfo?.storeName || 'Classic Glow';
+  const monogram = getAutoMonogram(storeName, storeInfo?.monogram);
   const logoType = storeInfo?.logoType || 'image'; // Default to the user's uploaded logo image
   const logoUrl = storeInfo?.logoUrl || '/logo.png';
 
@@ -35,8 +57,8 @@ export const BrandLogo = ({ className = "", size = "normal" }) => {
     const isDefaultGlowBasketImage = logoUrl === '/logo.png' || logoUrl === '/glow-basket-logo.png';
     const hasCustomStoreName = storeName && storeName.trim().toLowerCase() !== 'glow basket';
 
-    // If still using default /logo.png but user changed store name to another brand,
-    // show dynamic typographic logo with their new name instead of showing old "Glow Basket" image pixels
+    // If still using default /logo.png but user changed store name to another brand (e.g. Classic Glow),
+    // show dynamic typographic luxury monogram logo with their new name instead of showing old "Glow Basket" image pixels
     if (!isDefaultGlowBasketImage || !hasCustomStoreName) {
       return (
         <div className={`inline-flex items-center select-none ${className}`}>
@@ -64,7 +86,7 @@ export const BrandLogo = ({ className = "", size = "normal" }) => {
 
   return (
     <div className={`relative inline-flex items-center justify-center select-none py-1 px-2 ${className}`}>
-      {/* Background Soft Blush Serif Monogram Letters (GB) */}
+      {/* Background Soft Blush Serif Monogram Letters (CG) */}
       <span 
         className={`font-serif font-bold text-[#fcd8dc] tracking-tight leading-none pointer-events-none select-none ${currentFont.mono}`}
         style={{ letterSpacing: '-0.03em' }}
@@ -72,7 +94,7 @@ export const BrandLogo = ({ className = "", size = "normal" }) => {
         {monogram}
       </span>
 
-      {/* Foreground Elegant Cursive Script Signature (Glow Basket) */}
+      {/* Foreground Elegant Cursive Script Signature (classic glow) */}
       <span 
         className={`absolute inset-0 flex items-center justify-center font-script text-[#ba5d5d] whitespace-nowrap drop-shadow-2xs pointer-events-none leading-none ${currentFont.script}`}
         style={{ transform: 'translateY(-2px)' }}

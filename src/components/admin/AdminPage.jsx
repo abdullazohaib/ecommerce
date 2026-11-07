@@ -216,6 +216,14 @@ export const AdminPage = () => {
   const handleBrandingFieldChange = (field, value) => {
     setBrandingForm(prev => {
       const updated = { ...prev, [field]: value };
+      if (field === 'storeName' && value) {
+        // Auto-generate monogram if not explicitly customized or currently using default
+        const words = value.trim().split(/\s+/).filter(Boolean);
+        const autoMono = words.length >= 2 ? (words[0][0] + words[1][0]).toUpperCase() : value.trim().slice(0, 2).toUpperCase();
+        if (!prev.monogram || prev.monogram === 'GB' || prev.monogram === 'CG') {
+          updated.monogram = autoMono;
+        }
+      }
       updateStoreInfo(updated, false);
       return updated;
     });

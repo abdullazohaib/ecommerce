@@ -11,7 +11,14 @@ import {
   ChevronDown,
   Sparkles,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Flame,
+  Truck,
+  XCircle,
+  HelpCircle,
+  PhoneCall,
+  Info,
+  MessageCircle
 } from 'lucide-react';
 
 export const Header = () => {
@@ -27,6 +34,8 @@ export const Header = () => {
     categoriesList,
     navigateToProduct,
     navigateToCategory,
+    setSelectedSort,
+    openTrackingModal,
     setIsAuthModalOpen,
     setAuthModalTab,
     currentUser,
@@ -34,7 +43,9 @@ export const Header = () => {
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
+  const [ordersDropdownOpen, setOrdersDropdownOpen] = useState(false);
+  const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
@@ -90,10 +101,10 @@ export const Header = () => {
             </a>
 
             {/* ============================================================= */}
-            {/* CENTER-LEFT: NAVIGATION MENU (Home, Shop ⌵, About Us, Contact Us) */}
+            {/* CENTER-LEFT: NAVIGATION MENU (Home, Categories ⌵, Trends, Orders ⌵, Help ⌵) */}
             {/* ============================================================= */}
-            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 ml-2">
-              {/* Home */}
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-7 ml-2">
+              {/* 1. Home */}
               <a
                 href="/"
                 onClick={(e) => {
@@ -107,82 +118,200 @@ export const Header = () => {
                 Home
               </a>
 
-              {/* Shop Dropdown */}
+              {/* 2. Categories Dropdown */}
               <div 
                 className="relative"
-                onMouseEnter={() => setShopDropdownOpen(true)}
-                onMouseLeave={() => setShopDropdownOpen(false)}
+                onMouseEnter={() => setCategoriesDropdownOpen(true)}
+                onMouseLeave={() => setCategoriesDropdownOpen(false)}
               >
                 <button
                   type="button"
                   onClick={() => setViewWithUrl('shop')}
                   className={`flex items-center gap-1 text-[13px] font-bold transition-colors cursor-pointer py-2 ${
-                    currentView === 'shop' ? 'text-black' : 'text-slate-800 hover:text-black'
+                    currentView === 'shop' || currentView === 'category' ? 'text-black' : 'text-slate-800 hover:text-black'
                   }`}
                 >
-                  <span>Shop</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${shopDropdownOpen ? 'rotate-180' : ''}`} />
+                  <span>Categories</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu on hover - Dynamically synced with Admin Categories */}
-                {shopDropdownOpen && (
-                  <div className="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                {categoriesDropdownOpen && (
+                  <div className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
                     <a
                       href="/shop"
                       onClick={(e) => {
                         e.preventDefault();
-                        setShopDropdownOpen(false);
+                        setCategoriesDropdownOpen(false);
                         navigateToCategory('all');
                       }}
-                      className="block px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 hover:text-black rounded-lg transition-colors"
+                      className="block px-3.5 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-50 hover:text-black rounded-xl transition-colors"
                     >
-                      All Formulations
+                      All Formulations & Products
                     </a>
+                    <div className="h-px bg-slate-100 my-1"></div>
                     {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
                       <a
                         key={cat.id || cat.slug}
                         href={`/category/${cat.slug || cat.id}`}
                         onClick={(e) => {
                           e.preventDefault();
-                          setShopDropdownOpen(false);
+                          setCategoriesDropdownOpen(false);
                           navigateToCategory(cat.slug || cat.id);
                         }}
-                        className="block px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 hover:text-black rounded-lg transition-colors truncate"
+                        className="flex items-center justify-between px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black rounded-xl transition-colors"
                       >
-                        {cat.name}
+                        <span className="truncate">{cat.name}</span>
+                        {cat.itemCount ? (
+                          <span className="text-[10px] text-slate-400 font-mono">({cat.itemCount})</span>
+                        ) : null}
                       </a>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* About Us */}
+              {/* 3. Trends */}
               <a
-                href="/about-us"
+                href="/shop?sort=bestsellers"
                 onClick={(e) => {
                   e.preventDefault();
-                  setViewWithUrl('about');
+                  setSelectedSort('bestsellers');
+                  navigateToCategory('all');
+                  setViewWithUrl('shop');
                 }}
-                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
-                  currentView === 'about' ? 'text-black' : 'text-slate-800 hover:text-black'
-                }`}
+                className="flex items-center gap-1.5 text-[13px] font-bold text-slate-800 hover:text-black transition-colors whitespace-nowrap py-2 cursor-pointer group"
               >
-                About Us
+                <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
+                <span>Trends</span>
               </a>
 
-              {/* Contact Us */}
-              <a
-                href="/contact-us"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setViewWithUrl('contact');
-                }}
-                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
-                  currentView === 'contact' ? 'text-black' : 'text-slate-800 hover:text-black'
-                }`}
+              {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setOrdersDropdownOpen(true)}
+                onMouseLeave={() => setOrdersDropdownOpen(false)}
               >
-                Contact Us
-              </a>
+                <button
+                  type="button"
+                  onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
+                  className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
+                >
+                  <span>Orders</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {ordersDropdownOpen && (
+                  <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrdersDropdownOpen(false);
+                        openTrackingModal('track');
+                      }}
+                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block group-hover:text-black">Track Order</span>
+                        <span className="text-[11px] text-slate-500 block leading-tight">Live shipment status & courier AWB</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrdersDropdownOpen(false);
+                        openTrackingModal('cancel');
+                      }}
+                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-rose-50/60 transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <XCircle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-700">Cancel Order</span>
+                        <span className="text-[11px] text-slate-500 block leading-tight">Cancel before dispatch or return items</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Help Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setHelpDropdownOpen(true)}
+                onMouseLeave={() => setHelpDropdownOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                  className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
+                >
+                  <span>Help</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {helpDropdownOpen && (
+                  <div className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                    <a
+                      href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => setHelpDropdownOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div>
+                        <span className="text-xs font-bold block">WhatsApp 24/7 Support</span>
+                        <span className="text-[10px] text-slate-400 block">Instant chat with specialist</span>
+                      </div>
+                    </a>
+
+                    <a
+                      href="/contact-us"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('contact');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <PhoneCall className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">Contact Us</span>
+                    </a>
+
+                    <a
+                      href="/about-us"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('about');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <Info className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">About Us</span>
+                    </a>
+
+                    <a
+                      href="/shipping-policy"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setHelpDropdownOpen(false);
+                        setViewWithUrl('shipping-policy');
+                      }}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span className="text-xs font-bold">Shipping & Return Policy</span>
+                    </a>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
@@ -352,7 +481,54 @@ export const Header = () => {
               }}
               className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
             >
-              SHOP
+              CATEGORIES
+            </a>
+            <a
+              href="/shop?sort=bestsellers"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedSort('bestsellers');
+                navigateToCategory('all');
+                setViewWithUrl('shop');
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-1.5 w-full text-left py-2 text-xs font-bold text-rose-600 hover:text-rose-700"
+            >
+              <Flame className="w-3.5 h-3.5 fill-rose-500" />
+              <span>TRENDS</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openTrackingModal('track');
+              }}
+              className="flex items-center gap-2 w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black cursor-pointer"
+            >
+              <Truck className="w-4 h-4 text-amber-600" />
+              <span>TRACK ORDER</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openTrackingModal('cancel');
+              }}
+              className="flex items-center gap-2 w-full text-left py-2 text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
+            >
+              <XCircle className="w-4 h-4 text-rose-600" />
+              <span>CANCEL ORDER</span>
+            </button>
+            <a
+              href="/contact-us"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('contact');
+                setMobileMenuOpen(false);
+              }}
+              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
+            >
+              HELP & SUPPORT
             </a>
             <a
               href="/about-us"
@@ -364,17 +540,6 @@ export const Header = () => {
               className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
             >
               ABOUT US
-            </a>
-            <a
-              href="/contact-us"
-              onClick={(e) => {
-                e.preventDefault();
-                setViewWithUrl('contact');
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
-            >
-              CONTACT US
             </a>
             <a
               href="/admin/dashboard"
