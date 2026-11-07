@@ -32,6 +32,7 @@ export const Header = () => {
     categoriesList,
     navigateToProduct,
     navigateToCategory,
+    selectedSort,
     setSelectedSort,
     openTrackingModal,
     setIsAuthModalOpen,
