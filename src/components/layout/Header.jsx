@@ -30,6 +30,7 @@ export const Header = () => {
     setSearchQuery,
     productsList,
     categoriesList,
+    selectedCategory,
     navigateToProduct,
     navigateToCategory,
     selectedSort,
@@ -77,6 +78,62 @@ export const Header = () => {
       setMobileSearchOpen(false);
       setViewWithUrl('shop');
     }
+  };
+
+  // Render department item in the luxury category strip (SALE | LIPS | EYES | SKIN | FACE | NAILS)
+  const renderCategoryStripItem = (catId, displayName, catSlug) => {
+    const catData = (categoriesList || []).find(c => c.id === catId || c.slug === catSlug);
+    const subList = catData?.subcategories || [];
+
+    return (
+      <div key={catId} className="relative group shrink-0">
+        <a
+          href={`/category/${catSlug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            navigateToCategory(catSlug, 'all');
+          }}
+          className={`transition-colors cursor-pointer py-1 block hover:text-black ${
+            currentView === 'category' && selectedCategory === catSlug ? 'text-black font-bold' : 'text-neutral-900'
+          }`}
+        >
+          {displayName}
+        </a>
+
+        {/* Hover Dropdown with all subcategories */}
+        {subList.length > 0 && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block z-50">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-3 min-w-[210px] normal-case tracking-normal font-sans text-left">
+              <a
+                href={`/category/${catSlug}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToCategory(catSlug, 'all');
+                }}
+                className="block px-3 py-1.5 text-xs font-bold text-slate-900 hover:text-[#ba5d5d] hover:bg-slate-50 rounded-lg transition-colors border-b border-slate-100 mb-1"
+              >
+                All {displayName === 'SKIN' ? 'Skincare' : displayName} ({subList.length})
+              </a>
+              <div className="space-y-0.5 max-h-60 overflow-y-auto">
+                {subList.map(sub => (
+                  <a
+                    key={sub.id || sub.slug}
+                    href={`/category/${catSlug}/${sub.slug || sub.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToCategory(catSlug, sub.slug || sub.id);
+                    }}
+                    className="block px-3 py-1 text-xs text-slate-600 hover:text-black hover:bg-slate-50 rounded-lg transition-colors capitalize font-medium"
+                  >
+                    {sub.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -475,6 +532,61 @@ export const Header = () => {
             </form>
           </div>
         )}
+      </div>
+
+      {/* ============================================================= */}
+      {/* LUXURY CATEGORY STRIP: SALE | LIPS | EYES | SKIN | FACE | NAILS */}
+      {/* (Below Search Bar, Before Hero Banner) */}
+      {/* ============================================================= */}
+      <div className="border-t border-slate-100 bg-white/95 backdrop-blur-xs py-2 sm:py-2.5 shadow-3xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 overflow-x-auto no-scrollbar font-cinzel text-xs sm:text-[13px] font-semibold tracking-[0.18em] uppercase text-neutral-900">
+            {/* 1. SALE with Gold A */}
+            <a
+              href="/shop?sort=bestsellers"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedSort('bestsellers');
+                navigateToCategory('all');
+                setViewWithUrl('shop');
+              }}
+              className="hover:text-black transition-colors cursor-pointer shrink-0 py-1"
+              title="Shop Special Sale & Trending Offers"
+            >
+              S<span className="text-amber-500 font-bold">A</span>LE
+            </a>
+
+            {/* Separator */}
+            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+
+            {/* 2. LIPS */}
+            {renderCategoryStripItem('lips', 'LIPS', 'lips')}
+
+            {/* Separator */}
+            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+
+            {/* 3. EYES */}
+            {renderCategoryStripItem('eyes', 'EYES', 'eyes')}
+
+            {/* Separator */}
+            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+
+            {/* 4. SKIN */}
+            {renderCategoryStripItem('skincare', 'SKIN', 'skincare')}
+
+            {/* Separator */}
+            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+
+            {/* 5. FACE */}
+            {renderCategoryStripItem('face', 'FACE', 'face')}
+
+            {/* Separator */}
+            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+
+            {/* 6. NAILS */}
+            {renderCategoryStripItem('nails', 'NAILS', 'nails')}
+          </nav>
+        </div>
       </div>
 
       {/* MOBILE DRAWER NAVIGATION MENU */}
