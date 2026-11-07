@@ -20,6 +20,7 @@ export const ShopPage = () => {
     priceFilter,
     setPriceFilter,
     categoriesList,
+    categoryBanners,
     storeInfo,
     banners
   } = useStore();
@@ -38,11 +39,19 @@ export const ShopPage = () => {
     slugify(s.name) === slugify(selectedSubCategory || '')
   );
 
-  // Single full-size banner for all categories (same size & source as homepage hero banner)
+  // Dynamic banner for each specific category (Lips, Eyes, Face, Nails, Skincare, All Products)
   const availableBanners = (banners && banners.length > 0) ? banners : (storeInfo?.banners || []);
   const activeBanners = availableBanners.filter(b => b.active !== false && b.status !== 'Draft');
   const primaryBanner = activeBanners.length > 0 ? activeBanners[0] : availableBanners[0];
-  const categoryBannerImage = storeInfo?.categoryBannerImage || primaryBanner?.image || "/banners/classic-glow-hero-clean.jpg";
+
+  const activeCatSlug = currentCat?.slug || currentCat?.id || (selectedCategory !== 'all' ? selectedCategory : 'all');
+  const categoryBannerImage = 
+    (activeCatSlug && categoryBanners?.[activeCatSlug]) ||
+    currentCat?.bannerImg ||
+    categoryBanners?.['all'] ||
+    storeInfo?.categoryBannerImage ||
+    primaryBanner?.image ||
+    "/banners/classic-glow-hero-clean.jpg";
 
   // Filter products logic
   const filteredProducts = productsList.filter(prod => {

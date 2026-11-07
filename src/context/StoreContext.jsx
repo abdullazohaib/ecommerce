@@ -248,6 +248,29 @@ export const StoreProvider = ({ children }) => {
     return storeConfig.banners || [];
   });
 
+  // Dedicated Category Banners State: separate full-size banner for each category
+  const defaultCategoryBanners = {
+    lips: '/categories/lips.png',
+    eyes: '/categories/eyes.png',
+    face: '/categories/face.png',
+    nails: '/categories/nails.png',
+    skincare: '/categories/skin.png',
+    all: '/banners/classic-glow-hero-clean.jpg'
+  };
+
+  const [categoryBanners, setCategoryBanners] = useState(() => {
+    try {
+      const saved = localStorage.getItem('glowbasket_category_banners');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return { ...defaultCategoryBanners, ...parsed };
+        }
+      }
+    } catch (e) {}
+    return defaultCategoryBanners;
+  });
+
   // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare with Subcategories)
   const [categoriesList, setCategoriesList] = useState(() => {
     try {
@@ -522,6 +545,9 @@ export const StoreProvider = ({ children }) => {
         } else if (e.key === 'glowbasket_store_info') {
           const parsed = JSON.parse(e.newValue);
           if (parsed && typeof parsed === 'object') setStoreInfo(parsed);
+        } else if (e.key === 'glowbasket_category_banners') {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed && typeof parsed === 'object') setCategoryBanners(parsed);
         } else if (e.key === 'glowbasket_categories') {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) setCategoriesList(parsed);
@@ -547,6 +573,7 @@ export const StoreProvider = ({ children }) => {
       else if (key === 'products') setProductsList(data);
       else if (key === 'storeInfo') setStoreInfo(data);
       else if (key === 'categories') setCategoriesList(data);
+      else if (key === 'categoryBanners') setCategoryBanners(data);
       else if (key === 'aboutSection') setAboutSection(data);
       else if (key === 'policies') setPolicies(data);
       else if (key === 'reviews') setReviewsList(data);
@@ -1443,6 +1470,39 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  const updateCategoryBanner = (categorySlug, bannerUrl) => {
+    const slug = (categorySlug || 'all').toLowerCase();
+    
+    setCategoryBanners(prev => {
+      const next = { ...prev, [slug]: bannerUrl };
+      safeStorageSet('glowbasket_category_banners', next);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categoryBanners', data: next } }));
+      }
+      return next;
+    });
+
+    setCategoriesList(prev => {
+      const next = prev.map(c => {
+        if ((c.slug && c.slug.toLowerCase() === slug) || (c.id && c.id.toLowerCase() === slug)) {
+          return { ...c, bannerImg: bannerUrl };
+        }
+        return c;
+      });
+      safeStorageSet('glowbasket_categories', next);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
+      }
+      return next;
+    });
+
+    if (slug === 'all') {
+      updateStoreInfo({ categoryBannerImage: bannerUrl }, false);
+    }
+
+    addToast(`Banner updated & live on website!`, 'success');
+  };
+
   const updateAboutSection = (newAboutData) => {
     setAboutSection(prev => {
       const next = { ...prev, ...newAboutData };
@@ -1630,6 +1690,9 @@ export const StoreProvider = ({ children }) => {
         updateAnnouncement,
         categoriesList,
         setCategoriesList,
+        categoryBanners,
+        setCategoryBanners,
+        updateCategoryBanner,
         addCategory,
         updateCategory,
         deleteCategory,

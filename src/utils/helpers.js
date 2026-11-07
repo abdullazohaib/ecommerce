@@ -90,3 +90,70 @@ export const getAutoMonogram = (name, customMonogram) => {
   return clean.slice(0, 2).toUpperCase();
 };
 
+/**
+ * Compresses an image file for full-width category banners.
+ * Converts to optimized JPEG (~50KB - 80KB) so it saves instantly,
+ * never triggers browser localStorage quota errors, and renders sharply across mobile & desktop.
+ */
+export const compressBannerImage = (file, maxWidth = 1400, maxHeight = 500, quality = 0.80) => {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error('No file provided'));
+
+    if (file.type && !file.type.startsWith('image/')) {
+      return reject(new Error('Please select a valid image file (JPG, PNG, WEBP).'));
+    }
+
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = () => {
+        try {
+          URL.revokeObjectURL(objectUrl);
+          let width = img.naturalWidth || img.width;
+          let height = img.naturalHeight || img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+
+          // Fill background white
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        } catch (err) {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error('Failed to read image file'));
+          reader.readAsDataURL(file);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.readAsDataURL(file);
+      };
+
+      img.src = objectUrl;
+    } catch (e) {
+      const reader = new FileReader();
+      reader.onload = (ev) => resolve(ev.target.result);
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.readAsDataURL(file);
+    }
+  });
+};
+

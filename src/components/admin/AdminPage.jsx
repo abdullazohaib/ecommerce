@@ -4,6 +4,7 @@ import { categories as defaultCategories } from '../../data/categories';
 import { initialAboutSection, initialPolicies } from '../../config/storeConfig';
 import ImageUploadField from './ImageUploadField';
 import MultiImageUploadField from './MultiImageUploadField';
+import CategoryBannersManager from './CategoryBannersManager';
 import { 
   LayoutGrid, 
   Package, 
@@ -307,23 +308,6 @@ export const AdminPage = () => {
     }
   }, [reviewsHeader]);
 
-  // Category Collection Page Banner State (Single Full-Width Banner across all categories)
-  const [categoryBannerImage, setCategoryBannerImage] = useState(
-    storeInfo?.categoryBannerImage || '/banners/classic-glow-hero-clean.jpg'
-  );
-
-  useEffect(() => {
-    if (storeInfo?.categoryBannerImage) {
-      setCategoryBannerImage(storeInfo.categoryBannerImage);
-    }
-  }, [storeInfo?.categoryBannerImage]);
-
-  const handleSaveCategoryBanner = (newImg) => {
-    const val = (newImg !== undefined ? newImg : categoryBannerImage) || '/banners/classic-glow-hero-clean.jpg';
-    setCategoryBannerImage(val);
-    updateStoreInfo({ categoryBannerImage: val }, 'All Categories Banner updated successfully!');
-  };
-
   // Curated Image Presets for Quick Selection
   const imagePresets = [
     { label: "Night Cream Jar (Gold)", url: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80" },
@@ -332,29 +316,6 @@ export const AdminPage = () => {
     { label: "Herbal Soap Bar", url: "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=800&q=80" },
     { label: "Purple Tube Cream", url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80" },
     { label: "Wellness Supplement", url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80" }
-  ];
-
-  const categoryBannerPresets = [
-    { 
-      label: "Classic Glow Hero (1920×600)", 
-      url: "/banners/classic-glow-hero-clean.jpg",
-      description: "Default full-width signature collection banner"
-    },
-    { 
-      label: "Dr. Sheth's AM-PM Routine", 
-      url: "/banners/dr-sheths-am-pm-routine.jpg",
-      description: "Dermatologist ceramide & vitamin C routine" 
-    },
-    { 
-      label: "Luxury Botanical Skincare", 
-      url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1920&q=80",
-      description: "Natural organic herbal apothecary aesthetic" 
-    },
-    { 
-      label: "Radiant Beauty Glam", 
-      url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1920&q=80",
-      description: "Lip gloss & makeup glam banner" 
-    }
   ];
 
   const logoPresets = [
@@ -1653,57 +1614,8 @@ export const AdminPage = () => {
                 </button>
               </div>
 
-              {/* Category Page Banner Manager Quick Card */}
-              <div className="bg-gradient-to-r from-purple-50 via-indigo-50/50 to-pink-50/60 border border-indigo-100 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-20 h-12 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-indigo-200 shadow-2xs">
-                    <img
-                      src={categoryBannerImage || '/banners/classic-glow-hero-clean.jpg'}
-                      alt="Current Banner"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/banners/classic-glow-hero-clean.jpg";
-                      }}
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-xs font-bold text-slate-900">All Categories Full-Width Banner</h3>
-                      <span className="bg-purple-100 text-purple-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Live on All Categories
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                      Full-size banner matching homepage hero slider. Active across /category/lips, /category/lips/gloss, /shop, etc.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigateToAdminTab('banners');
-                    }}
-                    className="flex items-center gap-1.5 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition-colors cursor-pointer"
-                  >
-                    <Sliders className="w-3.5 h-3.5" />
-                    <span>Change Category Banner</span>
-                  </button>
-                  <a
-                    href="/category/lips"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToCategory('lips');
-                    }}
-                    className="flex items-center gap-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition-colors cursor-pointer"
-                  >
-                    <span>View Live</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  </a>
-                </div>
-              </div>
+              {/* Dedicated Category Banners Manager (Upload for Lips, Eyes, Face, Nails, Skincare, All) */}
+              <CategoryBannersManager />
 
               {/* Categories Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2002,171 +1914,8 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              {/* ======================================================= */}
-              {/* CARD: ALL CATEGORIES FULL-WIDTH PAGE BANNER             */}
-              {/* ======================================================= */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-bold text-slate-900">All Categories Full-Width Page Banner</h2>
-                      <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
-                        Live on All Categories
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">
-                      A single full-size edge-to-edge banner across all category & subcategory pages (e.g. /category/lips, /category/lips/gloss, /category/face, /shop), matching the homepage banner size.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSaveCategoryBanner('/banners/classic-glow-hero-clean.jpg')}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
-                      title="Restore original preset banner"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset Default</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleSaveCategoryBanner(categoryBannerImage)}
-                      className="flex items-center gap-1.5 bg-[#5B4DF5] hover:bg-[#4E3FE3] text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-indigo-500/25 transition-all cursor-pointer"
-                    >
-                      <Save className="w-4 h-4 stroke-[2.5]" />
-                      <span>Save Category Banner</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Banner Size Guidelines & Specifications */}
-                <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-sm border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-amber-400 text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
-                      📐 Dimensions
-                    </span>
-                    <span className="text-slate-200 text-[11px]">
-                      Recommended: <strong className="text-white">1920 × 600 px</strong> or <strong className="text-white">2400 × 800 px</strong> (Aspect ratio 3.2:1 / 16:5). Banner automatically scales responsively across desktop, tablet, and mobile.
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <a
-                      href="/category/lips"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigateToCategory('lips');
-                      }}
-                      className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-xl transition-colors text-[11px]"
-                    >
-                      <span>Preview Lips Category</span>
-                      <ExternalLink className="w-3 h-3 text-indigo-300" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Live Storefront Aspect Preview */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5 text-[#5B4DF5]" />
-                      Live Storefront Category Banner Preview:
-                    </span>
-                    <a
-                      href="/category/lips/gloss"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigateToCategory('lips', 'gloss');
-                      }}
-                      className="text-xs font-bold text-[#5B4DF5] hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Preview Live on /category/lips/gloss</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-
-                  <div className="w-full relative rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-950">
-                    <div className="w-full aspect-[16/9] sm:aspect-[2.2/1] md:aspect-[2.6/1] lg:aspect-[3/1] max-h-[380px] flex items-center justify-center overflow-hidden">
-                      <img
-                        src={categoryBannerImage || '/banners/classic-glow-hero-clean.jpg'}
-                        alt="Category Banner Preview"
-                        className="w-full h-full object-cover object-center"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "/banners/classic-glow-hero-clean.jpg";
-                        }}
-                      />
-                    </div>
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className="bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                        📐 1920 × 600 px Full-Width
-                      </span>
-                      <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                        Applied to All Categories
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Custom Upload Field & Presets */}
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-                  <ImageUploadField
-                    label="Upload Custom Category Banner or Paste Image URL"
-                    value={categoryBannerImage}
-                    onChange={(val) => {
-                      setCategoryBannerImage(val);
-                      updateStoreInfo({ categoryBannerImage: val }, false);
-                    }}
-                    aspect="banner"
-                    presets={categoryBannerPresets}
-                    helperText="Upload any 1920×600 or 2400×800 wide banner image (PNG, JPG, WebP), paste a URL, or choose a preset."
-                  />
-
-                  {/* 1-Click Curated Presets */}
-                  <div className="pt-3 border-t border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-700 block mb-2">
-                      ⚡ Quick 1-Click Banner Presets:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                      {categoryBannerPresets.map((preset, pIdx) => {
-                        const isCurrent = categoryBannerImage === preset.url;
-                        return (
-                          <button
-                            key={pIdx}
-                            type="button"
-                            onClick={() => {
-                              handleSaveCategoryBanner(preset.url);
-                            }}
-                            className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer group ${
-                              isCurrent
-                                ? 'border-[#5B4DF5] bg-indigo-50/70 ring-2 ring-indigo-200'
-                                : 'border-slate-200 bg-white hover:border-[#5B4DF5]/60 hover:bg-slate-50'
-                            }`}
-                          >
-                            <img
-                              src={preset.url}
-                              alt={preset.label}
-                              className="w-14 h-9 rounded-lg object-cover shrink-0 border border-slate-100"
-                            />
-                            <div className="min-w-0">
-                              <span className={`text-[11px] font-bold block truncate ${
-                                isCurrent ? 'text-[#5B4DF5]' : 'text-slate-800 group-hover:text-[#5B4DF5]'
-                              }`}>
-                                {preset.label}
-                              </span>
-                              <span className="text-[9px] text-slate-400 block truncate">
-                                {preset.description}
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Dedicated Category Banners Manager (Upload for Lips, Eyes, Face, Nails, Skincare, All) */}
+              <CategoryBannersManager />
 
               {/* Announcement Bar Customizer */}
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-6">
