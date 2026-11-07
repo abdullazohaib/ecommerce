@@ -39,6 +39,7 @@ export const ProductDetailPage = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
+  const [selectedShadeIdx, setSelectedShadeIdx] = useState(0);
   const [activeTab, setActiveTab] = useState('benefits');
   const [pincode, setPincode] = useState('');
   const [deliveryStatus, setDeliveryStatus] = useState(null);
@@ -390,6 +391,39 @@ export const ProductDetailPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Color Shades Selector (Only for products where hasShades is enabled) */}
+            {product.hasShades && product.shades && product.shades.length > 0 && (
+              <div className="pt-2">
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-bold text-slate-900 uppercase tracking-wide">
+                    Choose Shade: <span className="font-normal text-slate-600 capitalize ml-1">{product.shades[selectedShadeIdx]?.name || `Shade ${selectedShadeIdx + 1}`}</span>
+                  </span>
+                  {product.shadeCountText && (
+                    <span className="text-[11px] font-bold text-slate-500">
+                      {product.shadeCountText}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {product.shades.map((sh, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedShadeIdx(idx)}
+                      style={{ backgroundColor: sh.color }}
+                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
+                        selectedShadeIdx === idx
+                          ? 'border-black ring-2 ring-black/40 scale-110 shadow-sm'
+                          : 'border-slate-300 hover:scale-110 opacity-80 hover:opacity-100'
+                      }`}
+                      title={sh.name}
+                      aria-label={sh.name}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Quantity Selector & Action Buttons */}
             <div className="space-y-3 pt-3 border-t border-slate-100">

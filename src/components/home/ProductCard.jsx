@@ -18,14 +18,13 @@ export const ProductCard = ({ product }) => {
   const cleanSlug = product.slug || slugify(product.name || product.id);
   const directProductUrl = `/products/${cleanSlug}`;
 
-  // Shade palettes matching cosmetic products
-  const shadeSwatches = product.shades || [
-    { color: '#e8be9b', name: 'Fair Ivory' },
-    { color: '#dca47e', name: 'Natural Beige' },
-    { color: '#b96c4b', name: 'Warm Tan' },
-    { color: '#9d3d3c', name: 'Coral Spice' },
-    { color: '#74232c', name: 'Plum Crimson' }
-  ];
+  // Shade palettes only for products with shades enabled (e.g. Lipsticks, Foundations, Nail enamels)
+  const hasShades = Boolean(
+    product.hasShades && 
+    Array.isArray(product.shades) && 
+    product.shades.length > 0
+  );
+  const shadeSwatches = hasShades ? product.shades : [];
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -93,31 +92,33 @@ export const ProductCard = ({ product }) => {
       {/* Product Content Details */}
       <div className="flex-1 flex flex-col justify-between pt-1">
         <div>
-          {/* Shades Swatches Selector (Matching Screenshot) */}
-          <div className="flex items-center gap-1.5 my-2">
-            <div className="flex items-center gap-1.5">
-              {shadeSwatches.map((shade, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedShade(idx);
-                  }}
-                  className={`w-3.5 h-3.5 rounded-full transition-all cursor-pointer ${
-                    selectedShade === idx
-                      ? 'ring-2 ring-black ring-offset-2 scale-110'
-                      : 'hover:scale-110 opacity-80 hover:opacity-100'
-                  }`}
-                  style={{ backgroundColor: shade.color || shade }}
-                  title={shade.name || `Shade ${idx + 1}`}
-                />
-              ))}
+          {/* Shades Swatches Selector (Only for products where hasShades is enabled) */}
+          {hasShades && (
+            <div className="flex items-center gap-1.5 my-2">
+              <div className="flex items-center gap-1.5">
+                {shadeSwatches.slice(0, 5).map((shade, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedShade(idx);
+                    }}
+                    className={`w-3.5 h-3.5 rounded-full transition-all cursor-pointer ${
+                      selectedShade === idx
+                        ? 'ring-2 ring-black ring-offset-2 scale-110'
+                        : 'hover:scale-110 opacity-80 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: shade.color || shade }}
+                    title={shade.name || `Shade ${idx + 1}`}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] font-bold text-slate-800 ml-1">
+                {product.shadeCountText || `+${shadeSwatches.length} Shades`}
+              </span>
             </div>
-            <span className="text-[11px] font-bold text-slate-800 ml-1">
-              +{product.shadesCount || 6} Shades
-            </span>
-          </div>
+          )}
 
           {/* Title - clickable direct anchor with URL */}
           <a

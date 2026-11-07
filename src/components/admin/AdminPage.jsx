@@ -157,7 +157,10 @@ export const AdminPage = () => {
     size: '50g',
     featured: true,
     isBestseller: true,
-    isDealOfDay: false
+    isDealOfDay: false,
+    hasShades: false,
+    shades: [],
+    shadeCountText: '+6 Shades'
   };
   const [productForm, setProductForm] = useState(initialProductForm);
 
@@ -336,27 +339,24 @@ export const AdminPage = () => {
       finalImages.push("https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80");
     }
 
+    const productPayload = {
+      ...productForm,
+      price: Number(productForm.price),
+      originalPrice: Number(productForm.originalPrice) || Number(productForm.price),
+      stock: Number(productForm.stock) || 10,
+      status: productForm.status,
+      imageUrl: finalImages[0],
+      images: finalImages,
+      hasShades: Boolean(productForm.hasShades),
+      shades: productForm.hasShades && Array.isArray(productForm.shades) ? productForm.shades : [],
+      shadeCountText: productForm.hasShades ? (productForm.shadeCountText || '+6 Shades') : ''
+    };
+
     if (editingProductId) {
-      updateProduct(editingProductId, {
-        ...productForm,
-        price: Number(productForm.price),
-        originalPrice: Number(productForm.originalPrice) || Number(productForm.price),
-        stock: Number(productForm.stock) || 10,
-        status: productForm.status,
-        imageUrl: finalImages[0],
-        images: finalImages
-      });
+      updateProduct(editingProductId, productPayload);
       setEditingProductId(null);
     } else {
-      addProduct({
-        ...productForm,
-        price: Number(productForm.price),
-        originalPrice: Number(productForm.originalPrice) || Number(productForm.price),
-        stock: Number(productForm.stock) || 10,
-        status: productForm.status,
-        imageUrl: finalImages[0],
-        images: finalImages
-      });
+      addProduct(productPayload);
     }
     setProductForm(initialProductForm);
     setIsAddProductModalOpen(false);
@@ -365,6 +365,10 @@ export const AdminPage = () => {
   const handleEditProduct = (prod) => {
     setEditingProductId(prod.id);
     const prodImages = Array.isArray(prod.images) ? prod.images : (prod.imageUrl ? [prod.imageUrl] : []);
+    const hasShadesEnabled = Boolean(
+      prod.hasShades || 
+      (prod.shades && Array.isArray(prod.shades) && prod.shades.length > 0 && prod.category !== 'skincare')
+    );
     setProductForm({
       name: prod.name,
       brand: prod.brand,
@@ -381,7 +385,10 @@ export const AdminPage = () => {
       size: prod.size || '50g',
       featured: Boolean(prod.featured || prod.isBestseller),
       isBestseller: Boolean(prod.isBestseller || prod.featured),
-      isDealOfDay: Boolean(prod.isDealOfDay)
+      isDealOfDay: Boolean(prod.isDealOfDay),
+      hasShades: hasShadesEnabled,
+      shades: Array.isArray(prod.shades) ? prod.shades : [],
+      shadeCountText: prod.shadeCountText || (prod.shades && prod.shades.length > 0 ? `+${prod.shades.length} Shades` : '+6 Shades')
     });
     setIsAddProductModalOpen(true);
   };
@@ -1291,6 +1298,20 @@ export const AdminPage = () => {
                                   <span className="text-[11px] text-slate-400 block mt-0.5">
                                     {prod.brand} • SKU: {prod.sku || prod.id}
                                   </span>
+                                  {prod.hasShades && prod.shades && prod.shades.length > 0 && (
+                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-pink-700 font-semibold bg-pink-50 px-1.5 py-0.5 rounded-md border border-pink-200">
+                                      <span className="flex -space-x-1">
+                                        {prod.shades.slice(0, 3).map((s, i) => (
+                                          <span
+                                            key={i}
+                                            className="w-2.5 h-2.5 rounded-full border border-white"
+                                            style={{ backgroundColor: s.color }}
+                                          />
+                                        ))}
+                                      </span>
+                                      <span>{prod.shadeCountText || `+${prod.shades.length} shades`}</span>
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </td>
@@ -3047,6 +3068,275 @@ export const AdminPage = () => {
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                   </label>
+                </div>
+
+                {/* ========================================================= */}
+                {/* 🎨 COLOR SHADES & SWATCHES TOGGLE & BUILDER               */}
+                {/* ========================================================= */}
+                <div className="p-4 bg-gradient-to-br from-pink-50/70 via-rose-50/40 to-purple-50/50 border border-pink-200/90 rounded-2xl space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-pink-950 text-xs flex items-center gap-1.5">
+                        <span>🎨</span> Product has Color Shades & Swatches (Optional)
+                      </span>
+                      <p className="text-[11px] text-pink-800/80 mt-0.5">
+                        Enable for makeup & color cosmetics (Lipsticks, Foundations, Nail Polish). Keep disabled for skincare & creams.
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(productForm.hasShades)}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          if (checked && (!productForm.shades || productForm.shades.length === 0)) {
+                            // Pre-fill with sensible defaults based on category
+                            const defaultPreset = (productForm.category === 'face')
+                              ? [
+                                  { color: '#F7D6B8', name: 'Fair Ivory' },
+                                  { color: '#ECC49F', name: 'Natural Beige' },
+                                  { color: '#DCAB82', name: 'Warm Honey' },
+                                  { color: '#C68A57', name: 'Golden Caramel' },
+                                  { color: '#945A34', name: 'Deep Chestnut' }
+                                ]
+                              : (productForm.category === 'nails')
+                              ? [
+                                  { color: '#FF5A79', name: 'Bubblegum' },
+                                  { color: '#831843', name: 'Wine Velvet' },
+                                  { color: '#E11D48', name: 'Coral Pop' },
+                                  { color: '#475569', name: 'Slate Gray' },
+                                  { color: '#F43F5E', name: 'Ruby Gloss' }
+                                ]
+                              : [
+                                  { color: '#D88277', name: 'Nude Spice' },
+                                  { color: '#C26765', name: 'Rose Taupe' },
+                                  { color: '#E6988D', name: 'Peachy Nude' },
+                                  { color: '#9E4C4B', name: 'Mocha Mauve' },
+                                  { color: '#6E3236', name: 'Deep Hazel' }
+                                ];
+                            setProductForm({
+                              ...productForm,
+                              hasShades: true,
+                              shades: defaultPreset,
+                              shadeCountText: '+6 Shades'
+                            });
+                          } else {
+                            setProductForm({
+                              ...productForm,
+                              hasShades: checked
+                            });
+                          }
+                        }}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
+                    </label>
+                  </div>
+
+                  {/* Expanded Shades Editor when hasShades is ON */}
+                  {productForm.hasShades && (
+                    <div className="pt-3 border-t border-pink-200/80 space-y-3">
+                      {/* 1-Click Preset Palettes */}
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                          ⚡ Quick Palette Presets (Click to apply):
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setProductForm({
+                              ...productForm,
+                              shades: [
+                                { color: '#D88277', name: 'Nude Spice' },
+                                { color: '#C26765', name: 'Rose Taupe' },
+                                { color: '#E6988D', name: 'Peachy Nude' },
+                                { color: '#9E4C4B', name: 'Mocha Mauve' },
+                                { color: '#6E3236', name: 'Deep Hazel' }
+                              ],
+                              shadeCountText: '+6 Shades'
+                            })}
+                            className="px-2.5 py-1 text-[11px] font-semibold bg-white border border-pink-300 rounded-lg hover:bg-pink-50 text-slate-800 transition-colors cursor-pointer"
+                          >
+                            💄 Nude Lips
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setProductForm({
+                              ...productForm,
+                              shades: [
+                                { color: '#C81D25', name: 'Ruby Red' },
+                                { color: '#9A031E', name: 'Scarlet Bold' },
+                                { color: '#6A040F', name: 'Burgundy Wine' },
+                                { color: '#D90429', name: 'Cherry Crimson' },
+                                { color: '#540B0E', name: 'Midnight Plum' }
+                              ],
+                              shadeCountText: '+18 Shades'
+                            })}
+                            className="px-2.5 py-1 text-[11px] font-semibold bg-white border border-pink-300 rounded-lg hover:bg-pink-50 text-slate-800 transition-colors cursor-pointer"
+                          >
+                            💋 Bold Reds
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setProductForm({
+                              ...productForm,
+                              shades: [
+                                { color: '#F7D6B8', name: 'Fair Ivory' },
+                                { color: '#ECC49F', name: 'Natural Beige' },
+                                { color: '#DCAB82', name: 'Warm Honey' },
+                                { color: '#C68A57', name: 'Golden Caramel' },
+                                { color: '#945A34', name: 'Deep Chestnut' }
+                              ],
+                              shadeCountText: '+7 Shades'
+                            })}
+                            className="px-2.5 py-1 text-[11px] font-semibold bg-white border border-pink-300 rounded-lg hover:bg-pink-50 text-slate-800 transition-colors cursor-pointer"
+                          >
+                            🧴 Foundation Tones
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setProductForm({
+                              ...productForm,
+                              shades: [
+                                { color: '#FF5A79', name: 'Bubblegum' },
+                                { color: '#831843', name: 'Wine Velvet' },
+                                { color: '#E11D48', name: 'Coral Pop' },
+                                { color: '#475569', name: 'Slate Gray' },
+                                { color: '#F43F5E', name: 'Ruby Gloss' }
+                              ],
+                              shadeCountText: '+12 Shades'
+                            })}
+                            className="px-2.5 py-1 text-[11px] font-semibold bg-white border border-pink-300 rounded-lg hover:bg-pink-50 text-slate-800 transition-colors cursor-pointer"
+                          >
+                            💅 Nail Polish
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Individual Shades List */}
+                      <div className="space-y-2 bg-white/80 p-3 rounded-xl border border-pink-200/80">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] font-bold text-slate-700">
+                            Color Shades ({productForm.shades?.length || 0}):
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setProductForm({
+                              ...productForm,
+                              shades: [
+                                ...(productForm.shades || []),
+                                { color: '#D88277', name: `Shade ${(productForm.shades?.length || 0) + 1}` }
+                              ]
+                            })}
+                            className="text-[11px] font-bold text-pink-700 hover:text-pink-900 cursor-pointer"
+                          >
+                            + Add Another Shade
+                          </button>
+                        </div>
+
+                        {(!productForm.shades || productForm.shades.length === 0) ? (
+                          <p className="text-[11px] text-slate-400 italic">No shades added yet. Pick a preset above or click "+ Add Another Shade".</p>
+                        ) : (
+                          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                            {productForm.shades.map((sh, idx) => (
+                              <div key={idx} className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-slate-200">
+                                {/* Color Picker Input */}
+                                <input
+                                  type="color"
+                                  value={sh.color || '#D88277'}
+                                  onChange={(e) => {
+                                    const nextShades = [...productForm.shades];
+                                    nextShades[idx] = { ...nextShades[idx], color: e.target.value };
+                                    setProductForm({ ...productForm, shades: nextShades });
+                                  }}
+                                  className="w-7 h-7 rounded-md cursor-pointer border border-slate-300 p-0 shrink-0"
+                                  title="Choose Shade Color"
+                                />
+
+                                {/* Hex Code Input */}
+                                <input
+                                  type="text"
+                                  value={sh.color || ''}
+                                  onChange={(e) => {
+                                    const nextShades = [...productForm.shades];
+                                    nextShades[idx] = { ...nextShades[idx], color: e.target.value };
+                                    setProductForm({ ...productForm, shades: nextShades });
+                                  }}
+                                  placeholder="#HEX"
+                                  className="w-20 bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs font-mono text-slate-700 outline-none uppercase"
+                                />
+
+                                {/* Shade Name Input */}
+                                <input
+                                  type="text"
+                                  value={sh.name || ''}
+                                  onChange={(e) => {
+                                    const nextShades = [...productForm.shades];
+                                    nextShades[idx] = { ...nextShades[idx], name: e.target.value };
+                                    setProductForm({ ...productForm, shades: nextShades });
+                                  }}
+                                  placeholder="Shade Name (e.g. Nude Peach)"
+                                  className="flex-1 bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs text-slate-800 outline-none"
+                                />
+
+                                {/* Remove Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextShades = productForm.shades.filter((_, i) => i !== idx);
+                                    setProductForm({ ...productForm, shades: nextShades });
+                                  }}
+                                  className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-600 rounded cursor-pointer font-bold"
+                                  title="Remove Shade"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Extra Shade Count Badge Input & Live Preview */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                            Extra Shades Text (e.g. +6 Shades, +18 Shades)
+                          </label>
+                          <input
+                            type="text"
+                            value={productForm.shadeCountText || ''}
+                            onChange={(e) => setProductForm({ ...productForm, shadeCountText: e.target.value })}
+                            placeholder="+6 Shades"
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-pink-500"
+                          />
+                        </div>
+
+                        {/* Live Preview Box */}
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-200">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                            Live Card Preview:
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {productForm.shades?.slice(0, 5).map((sh, idx) => (
+                              <span
+                                key={idx}
+                                style={{ backgroundColor: sh.color }}
+                                className="w-3.5 h-3.5 rounded-full border border-black/20"
+                                title={sh.name}
+                              />
+                            ))}
+                            <span className="text-[11px] font-bold text-neutral-900 ml-1">
+                              {productForm.shadeCountText || '+6 Shades'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Primary Product Photo */}

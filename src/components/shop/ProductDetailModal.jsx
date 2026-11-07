@@ -16,6 +16,7 @@ export const ProductDetailModal = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
+  const [selectedShadeIdx, setSelectedShadeIdx] = useState(0);
 
   if (!quickViewProduct) return null;
 
@@ -144,6 +145,38 @@ export const ProductDetailModal = () => {
                 </div>
               ))}
             </div>
+            {/* Color Shades Selector (Shown only when product has shades enabled) */}
+            {product.hasShades && product.shades && product.shades.length > 0 && (
+              <div className="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-bold text-slate-800">Select Shade:</span>
+                  <span className="text-slate-600 font-semibold text-[11px]">
+                    {product.shades[selectedShadeIdx]?.name || `Shade ${selectedShadeIdx + 1}`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {product.shades.map((sh, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedShadeIdx(idx)}
+                      style={{ backgroundColor: sh.color }}
+                      className={`w-5 h-5 rounded-full border transition-all cursor-pointer ${
+                        selectedShadeIdx === idx
+                          ? 'border-black ring-2 ring-black scale-110'
+                          : 'border-slate-300 hover:scale-110'
+                      }`}
+                      title={sh.name}
+                    />
+                  ))}
+                  {product.shadeCountText && (
+                    <span className="text-[11px] font-bold text-slate-700 ml-1">
+                      {product.shadeCountText}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Quantity & CTA Buttons */}

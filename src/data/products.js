@@ -19,6 +19,15 @@ export const products = [
     badge: "Trending",
     featured: true,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+6 Shades",
+    shades: [
+      { color: "#e89098", name: "Berry Dew" },
+      { color: "#d86b77", name: "Rose Nectar" },
+      { color: "#c83f49", name: "Ruby Glaze" },
+      { color: "#b32a35", name: "Plum Shine" },
+      { color: "#7a1822", name: "Black Cherry" }
+    ],
     overlayText: "NOURISHING HIGH-GLOSS HYDRATION",
     keyActives: "Tripeptide Complex + Raspberry Seed Oil + Vitamin E",
     images: [
@@ -54,6 +63,15 @@ export const products = [
     badge: "Must Have",
     featured: false,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+18 Shades",
+    shades: [
+      { color: "#e89098", name: "Nude Peach" },
+      { color: "#c83f49", name: "Rose Red" },
+      { color: "#991b24", name: "Ruby Bold" },
+      { color: "#7a1822", name: "Plum Berry" },
+      { color: "#58131a", name: "Deep Wine" }
+    ],
     overlayText: "PRECISE DEFINE & FULL CONTOUR",
     keyActives: "Carnauba Wax + Shea Butter + Rich Mineral Pigments",
     images: [
@@ -89,6 +107,15 @@ export const products = [
     badge: "Best Seller",
     featured: true,
     isDealOfDay: true,
+    hasShades: true,
+    shadeCountText: "+18 Shades",
+    shades: [
+      { color: "#e89098", name: "Velvet Mauve" },
+      { color: "#c83f49", name: "Crimson Red" },
+      { color: "#991b24", name: "Ruby Suede" },
+      { color: "#7a1822", name: "Plum Noir" },
+      { color: "#58131a", name: "Dark Cherry" }
+    ],
     overlayText: "16H TRANSFER-PROOF VELVET FINISH",
     keyActives: "Shea Butter + Vitamin E + Jojoba Oil",
     images: [
@@ -124,6 +151,15 @@ export const products = [
     badge: "Trending",
     featured: true,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+8 Shades",
+    shades: [
+      { color: "#f7b5be", name: "Rose Nectar" },
+      { color: "#e67d8e", name: "Pink Shimmer" },
+      { color: "#d4586d", name: "Coral Glass" },
+      { color: "#b53549", name: "Berry Glaze" },
+      { color: "#8a1c2e", name: "Wine Sparkle" }
+    ],
     overlayText: "HYALURONIC GLASSY PLUMP FINISH",
     keyActives: "Hyaluronic Acid Spheres + Maxi-Lip Peptides + Almond Oil",
     images: [
@@ -307,6 +343,15 @@ export const products = [
     badge: "Best Seller",
     featured: true,
     isDealOfDay: true,
+    hasShades: true,
+    shadeCountText: "+7 Shades",
+    shades: [
+      { color: "#F7D6B8", name: "Fair Ivory" },
+      { color: "#ECC49F", name: "Natural Beige" },
+      { color: "#DCAB82", name: "Warm Honey" },
+      { color: "#C68A57", name: "Golden Caramel" },
+      { color: "#945A34", name: "Deep Chestnut" }
+    ],
     overlayText: "HD SEAMLESS SKIN-LIKE FINISH",
     keyActives: "Niacinamide + Squalane + Micro-coated Mineral Pigments",
     images: [
@@ -447,6 +492,15 @@ export const products = [
     badge: "Top Rated",
     featured: true,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+6 Shades",
+    shades: [
+      { color: "#F7D6B8", name: "Fair 01" },
+      { color: "#ECC49F", name: "Light 02" },
+      { color: "#DCAB82", name: "Medium 03" },
+      { color: "#C68A57", name: "Tan 04" },
+      { color: "#945A34", name: "Deep 05" }
+    ],
     overlayText: "FULL COVERAGE NO CREASING",
     keyActives: "Caffeine + Peptides + Vitamin C + Squalane",
     images: [
@@ -482,6 +536,15 @@ export const products = [
     badge: "Hot Deal",
     featured: true,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+5 Shades",
+    shades: [
+      { color: "#F7D6B8", name: "Ivory" },
+      { color: "#ECC49F", name: "Natural" },
+      { color: "#DCAB82", name: "Honey" },
+      { color: "#C68A57", name: "Caramel" },
+      { color: "#945A34", name: "Chestnut" }
+    ],
     overlayText: "12H OIL-CONTROL SILK SHIELD",
     keyActives: "Micro-fine Talc-Free Minerals + Vitamin C + Zinc Oxide",
     images: [
@@ -521,6 +584,15 @@ export const products = [
     badge: "New",
     featured: true,
     isDealOfDay: false,
+    hasShades: true,
+    shadeCountText: "+12 Shades",
+    shades: [
+      { color: "#ff5a79", name: "Bubblegum" },
+      { color: "#831843", name: "Wine Velvet" },
+      { color: "#e11d48", name: "Coral Pop" },
+      { color: "#475569", name: "Slate Gray" },
+      { color: "#f43f5e", name: "Ruby Gloss" }
+    ],
     overlayText: "SALON GEL SHINE NO UV LAMP NEEDED",
     keyActives: "10-Free Vegan Lacquer Resin + Bamboo Extract + Vitamin E",
     images: [

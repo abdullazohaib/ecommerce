@@ -51,33 +51,12 @@ export const BestsellersRow = () => {
     }, 1200);
   };
 
-  const getShades = (product) => {
-    if (product.shades && Array.isArray(product.shades) && product.shades.length > 0) {
-      return product.shades;
-    }
-    if (product.category === 'lips') {
-      return [
-        { color: '#e89098', name: 'Nude Peach' },
-        { color: '#c83f49', name: 'Rose Red' },
-        { color: '#991b24', name: 'Ruby Bold' },
-        { color: '#7a1822', name: 'Plum Berry' },
-        { color: '#58131a', name: 'Deep Wine' },
-      ];
-    }
-    return [
-      { color: '#f5d5be', name: 'Fair Ivory' },
-      { color: '#e6be9f', name: 'Natural Beige' },
-      { color: '#d8ab85', name: 'Golden Sand' },
-      { color: '#b9885c', name: 'Warm Tan' },
-      { color: '#8c5936', name: 'Rich Caramel' },
-    ];
-  };
-
-  const getExtraShadeCount = (product) => {
-    if (product.category === 'lips') return '+18 Shades';
-    if (product.category === 'face') return '+7 Shades';
-    if (product.category === 'eyes') return '+4 Shades';
-    return '+6 Shades';
+  const hasProductShades = (product) => {
+    return Boolean(
+      product.hasShades && 
+      Array.isArray(product.shades) && 
+      product.shades.length > 0
+    );
   };
 
   return (
@@ -125,9 +104,9 @@ export const BestsellersRow = () => {
                   ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
                   : 15);
 
-              const shades = getShades(product);
               const activeShade = selectedShades[product.id] || 0;
-              const extraShades = getExtraShadeCount(product);
+              const hasShades = hasProductShades(product);
+              const shadesList = hasShades ? product.shades : [];
               const isAdded = addedItems[product.id];
               const reviews = product.reviewsCount || Math.floor(product.price * 1.8) + 120;
 
@@ -170,29 +149,33 @@ export const BestsellersRow = () => {
                       />
                     </div>
 
-                    {/* Shade Swatches Row (Circular dots + extra count) */}
-                    <div className="flex items-center gap-1.5 my-2">
-                      {shades.slice(0, 5).map((sh, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedShades(prev => ({ ...prev, [product.id]: idx }));
-                          }}
-                          style={{ backgroundColor: sh.color }}
-                          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border transition-all cursor-pointer ${
-                            activeShade === idx 
-                              ? 'border-black ring-1 ring-black scale-110' 
-                              : 'border-slate-300 hover:scale-110'
-                          }`}
-                          title={sh.name}
-                        />
-                      ))}
-                      <span className="text-[10px] font-bold text-neutral-900 ml-1">
-                        {extraShades}
-                      </span>
-                    </div>
+                    {/* Shade Swatches Row (Circular dots + extra count) - Only shown if product has shades */}
+                    {hasShades && (
+                      <div className="flex items-center gap-1.5 my-2">
+                        {shadesList.slice(0, 5).map((sh, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedShades(prev => ({ ...prev, [product.id]: idx }));
+                            }}
+                            style={{ backgroundColor: sh.color || sh }}
+                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border transition-all cursor-pointer ${
+                              activeShade === idx 
+                                ? 'border-black ring-1 ring-black scale-110' 
+                                : 'border-slate-300 hover:scale-110'
+                            }`}
+                            title={sh.name || `Shade ${idx + 1}`}
+                          />
+                        ))}
+                        {product.shadeCountText && (
+                          <span className="text-[10px] font-bold text-neutral-900 ml-1">
+                            {product.shadeCountText}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Product Name (Uppercase & letter-spaced matching reference) */}
                     <h3 className="font-bold text-neutral-900 text-xs sm:text-[13px] uppercase tracking-wider line-clamp-1 group-hover:text-black transition-colors">
@@ -255,3 +238,4 @@ export const BestsellersRow = () => {
     </section>
   );
 };
+

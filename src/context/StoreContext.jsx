@@ -190,11 +190,16 @@ export const StoreProvider = ({ children }) => {
         'health-wellness': 'skincare'
       };
 
-      list = list.map(p => ({
-        ...p,
-        category: catMap[p.category] || p.category || 'skincare',
-        status: p.status || (p.stock > 10 ? 'Active' : p.stock > 0 ? 'Scheduled' : 'Draft')
-      }));
+      list = list.map(p => {
+        const cat = catMap[p.category] || p.category || 'skincare';
+        const isSkincare = cat === 'skincare';
+        return {
+          ...p,
+          category: cat,
+          status: p.status || (p.stock > 10 ? 'Active' : p.stock > 0 ? 'Scheduled' : 'Draft'),
+          hasShades: isSkincare ? false : (p.hasShades !== undefined ? p.hasShades : Boolean(p.shades && p.shades.length > 0))
+        };
+      });
 
       // Ensure new initial products (Lips, Eyes, Face, Nails) are populated if not already in list
       const existingIds = new Set(list.map(p => p.id));
