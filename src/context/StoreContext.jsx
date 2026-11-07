@@ -259,45 +259,83 @@ export const StoreProvider = ({ children }) => {
   };
 
   const [categoryBanners, setCategoryBanners] = useState(() => {
+    const custom = {};
+    // 1. Read individual guaranteed keys (crash-proof persistence across refresh)
+    ['lips', 'eyes', 'face', 'nails', 'skincare', 'all'].forEach(slug => {
+      try {
+        const val = localStorage.getItem(`glowbasket_banner_${slug}`);
+        if (val) custom[slug] = val;
+      } catch (e) {}
+    });
+
+    // 2. Read glowbasket_category_banners object
     try {
       const saved = localStorage.getItem('glowbasket_category_banners');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
-          return { ...defaultCategoryBanners, ...parsed };
+          Object.assign(custom, parsed);
         }
       }
     } catch (e) {}
-    return defaultCategoryBanners;
+
+    // 3. Check categories in localStorage for custom uploaded banners
+    try {
+      const savedCats = localStorage.getItem('glowbasket_categories');
+      if (savedCats) {
+        const parsedCats = JSON.parse(savedCats);
+        if (Array.isArray(parsedCats)) {
+          parsedCats.forEach(c => {
+            const slug = (c.slug || c.id || '').toLowerCase();
+            if (slug && c.bannerImg && !custom[slug]) {
+              custom[slug] = c.bannerImg;
+            }
+          });
+        }
+      }
+    } catch (e) {}
+
+    return { ...defaultCategoryBanners, ...custom };
   });
 
   // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare with Subcategories)
   const [categoriesList, setCategoriesList] = useState(() => {
     try {
       const saved = localStorage.getItem('glowbasket_categories');
+      let customBanners = {};
+      try {
+        const savedB = localStorage.getItem('glowbasket_category_banners');
+        if (savedB) customBanners = JSON.parse(savedB);
+      } catch (e) {}
+
+      ['lips', 'eyes', 'face', 'nails', 'skincare', 'all'].forEach(slug => {
+        try {
+          const direct = localStorage.getItem(`glowbasket_banner_${slug}`);
+          if (direct) customBanners[slug] = direct;
+        } catch (e) {}
+      });
+
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If stored categories are the old ones or lack subcategories, upgrade to new beauty categories
-          const hasLegacy = parsed.some(c => c.id === 'whitening-creams' || c.id === 'night-creams');
-          const hasSubcategories = parsed.some(c => Array.isArray(c.subcategories) && c.subcategories.length > 0);
-          if (!hasLegacy && hasSubcategories) {
-            return parsed.map(c => {
-              if (c.bannerImg && c.bannerImg.includes('unsplash.com')) {
-                const map = {
-                  lips: '/categories/lips.png',
-                  eyes: '/categories/eyes.png',
-                  face: '/categories/face.png',
-                  nails: '/categories/nails.png',
-                  skincare: '/categories/skin.png',
-                };
-                if (map[c.id || c.slug]) return { ...c, bannerImg: map[c.id || c.slug] };
-              }
-              return c;
-            });
-          }
+          parsed.forEach(c => {
+            const slug = (c.slug || c.id || '').toLowerCase();
+            if (slug && c.bannerImg) {
+              customBanners[slug] = c.bannerImg;
+            }
+          });
         }
       }
+
+      // Always return complete beauty categories with custom uploaded banners preserved
+      return initialCategories.map(cat => {
+        const slug = cat.slug || cat.id;
+        const banner = customBanners[slug] || cat.bannerImg;
+        return {
+          ...cat,
+          bannerImg: banner
+        };
+      });
     } catch (e) {}
     return initialCategories;
   });
@@ -505,6 +543,19 @@ export const StoreProvider = ({ children }) => {
   useEffect(() => {
     safeStorageSet('glowbasket_categories', categoriesList);
   }, [categoriesList]);
+
+  useEffect(() => {
+    safeStorageSet('glowbasket_category_banners', categoryBanners);
+    if (categoryBanners && typeof categoryBanners === 'object') {
+      Object.entries(categoryBanners).forEach(([slug, url]) => {
+        if (url && typeof url === 'string') {
+          try {
+            localStorage.setItem(`glowbasket_banner_${slug}`, url);
+          } catch (e) {}
+        }
+      });
+    }
+  }, [categoryBanners]);
 
   useEffect(() => {
     safeStorageSet('glowbasket_about_section', aboutSection);
@@ -1473,6 +1524,17 @@ export const StoreProvider = ({ children }) => {
   const updateCategoryBanner = (categorySlug, bannerUrl) => {
     const slug = (categorySlug || 'all').toLowerCase();
     
+    // Guaranteed isolated persistent key per category (never lost on refresh)
+    try {
+      localStorage.setItem(`glowbasket_banner_${slug}`, bannerUrl);
+    } catch (e) {
+      try {
+        localStorage.removeItem('auraglow_products');
+        localStorage.removeItem('glowbasket_cart');
+        localStorage.setItem(`glowbasket_banner_${slug}`, bannerUrl);
+      } catch (e2) {}
+    }
+
     setCategoryBanners(prev => {
       const next = { ...prev, [slug]: bannerUrl };
       safeStorageSet('glowbasket_category_banners', next);

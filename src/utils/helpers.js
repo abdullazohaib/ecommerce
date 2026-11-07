@@ -36,13 +36,9 @@ export const safeStorageSet = (key, value) => {
     console.warn(`[Storage] Failed to save ${key} to localStorage:`, err);
     try {
       // Auto-prune space: remove obsolete legacy keys & non-critical caches
-      localStorage.removeItem('auraglow_store_info');
-      localStorage.removeItem('auraglow_products');
-      localStorage.removeItem('auraglow_orders');
-      localStorage.removeItem('auraglow_cart');
-      localStorage.removeItem('auraglow_wishlist');
-      localStorage.removeItem('auraglow_user');
-      localStorage.removeItem('auraglow_admin_auth');
+      ['auraglow_store_info', 'auraglow_products', 'auraglow_orders', 'auraglow_cart', 'auraglow_wishlist', 'auraglow_user', 'auraglow_admin_auth', 'glowbasket_cart', 'glowbasket_wishlist'].forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
 
       // If saving storeInfo, always guarantee backup logo keys are saved
       if (key === 'glowbasket_store_info' && value && typeof value === 'object') {
@@ -95,11 +91,11 @@ export const getAutoMonogram = (name, customMonogram) => {
  * Converts to optimized JPEG (~50KB - 80KB) so it saves instantly,
  * never triggers browser localStorage quota errors, and renders sharply across mobile & desktop.
  */
-export const compressBannerImage = (file, maxWidth = 1400, maxHeight = 500, quality = 0.80) => {
+export const compressBannerImage = (file, maxWidth = 1200, maxHeight = 450, quality = 0.78) => {
   return new Promise((resolve, reject) => {
     if (!file) return reject(new Error('No file provided'));
 
-    if (file.type && !file.type.startsWith('image/')) {
+    if (file.type && !file.type.startsWith('image/') && !file.name?.match(/\.(jpe?g|png|webp|svg|gif|heic|bmp)$/i)) {
       return reject(new Error('Please select a valid image file (JPG, PNG, WEBP).'));
     }
 

@@ -1572,16 +1572,6 @@ export const AdminPage = () => {
                   <span>
                     Showing {filteredProducts.length} of {productsList.length} products
                   </span>
-                  <button
-                    onClick={() => {
-                      if (window.confirm("Reset products catalog to original standard items?")) {
-                        resetProductsToDefault();
-                      }
-                    }}
-                    className="text-slate-400 hover:text-[#5B4DF5] underline cursor-pointer text-[11px]"
-                  >
-                    Reset Catalog to Defaults
-                  </button>
                 </div>
 
               </div>
@@ -1727,19 +1717,6 @@ export const AdminPage = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        if (window.confirm('Reset all hero banners to default original settings?')) {
-                          resetBannersToDefault();
-                        }
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
-                      title="Restore original preset banners"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset Defaults</span>
-                    </button>
-
                     <button
                       onClick={() => {
                         setEditingBannerId(null);

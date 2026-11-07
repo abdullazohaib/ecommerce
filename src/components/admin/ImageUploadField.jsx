@@ -15,7 +15,7 @@ import {
  * Prevents exceeding localStorage quota by scaling down massive phone camera photos (e.g. 5MB -> ~150KB)
  * while preserving crystal-clear sharpness for web screens.
  */
-export const compressImageFile = (file, maxWidth = 1920, maxHeight = 1080, quality = 0.82) => {
+export const compressImageFile = (file, maxWidth = 1000, maxHeight = 1000, quality = 0.78) => {
   return new Promise((resolve, reject) => {
     if (!file) return reject(new Error('No file provided'));
     // SVGs can be read directly
@@ -27,45 +27,60 @@ export const compressImageFile = (file, maxWidth = 1920, maxHeight = 1080, quali
       return;
     }
 
-    const isPng = file.type === 'image/png';
-    const isWebp = file.type === 'image/webp';
-    const hasTransparency = isPng || isWebp;
+    // Only preserve PNG format for explicit small logos
+    const isLogo = maxWidth <= 400 && (file.type === 'image/png' || file.type === 'image/webp');
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
+    let objectUrl;
+    try {
+      objectUrl = URL.createObjectURL(file);
+    } catch (e) {}
 
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
+    const img = new Image();
+    img.onload = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      let width = img.naturalWidth || img.width;
+      let height = img.naturalHeight || img.height;
 
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!hasTransparency) {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, width, height);
-        } else {
-          ctx.clearRect(0, 0, width, height);
-        }
-        ctx.drawImage(img, 0, 0, width, height);
+      if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
 
-        // Convert to optimized format (PNG to preserve transparency for logos, JPEG for photos)
-        const format = hasTransparency ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(format, hasTransparency ? undefined : quality);
-        resolve(dataUrl);
-      };
-      img.onerror = () => resolve(event.target.result); // Fallback to raw
-      img.src = event.target.result;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!isLogo) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        ctx.clearRect(0, 0, width, height);
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Photos, products, banners always output JPEG for small ~35KB payload
+      const format = isLogo ? 'image/png' : 'image/jpeg';
+      const dataUrl = canvas.toDataURL(format, isLogo ? undefined : quality);
+      resolve(dataUrl);
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+
+    img.onerror = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      const reader = new FileReader();
+      reader.onload = (event) => resolve(event.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    };
+
+    if (objectUrl) {
+      img.src = objectUrl;
+    } else {
+      const reader = new FileReader();
+      reader.onload = (event) => { img.src = event.target.result; };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
   });
 };
 
@@ -100,7 +115,7 @@ export default function ImageUploadField({
 
   const handleFileProcess = async (file) => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
+    if (file.type && !file.type.startsWith('image/') && !file.name?.match(/\.(jpe?g|png|webp|svg|gif|heic|bmp)$/i)) {
       setErrorMsg('Please select a valid image file (JPG, PNG, WEBP, SVG).');
       return;
     }
@@ -108,10 +123,10 @@ export default function ImageUploadField({
     setIsProcessing(true);
 
     try {
-      // Optimize image for fast rendering and local storage compatibility
-      const maxW = aspect === 'contain' ? 600 : (aspect === 'banner' ? 1920 : 1200);
-      const maxH = aspect === 'contain' ? 240 : (aspect === 'banner' ? 750 : 1200);
-      const compressedDataUrl = await compressImageFile(file, maxW, maxH, aspect === 'banner' ? 0.82 : 0.85);
+      // Optimize image for ultra-fast rendering & localStorage quota safety
+      const maxW = aspect === 'contain' ? 400 : (aspect === 'banner' ? 1200 : 800);
+      const maxH = aspect === 'contain' ? 200 : (aspect === 'banner' ? 450 : 800);
+      const compressedDataUrl = await compressImageFile(file, maxW, maxH, 0.78);
       onChange(compressedDataUrl);
     } catch (err) {
       console.error("Image processing error:", err);
@@ -129,6 +144,7 @@ export default function ImageUploadField({
     if (file) {
       handleFileProcess(file);
     }
+    e.target.value = '';
   };
 
   const handleDragOver = (e) => {
