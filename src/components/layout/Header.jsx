@@ -10,9 +10,7 @@ import {
   ArrowRight,
   ChevronDown,
   Sparkles,
-  Zap,
   ShieldCheck,
-  Flame,
   Truck,
   XCircle,
   HelpCircle,
@@ -83,12 +81,12 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18">
+        <div className="flex items-center justify-between h-16 sm:h-18 gap-4">
           
           {/* ============================================================= */}
-          {/* LEFT: SIGNATURE LUXURY BRAND LOGO (GB Watermark + Script / Image) */}
+          {/* LEFT: SIGNATURE LUXURY BRAND LOGO */}
           {/* ============================================================= */}
-          <div className="flex items-center gap-6 lg:gap-8">
+          <div className="flex items-center shrink-0">
             <a
               href="/"
               onClick={(e) => {
@@ -96,252 +94,253 @@ export const Header = () => {
                 setViewWithUrl('home');
               }}
               className="flex items-center gap-2 select-none group py-1 shrink-0"
-              title={storeInfo?.storeName || "Glow Basket"}
+              title={storeInfo?.storeName || "Classic Glow"}
             >
               <BrandLogo size="normal" />
             </a>
+          </div>
 
-            {/* ============================================================= */}
-            {/* CENTER-LEFT: NAVIGATION MENU (Home, Categories ⌵, Trends, Orders ⌵, Help ⌵) */}
-            {/* ============================================================= */}
-            <nav className="hidden lg:flex items-center gap-5 xl:gap-7 ml-2">
-              {/* 1. Home */}
-              <a
-                href="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setViewWithUrl('home');
-                }}
-                className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
-                  currentView === 'home' ? 'text-black' : 'text-slate-800 hover:text-black'
+          {/* ============================================================= */}
+          {/* CENTER: BALANCED NAVIGATION MENU (Evenly distributed) */}
+          {/* ============================================================= */}
+          <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 flex-1 px-4">
+            {/* 1. Home */}
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                setViewWithUrl('home');
+              }}
+              className={`text-[13px] font-bold transition-colors whitespace-nowrap ${
+                currentView === 'home' ? 'text-black' : 'text-slate-800 hover:text-black'
+              }`}
+            >
+              Home
+            </a>
+
+            {/* 2. Categories Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setCategoriesDropdownOpen(true)}
+              onMouseLeave={() => setCategoriesDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setViewWithUrl('shop')}
+                className={`flex items-center gap-1 text-[13px] font-bold transition-colors cursor-pointer py-2 ${
+                  currentView === 'shop' || currentView === 'category' ? 'text-black' : 'text-slate-800 hover:text-black'
                 }`}
               >
-                Home
-              </a>
+                <span>Categories</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-              {/* 2. Categories Dropdown */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setCategoriesDropdownOpen(true)}
-                onMouseLeave={() => setCategoriesDropdownOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setViewWithUrl('shop')}
-                  className={`flex items-center gap-1 text-[13px] font-bold transition-colors cursor-pointer py-2 ${
-                    currentView === 'shop' || currentView === 'category' ? 'text-black' : 'text-slate-800 hover:text-black'
-                  }`}
-                >
-                  <span>Categories</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
+              {/* Luxury 5-Column Mega Menu - Centered below Categories */}
+              {categoriesDropdownOpen && (
+                <div className="absolute top-full -left-48 xl:-left-60 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                  <div className="grid grid-cols-5 gap-6">
+                    {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
+                      <div key={cat.id || cat.slug} className="space-y-3">
+                        {/* Column Parent Category Header (Uppercase Bold) */}
+                        <a
+                          href={`/category/${cat.slug || cat.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCategoriesDropdownOpen(false);
+                            navigateToCategory(cat.slug || cat.id, 'all');
+                          }}
+                          className="block text-[13px] font-black uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
+                        >
+                          {cat.name}
+                        </a>
 
-                {/* Luxury 5-Column Mega Menu - Exactly Matching User's Blueprint */}
-                {categoriesDropdownOpen && (
-                  <div className="absolute top-full -left-16 w-[840px] xl:w-[940px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
-                    <div className="grid grid-cols-5 gap-6">
-                      {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
-                        <div key={cat.id || cat.slug} className="space-y-3">
-                          {/* Column Parent Category Header (Uppercase Bold) */}
-                          <a
-                            href={`/category/${cat.slug || cat.id}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setCategoriesDropdownOpen(false);
-                              navigateToCategory(cat.slug || cat.id, 'all');
-                            }}
-                            className="block text-[13px] font-black uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
-                          >
-                            {cat.name}
-                          </a>
-
-                          {/* Subcategories (Inside it all products) */}
-                          <div className="space-y-2">
-                            {(cat.subcategories || []).map(sub => (
-                              <a
-                                key={sub.id || sub.slug}
-                                href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setCategoriesDropdownOpen(false);
-                                  navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
-                                }}
-                                className="block text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
-                              >
-                                {sub.name}
-                              </a>
-                            ))}
-                          </div>
+                        {/* Subcategories (Inside it all products) */}
+                        <div className="space-y-2">
+                          {(cat.subcategories || []).map(sub => (
+                            <a
+                              key={sub.id || sub.slug}
+                              href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCategoriesDropdownOpen(false);
+                                navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
+                              }}
+                              className="block text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
+                            >
+                              {sub.name}
+                            </a>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bottom Utility Bar */}
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs bg-slate-50/70 -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl">
+                    <div className="flex items-center gap-2 text-slate-500 font-medium">
+                      <Sparkles className="w-3.5 h-3.5 text-black" />
+                      <span>Curated Luxury Cosmetics & Dermatological Formulations</span>
                     </div>
+                    <a
+                      href="/shop"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCategoriesDropdownOpen(false);
+                        navigateToCategory('all', 'all');
+                      }}
+                      className="font-bold text-black hover:underline flex items-center gap-1 group"
+                    >
+                      <span>View All Products ({productsList.length})</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
 
-                    {/* Bottom Utility Bar */}
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs bg-slate-50/70 -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl">
-                      <div className="flex items-center gap-2 text-slate-500 font-medium">
-                        <Sparkles className="w-3.5 h-3.5 text-black" />
-                        <span>Curated Luxury Cosmetics & Dermatological Formulations</span>
-                      </div>
-                      <a
-                        href="/shop"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCategoriesDropdownOpen(false);
-                          navigateToCategory('all', 'all');
-                        }}
-                        className="font-bold text-black hover:underline flex items-center gap-1 group"
-                      >
-                        <span>View All Products ({productsList.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </a>
+            {/* 3. Trends (Clean Text, No Red Flame Icon) */}
+            <a
+              href="/shop?sort=bestsellers"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedSort('bestsellers');
+                navigateToCategory('all');
+                setViewWithUrl('shop');
+              }}
+              className={`text-[13px] font-bold transition-colors whitespace-nowrap py-2 cursor-pointer ${
+                currentView === 'shop' && selectedSort === 'bestsellers' ? 'text-black' : 'text-slate-800 hover:text-black'
+              }`}
+            >
+              Trends
+            </a>
+
+            {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setOrdersDropdownOpen(true)}
+              onMouseLeave={() => setOrdersDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
+                className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
+              >
+                <span>Orders</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {ordersDropdownOpen && (
+                <div className="absolute top-full -left-10 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrdersDropdownOpen(false);
+                      openTrackingModal('track');
+                    }}
+                    className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Truck className="w-4 h-4" />
                     </div>
-                  </div>
-                )}
-              </div>
+                    <div>
+                      <span className="text-xs font-bold text-slate-900 block group-hover:text-black">Track Order</span>
+                      <span className="text-[11px] text-slate-500 block leading-tight">Live shipment status & courier AWB</span>
+                    </div>
+                  </button>
 
-              {/* 3. Trends */}
-              <a
-                href="/shop?sort=bestsellers"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelectedSort('bestsellers');
-                  navigateToCategory('all');
-                  setViewWithUrl('shop');
-                }}
-                className="flex items-center gap-1.5 text-[13px] font-bold text-slate-800 hover:text-black transition-colors whitespace-nowrap py-2 cursor-pointer group"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrdersDropdownOpen(false);
+                      openTrackingModal('cancel');
+                    }}
+                    className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-rose-50/60 transition-colors text-left cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <XCircle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-700">Cancel Order</span>
+                      <span className="text-[11px] text-slate-500 block leading-tight">Cancel before dispatch or return items</span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Help Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setHelpDropdownOpen(true)}
+              onMouseLeave={() => setHelpDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
               >
-                <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
-                <span>Trends</span>
-              </a>
+                <span>Help</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-              {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setOrdersDropdownOpen(true)}
-                onMouseLeave={() => setOrdersDropdownOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
-                  className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
-                >
-                  <span>Orders</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
+              {helpDropdownOpen && (
+                <div className="absolute top-full -left-10 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                  <a
+                    href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setHelpDropdownOpen(false)}
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold block">WhatsApp 24/7 Support</span>
+                      <span className="text-[10px] text-slate-400 block">Instant chat with specialist</span>
+                    </div>
+                  </a>
 
-                {ordersDropdownOpen && (
-                  <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOrdersDropdownOpen(false);
-                        openTrackingModal('track');
-                      }}
-                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left cursor-pointer group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <Truck className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 block group-hover:text-black">Track Order</span>
-                        <span className="text-[11px] text-slate-500 block leading-tight">Live shipment status & courier AWB</span>
-                      </div>
-                    </button>
+                  <a
+                    href="/contact-us"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setHelpDropdownOpen(false);
+                      setViewWithUrl('contact');
+                    }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                  >
+                    <PhoneCall className="w-4 h-4 text-slate-500 shrink-0" />
+                    <span className="text-xs font-bold">Contact Us</span>
+                  </a>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOrdersDropdownOpen(false);
-                        openTrackingModal('cancel');
-                      }}
-                      className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-rose-50/60 transition-colors text-left cursor-pointer group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <XCircle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-700">Cancel Order</span>
-                        <span className="text-[11px] text-slate-500 block leading-tight">Cancel before dispatch or return items</span>
-                      </div>
-                    </button>
-                  </div>
-                )}
-              </div>
+                  <a
+                    href="/about-us"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setHelpDropdownOpen(false);
+                      setViewWithUrl('about');
+                    }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                  >
+                    <Info className="w-4 h-4 text-slate-500 shrink-0" />
+                    <span className="text-xs font-bold">About Us</span>
+                  </a>
 
-              {/* 5. Help Dropdown */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setHelpDropdownOpen(true)}
-                onMouseLeave={() => setHelpDropdownOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
-                  className="flex items-center gap-1 text-[13px] font-bold text-slate-800 hover:text-black transition-colors cursor-pointer py-2"
-                >
-                  <span>Help</span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {helpDropdownOpen && (
-                  <div className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
-                    <a
-                      href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => setHelpDropdownOpen(false)}
-                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 transition-colors"
-                    >
-                      <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <div>
-                        <span className="text-xs font-bold block">WhatsApp 24/7 Support</span>
-                        <span className="text-[10px] text-slate-400 block">Instant chat with specialist</span>
-                      </div>
-                    </a>
-
-                    <a
-                      href="/contact-us"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setHelpDropdownOpen(false);
-                        setViewWithUrl('contact');
-                      }}
-                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                    >
-                      <PhoneCall className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span className="text-xs font-bold">Contact Us</span>
-                    </a>
-
-                    <a
-                      href="/about-us"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setHelpDropdownOpen(false);
-                        setViewWithUrl('about');
-                      }}
-                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                    >
-                      <Info className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span className="text-xs font-bold">About Us</span>
-                    </a>
-
-                    <a
-                      href="/shipping-policy"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setHelpDropdownOpen(false);
-                        setViewWithUrl('shipping-policy');
-                      }}
-                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
-                    >
-                      <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
-                      <span className="text-xs font-bold">Shipping & Return Policy</span>
-                    </a>
-                  </div>
-                )}
-              </div>
-            </nav>
-          </div>
+                  <a
+                    href="/shipping-policy"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setHelpDropdownOpen(false);
+                      setViewWithUrl('shipping-policy');
+                    }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-800 hover:text-black transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
+                    <span className="text-xs font-bold">Shipping & Return Policy</span>
+                  </a>
+                </div>
+              )}
+            </div>
+          </nav>
 
           {/* ============================================================= */}
           {/* RIGHT: SEARCH BAR + LIGHTNING/USER ICON + CART (🛍️ [0]) */}
@@ -416,23 +415,17 @@ export const Header = () => {
               <Search className="w-5 h-5 stroke-[1.8]" />
             </button>
 
-            {/* Lightning / User Account Icon (Matching Dr. Sheth's [👤⚡] profile icon) */}
+            {/* Clean Luxury User Account Icon */}
             <button
               onClick={() => {
                 setAuthModalTab('login');
                 setIsAuthModalOpen(true);
               }}
-              className="relative flex items-center p-1 text-slate-900 hover:text-black transition-colors cursor-pointer group"
+              className="p-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer"
               title={currentUser ? `Signed in as ${currentUser.name}` : "Sign In / Register"}
+              aria-label="User Account"
             >
               <User className="w-5 h-5 stroke-[1.8]" />
-              <Zap className="w-3 h-3 text-amber-500 fill-amber-500 -ml-1 -mt-2 group-hover:scale-110 transition-transform" />
-              {currentUser && (
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
-              )}
-              {isAdminAuthenticated && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-1 ring-white" title="Admin Active"></span>
-              )}
             </button>
 
             {/* Shopping Bag Icon with Dr. Sheth's Red Circular Badge [🛍️ 0] */}
@@ -555,9 +548,8 @@ export const Header = () => {
                 setViewWithUrl('shop');
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center gap-1.5 w-full text-left py-2 text-xs font-bold text-rose-600 hover:text-rose-700"
+              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black tracking-wider"
             >
-              <Flame className="w-3.5 h-3.5 fill-rose-500" />
               <span>TRENDS</span>
             </a>
             <button
