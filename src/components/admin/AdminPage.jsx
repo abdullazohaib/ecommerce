@@ -138,8 +138,8 @@ export const AdminPage = () => {
   // New / Edit Product Form State
   const initialProductForm = {
     name: '',
-    brand: 'Glow Basket Select',
-    category: 'whitening-creams',
+    brand: 'Classic Glow',
+    category: 'skincare',
     subCategory: 'Skin Care',
     price: '',
     originalPrice: '',
@@ -1331,7 +1331,7 @@ export const AdminPage = () => {
                 {cats.map(cat => {
                   const prodCount = cat.id === 'all'
                     ? productsList.length
-                    : productsList.filter(p => p.category === cat.id).length;
+                    : productsList.filter(p => p.category === cat.id || p.category === cat.slug).length;
 
                   return (
                     <div 
@@ -2954,7 +2954,7 @@ export const AdminPage = () => {
                       type="text"
                       value={categoryForm.slug}
                       onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })}
-                      placeholder="e.g. night-creams"
+                      placeholder="e.g. lips, eyes, face, nails, skincare"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-mono focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -3344,10 +3344,17 @@ export const AdminPage = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setBannerForm({ ...bannerForm, ctaLink: '/category/night-creams' })}
+                        onClick={() => setBannerForm({ ...bannerForm, ctaLink: '/category/skincare' })}
                         className="text-[10px] px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold transition-colors cursor-pointer"
                       >
-                        🌙 Night Creams Category
+                        🧴 Skincare Category
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBannerForm({ ...bannerForm, ctaLink: '/category/lips' })}
+                        className="text-[10px] px-2.5 py-1 rounded-lg bg-pink-100 hover:bg-pink-200 text-pink-800 font-bold transition-colors cursor-pointer"
+                      >
+                        💄 Lips Category
                       </button>
                       <button
                         type="button"

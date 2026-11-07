@@ -188,7 +188,9 @@ export const ShopPage = () => {
                       <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                         selectedCategory === cat.id ? 'bg-neutral-800 text-white' : 'text-slate-400 bg-slate-100'
                       }`}>
-                        {cat.id === 'all' ? productsList.length : cat.count}
+                        {cat.id === 'all' 
+                          ? productsList.length 
+                          : productsList.filter(p => p.category === cat.id || p.category === cat.slug).length}
                       </span>
                     </a>
                   ))}

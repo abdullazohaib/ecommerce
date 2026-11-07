@@ -5,65 +5,58 @@ export const categories = [
     slug: "all",
     icon: "Sparkles",
     count: 14,
-    description: "Explore our full range of certified herbal skincare and beauty essentials"
+    description: "Explore our full range of certified cosmetics, glam beauty and radiant skincare essentials"
   },
   {
-    id: "whitening-creams",
-    name: "Whitening Creams",
-    slug: "whitening-creams",
-    icon: "SunMedium",
-    count: 4,
+    id: "lips",
+    name: "Lips",
+    slug: "lips",
+    icon: "Sparkles",
+    count: 2,
     badge: "Trending",
-    description: "Advanced L-Glutathione, Kojic Acid and Arbutin radiance day & night creams",
-    bannerImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1200&q=80"
+    description: "Hydrating matte lipsticks, high-shine plumping lip glosses, nourishing lip balms & long-lasting tints",
+    bannerImg: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80"
   },
   {
-    id: "night-creams",
-    name: "Night Creams",
-    slug: "night-creams",
-    icon: "Moon",
+    id: "eyes",
+    name: "Eyes",
+    slug: "eyes",
+    icon: "Eye",
+    count: 2,
+    badge: "Must Have",
+    description: "Volumizing waterproof mascaras, precision matte eyeliners, organic kajal & eye shadow palettes",
+    bannerImg: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "face",
+    name: "Face",
+    slug: "face",
+    icon: "Smile",
     count: 3,
     badge: "Best Seller",
-    description: "Overnight deep repair formulas for spot reduction and natural glow",
-    bannerImg: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1200&q=80"
+    description: "Flawless HD liquid foundations, oil-control compact powders, radiant blushes & silky primers",
+    bannerImg: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80"
   },
   {
-    id: "soaps",
-    name: "Herbal Soaps",
-    slug: "soaps",
+    id: "nails",
+    name: "Nails",
+    slug: "nails",
+    icon: "Palette",
+    count: 2,
+    badge: "New Launch",
+    description: "High-gloss gel nail paints, chip-resistant lacquers, strengthening treatments & cuticle oils",
+    bannerImg: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "skincare",
+    name: "Skincare",
+    slug: "skincare",
     icon: "Droplets",
-    count: 2,
-    description: "Handcrafted bath & face soaps with active skin brightening extracts",
-    bannerImg: "https://images.unsplash.com/photo-1607006314647-79a6d05634e7?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "serums",
-    name: "Face Serums",
-    slug: "serums",
-    icon: "Pipette",
-    count: 2,
-    badge: "Fast Acting",
-    description: "Concentrated active vitamin C and glutathione facial booster serums",
-    bannerImg: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "lotions-cleansers",
-    name: "Lotions & Cleansers",
-    slug: "lotions-cleansers",
-    icon: "Flame",
-    count: 2,
-    description: "Hydrating full-body fairness lotions and refreshing clarifying face washes",
-    bannerImg: "https://images.unsplash.com/photo-1556228722-d0b5d045d654?auto=format&fit=crop&w=1200&q=80"
-  },
-  {
-    id: "health-wellness",
-    name: "Health & Wellness",
-    slug: "health-wellness",
-    icon: "HeartPulse",
-    count: 2,
-    badge: "100% Herbal",
-    description: "Natural herbal weight gain formulas and traditional health supplements",
-    bannerImg: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80"
+    count: 6,
+    badge: "Certified",
+    description: "Dermatologist formulated night creams, active glutathione serums, clarifying face washes & soaps",
+    bannerImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80"
   }
 ];
 
+export default categories;

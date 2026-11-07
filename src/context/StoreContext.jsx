@@ -172,11 +172,32 @@ export const StoreProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem('glowbasket_products') || localStorage.getItem('auraglow_products');
       const parsed = saved ? JSON.parse(saved) : null;
-      const list = Array.isArray(parsed) && parsed.length > 0 ? parsed : initialProducts;
-      return list.map(p => ({
+      let list = Array.isArray(parsed) && parsed.length > 0 ? parsed : initialProducts;
+
+      // Auto-migrate legacy category IDs to new beauty categories
+      const catMap = {
+        'whitening-creams': 'skincare',
+        'night-creams': 'skincare',
+        'serums': 'skincare',
+        'soaps': 'skincare',
+        'lotions-cleansers': 'skincare',
+        'health-wellness': 'skincare'
+      };
+
+      list = list.map(p => ({
         ...p,
+        category: catMap[p.category] || p.category || 'skincare',
         status: p.status || (p.stock > 10 ? 'Active' : p.stock > 0 ? 'Scheduled' : 'Draft')
       }));
+
+      // Ensure new initial products (Lips, Eyes, Face, Nails) are populated if not already in list
+      const existingIds = new Set(list.map(p => p.id));
+      const missingInitial = initialProducts.filter(p => !existingIds.has(p.id));
+      if (missingInitial.length > 0) {
+        list = [...list, ...missingInitial];
+      }
+
+      return list;
     } catch {
       return initialProducts.map(p => ({
         ...p,
@@ -211,13 +232,20 @@ export const StoreProvider = ({ children }) => {
     return storeConfig.banners || [];
   });
 
-  // Categories State (Controlled & Editable from Admin)
+  // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare)
   const [categoriesList, setCategoriesList] = useState(() => {
     try {
       const saved = localStorage.getItem('glowbasket_categories');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // If stored categories are the old ones (whitening-creams, night-creams), upgrade to new beauty categories
+          const hasLegacy = parsed.some(c => c.id === 'whitening-creams' || c.id === 'night-creams');
+          const hasNew = parsed.some(c => ['lips', 'eyes', 'face', 'nails', 'skincare'].includes(c.id));
+          if (!hasLegacy && hasNew) {
+            return parsed;
+          }
+        }
       }
     } catch (e) {}
     return initialCategories;
