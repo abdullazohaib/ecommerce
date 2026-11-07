@@ -123,7 +123,6 @@ export const AdminPage = () => {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [selectedSubCategoryFilter, setSelectedSubCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'Active' | 'Scheduled' | 'Draft'
-  const [dealFilter, setDealFilter] = useState('all'); // 'all' | 'deal'
   const [bestsellerFilter, setBestsellerFilter] = useState('all'); // 'all' | 'bestseller'
   const [launchFilter, setLaunchFilter] = useState('all'); // 'all' | 'launch'
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
@@ -602,7 +601,6 @@ export const AdminPage = () => {
       prod.subCategory === selectedSubCategoryFilter || 
       (prod.subCategory && slugify(prod.subCategory) === slugify(selectedSubCategoryFilter));
     const matchesStatus = statusFilter === 'all' || (prod.status || 'Active') === statusFilter;
-    const matchesDeal = dealFilter === 'all' || (dealFilter === 'deal' && Boolean(prod.isDealOfDay));
     const matchesBestseller = bestsellerFilter === 'all' || (bestsellerFilter === 'bestseller' && Boolean(prod.isBestseller || prod.featured));
     const matchesLaunch = launchFilter === 'all' || (launchFilter === 'launch' && Boolean(
       prod.isNewLaunch || 
@@ -612,7 +610,7 @@ export const AdminPage = () => {
         prod.badge.toLowerCase().includes('arrival')
       ))
     ));
-    return matchesSearch && matchesCat && matchesSubCat && matchesStatus && matchesDeal && matchesBestseller && matchesLaunch;
+    return matchesSearch && matchesCat && matchesSubCat && matchesStatus && matchesBestseller && matchesLaunch;
   });
 
   // Filtered Orders
@@ -1247,24 +1245,6 @@ export const AdminPage = () => {
 
                     <button
                       type="button"
-                      onClick={() => setDealFilter(prev => prev === 'deal' ? 'all' : 'deal')}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                        dealFilter === 'deal'
-                          ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                      }`}
-                      title="Filter products by Deals of the Day"
-                    >
-                      <span>⚡ Deals of Day</span>
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                        dealFilter === 'deal' ? 'bg-white text-amber-700' : 'bg-amber-100 text-amber-900'
-                      }`}>
-                        {safeProducts.filter(p => p.isDealOfDay).length}
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
                       onClick={() => setBestsellerFilter(prev => prev === 'bestseller' ? 'all' : 'bestseller')}
                       className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 cursor-pointer shrink-0 ${
                         bestsellerFilter === 'bestseller'
@@ -1325,9 +1305,6 @@ export const AdminPage = () => {
                         </th>
                         <th className="py-3 px-3 font-semibold text-slate-500">
                           Stock <span className="inline-block text-[10px]">˅</span>
-                        </th>
-                        <th className="py-3 px-3 font-semibold text-slate-500 text-center">
-                          Deal of Day
                         </th>
                         <th className="py-3 px-3 font-semibold text-slate-500 text-center">
                           Bestseller
@@ -1417,32 +1394,6 @@ export const AdminPage = () => {
 
                             <td className="py-3.5 px-3 text-slate-600 font-medium">
                               {prod.stock}
-                            </td>
-
-                            <td className="py-3.5 px-3 text-center">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const updatedDeal = !prod.isDealOfDay;
-                                  updateProduct(prod.id, { isDealOfDay: updatedDeal });
-                                  addToast(
-                                    updatedDeal 
-                                      ? `Added "${prod.name}" to Deals of the Day!` 
-                                      : `Removed "${prod.name}" from Deals of the Day`,
-                                    'success'
-                                  );
-                                }}
-                                className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1 ${
-                                  prod.isDealOfDay
-                                    ? 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 shadow-2xs'
-                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
-                                }`}
-                                title={prod.isDealOfDay ? 'Featured in Deals of the Day. Click to remove.' : 'Click to feature in Deals of the Day'}
-                              >
-                                <span>⚡</span>
-                                <span>{prod.isDealOfDay ? 'Deal Active' : '+ Make Deal'}</span>
-                              </button>
                             </td>
 
                             <td className="py-3.5 px-3 text-center">
@@ -3730,27 +3681,6 @@ export const AdminPage = () => {
                   </div>
                 </div>
 
-                {/* Deal of the Day Toggle */}
-                <div className="p-4 bg-amber-50/80 border border-amber-200/90 rounded-2xl flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-amber-950 text-xs flex items-center gap-1.5">
-                      <span>⚡</span> Feature in "Deals of the Day" on Homepage
-                    </span>
-                    <p className="text-[11px] text-amber-800/80 mt-0.5">
-                      Highlight this product in the limited-time Deal of the Day countdown section.
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(productForm.isDealOfDay)}
-                      onChange={(e) => setProductForm({ ...productForm, isDealOfDay: e.target.checked })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                  </label>
-                </div>
-
                 {/* Bestseller Toggle */}
                 <div className="p-4 bg-purple-50/80 border border-purple-200/90 rounded-2xl flex items-center justify-between">
                   <div>
@@ -3758,7 +3688,7 @@ export const AdminPage = () => {
                       <span>⭐</span> Feature in "Bestsellers" Row on Homepage
                     </span>
                     <p className="text-[11px] text-purple-800/80 mt-0.5">
-                      Showcase this product in the Bestsellers carousel row before Deals of the Day.
+                      Showcase this product in the Bestsellers carousel row.
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">

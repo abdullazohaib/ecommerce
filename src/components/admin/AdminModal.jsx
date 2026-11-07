@@ -987,15 +987,6 @@ export const AdminModal = () => {
                         />
                         <span>Featured on Homepage</span>
                       </label>
-                      <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={productForm.isDealOfDay}
-                          onChange={(e) => setProductForm({ ...productForm, isDealOfDay: e.target.checked })}
-                          className="accent-amber-500"
-                        />
-                        <span>Deal of the Day</span>
-                      </label>
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
