@@ -39,6 +39,7 @@ export default {
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        cinzel: ['Cinzel', 'Playfair Display', 'serif'],
         jost: ['Jost', 'Plus Jakarta Sans', 'sans-serif'],
         montserrat: ['Montserrat', 'Plus Jakarta Sans', 'sans-serif'],
         serif: ['Playfair Display', 'Georgia', 'serif'],

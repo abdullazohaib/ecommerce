@@ -100,23 +100,23 @@ export const Header = () => {
               <BrandLogo size="normal" />
             </a>
 
-            {/* Primary Navigation Menu with Jost Luxury Typography & 15px Size */}
-            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 font-jost text-[15px] font-semibold tracking-[0.03em]">
-              {/* 1. Home */}
+            {/* Primary Navigation Menu - Matching Roman Serif Luxury UI (Cinzel, All-Caps, Wide Letter-Spacing & Generous Spacing) */}
+            <nav className="hidden lg:flex items-center gap-7 lg:gap-9 xl:gap-13 font-cinzel text-[13px] xl:text-[14px] font-semibold tracking-[0.16em] uppercase">
+              {/* 1. HOME */}
               <a
                 href="/"
                 onClick={(e) => {
                   e.preventDefault();
                   setViewWithUrl('home');
                 }}
-                className={`transition-colors whitespace-nowrap py-1.5 cursor-pointer ${
+                className={`transition-colors whitespace-nowrap py-1 cursor-pointer ${
                   currentView === 'home' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
                 }`}
               >
-                Home
+                HOME
               </a>
 
-              {/* 2. Categories Dropdown */}
+              {/* 2. CATEGORIES Dropdown */}
               <div 
                 className="relative"
                 onMouseEnter={() => setCategoriesDropdownOpen(true)}
@@ -125,17 +125,17 @@ export const Header = () => {
                 <button
                   type="button"
                   onClick={() => setViewWithUrl('shop')}
-                  className={`flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer py-1 ${
                     currentView === 'shop' || currentView === 'category' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
                   }`}
                 >
-                  <span>Categories</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                  <span>CATEGORIES</span>
+                  <ChevronDown className={`w-3.5 h-3.5 stroke-[1.8] text-slate-500 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180 text-black' : ''}`} />
                 </button>
 
                 {/* Luxury 5-Column Mega Menu - Proportionally Positioned */}
                 {categoriesDropdownOpen && (
-                  <div className="absolute top-full -left-20 xl:-left-24 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                  <div className="absolute top-full -left-20 xl:-left-24 w-[820px] xl:w-[920px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50 normal-case tracking-normal">
                     <div className="grid grid-cols-5 gap-6">
                       {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
                         <div key={cat.id || cat.slug} className="space-y-3">
@@ -147,7 +147,7 @@ export const Header = () => {
                               setCategoriesDropdownOpen(false);
                               navigateToCategory(cat.slug || cat.id, 'all');
                             }}
-                            className="block font-jost text-xs font-bold uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
+                            className="block font-cinzel text-xs font-bold uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
                           >
                             {cat.name}
                           </a>
@@ -163,7 +163,7 @@ export const Header = () => {
                                   setCategoriesDropdownOpen(false);
                                   navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
                                 }}
-                                className="block font-sans text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
+                                className="block font-sans text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5 capitalize"
                               >
                                 {sub.name}
                               </a>
@@ -186,7 +186,7 @@ export const Header = () => {
                           setCategoriesDropdownOpen(false);
                           navigateToCategory('all', 'all');
                         }}
-                        className="font-bold text-black hover:underline flex items-center gap-1 group"
+                        className="font-bold text-black hover:underline flex items-center gap-1 group font-sans"
                       >
                         <span>View All Products ({productsList.length})</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -196,7 +196,7 @@ export const Header = () => {
                 )}
               </div>
 
-              {/* 3. Trends (Clean Text, No Red Flame Icon) */}
+              {/* 3. TRENDS */}
               <a
                 href="/shop?sort=bestsellers"
                 onClick={(e) => {
@@ -205,14 +205,14 @@ export const Header = () => {
                   navigateToCategory('all');
                   setViewWithUrl('shop');
                 }}
-                className={`transition-colors whitespace-nowrap py-1.5 cursor-pointer ${
+                className={`transition-colors whitespace-nowrap py-1 cursor-pointer ${
                   currentView === 'shop' && selectedSort === 'bestsellers' ? 'text-black font-bold border-b-2 border-black' : 'text-slate-800 hover:text-black'
                 }`}
               >
-                Trends
+                TRENDS
               </a>
 
-              {/* 4. Orders Dropdown (Track Order & Cancel Order) */}
+              {/* 4. ORDERS Dropdown */}
               <div 
                 className="relative"
                 onMouseEnter={() => setOrdersDropdownOpen(true)}
@@ -221,14 +221,14 @@ export const Header = () => {
                 <button
                   type="button"
                   onClick={() => setOrdersDropdownOpen(!ordersDropdownOpen)}
-                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1.5"
+                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1"
                 >
-                  <span>Orders</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                  <span>ORDERS</span>
+                  <ChevronDown className={`w-3.5 h-3.5 stroke-[1.8] text-slate-500 transition-transform duration-200 ${ordersDropdownOpen ? 'rotate-180 text-black' : ''}`} />
                 </button>
 
                 {ordersDropdownOpen && (
-                  <div className="absolute top-full -left-6 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                  <div className="absolute top-full -left-6 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1 normal-case tracking-normal font-sans">
                     <button
                       type="button"
                       onClick={() => {
@@ -266,7 +266,7 @@ export const Header = () => {
                 )}
               </div>
 
-              {/* 5. Help Dropdown */}
+              {/* 5. HELP Dropdown */}
               <div 
                 className="relative"
                 onMouseEnter={() => setHelpDropdownOpen(true)}
@@ -275,14 +275,14 @@ export const Header = () => {
                 <button
                   type="button"
                   onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
-                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1.5"
+                  className="flex items-center gap-1.5 text-slate-800 hover:text-black transition-colors cursor-pointer py-1"
                 >
-                  <span>Help</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180 text-black' : ''}`} />
+                  <span>HELP</span>
+                  <ChevronDown className={`w-3.5 h-3.5 stroke-[1.8] text-slate-500 transition-transform duration-200 ${helpDropdownOpen ? 'rotate-180 text-black' : ''}`} />
                 </button>
 
                 {helpDropdownOpen && (
-                  <div className="absolute top-full -left-6 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1">
+                  <div className="absolute top-full -left-6 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50 space-y-1 normal-case tracking-normal font-sans">
                     <a
                       href={`https://wa.me/${(storeInfo?.whatsappNumber || '919820045678').replace(/\D/g, '')}?text=Hi%2C%20I%20need%20help%20with%20my%20order`}
                       target="_blank"
