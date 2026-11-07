@@ -180,6 +180,94 @@ export const products = [
     size: "5.5ml",
     authenticity: "Genuine verified formulation"
   },
+  {
+    id: "prod-lip-5",
+    slug: "classic-glow-diamond-shimmer-holographic-lip-gloss",
+    name: "Classic Glow Diamond Shimmer Holographic Lip Topper Gloss",
+    brand: "Classic Glow",
+    category: "lips",
+    subCategory: "Gloss",
+    sku: "CG-LIP-GLOSS-05",
+    price: 499,
+    originalPrice: 749,
+    discountPercentage: 33,
+    rating: 4.9,
+    reviewsCount: 164,
+    stock: 35,
+    badge: "Bestseller",
+    featured: true,
+    isDealOfDay: false,
+    isNewLaunch: false,
+    hasShades: true,
+    shadeCountText: "+6 Shades",
+    shades: [
+      { color: "#fff0f5", name: "Diamond Frost" },
+      { color: "#ffd1dc", name: "Rose Quartz" },
+      { color: "#ffe4e1", name: "Gold Dust" },
+      { color: "#ffb6c1", name: "Peach Sparkle" }
+    ],
+    overlayText: "HOLOGRAPHIC 3D CRYSTAL REFLECTION",
+    keyActives: "Multi-Reflective Prismatic Crystals + Jojoba Oil + Vitamin E",
+    images: [
+      "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80"
+    ],
+    shortDescription: "Ultra-reflective prismatic micro-glitters that create an instant 3D wet-look mirror shine.",
+    description: "Catch the light from every angle with crystal-clear holographic gloss that cushions lips without tackiness.",
+    benefits: [
+      "Light-catching prismatic sparkle with 3D crystal depth",
+      "Vitamin E & Jojoba oil soften fine lip lines",
+      "Non-gritty, ultra-smooth applicator glide"
+    ],
+    ingredients: "Polybutene, Hydrogenated Polyisobutene, Jojoba Seed Oil, Prismatic Mica, Vitamin E Acetate.",
+    howToUse: "Dab across the center of bare lips for instant dimension or layer atop matte lipstick.",
+    size: "6ml",
+    authenticity: "100% Genuine with security hologram"
+  },
+  {
+    id: "prod-lip-6",
+    slug: "classic-glow-juicy-plump-tinted-peptide-lip-jelly-gloss",
+    name: "Classic Glow Juicy Plump Tinted Peptide Lip Jelly Gloss",
+    brand: "Classic Glow",
+    category: "lips",
+    subCategory: "Gloss",
+    sku: "CG-LIP-GLOSS-06",
+    price: 599,
+    originalPrice: 899,
+    discountPercentage: 33,
+    rating: 4.9,
+    reviewsCount: 310,
+    stock: 50,
+    badge: "New Launch",
+    featured: true,
+    isDealOfDay: false,
+    isNewLaunch: true,
+    hasShades: true,
+    shadeCountText: "+5 Shades",
+    shades: [
+      { color: "#d94f70", name: "Cherry Glaze" },
+      { color: "#b93b58", name: "Plum Syrup" },
+      { color: "#e87082", name: "Strawberry Jelly" },
+      { color: "#c95267", name: "Fig Nectar" }
+    ],
+    overlayText: "VOLUMIZING PEPTIDE JELLY FORMULA",
+    keyActives: "Botanical Maxi-Lip Peptides + Fresh Mint Extract + Camellia Seed Oil",
+    images: [
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&w=800&q=80"
+    ],
+    shortDescription: "Jelly-textured tinted plumping gloss with peppermint oil and tri-peptides for fuller lips.",
+    description: "An invigorating peptide wash of color that tingles gently while boosting natural lip fullness and imparting high-shine juice glaze.",
+    benefits: [
+      "Instant cooling plump sensation with peptide fullness",
+      "Zero sticky residue, ultra-glossy glaze look",
+      "Nourishing Camellia Oil locks in 12-hour hydration"
+    ],
+    ingredients: "Polybutene, Camellia Japonica Seed Oil, Palmitoyl Tripeptide-1, Peppermint Leaf Oil, Shea Butter.",
+    howToUse: "Swipe generously over lips for an instant plumping flush and wet glass shine.",
+    size: "6.5ml",
+    authenticity: "Batch verified & tamper sealed"
+  },
 
   // =========================================================================
   // EYES (Eye Liner, Kajal & kohl, Mascara, Eye Shadow)

@@ -193,11 +193,14 @@ export const StoreProvider = ({ children }) => {
       };
 
       list = list.map(p => {
-        const cat = catMap[p.category] || p.category || 'skincare';
+        const initMatch = initialProducts.find(ip => ip.id === p.id);
+        const cat = catMap[p.category] || p.category || initMatch?.category || 'skincare';
+        const subCategory = p.subCategory || initMatch?.subCategory || '';
         const isSkincare = cat === 'skincare';
         return {
           ...p,
           category: cat,
+          subCategory: subCategory,
           status: p.status || (p.stock > 10 ? 'Active' : p.stock > 0 ? 'Scheduled' : 'Draft'),
           hasShades: isSkincare ? false : (p.hasShades !== undefined ? p.hasShades : Boolean(p.shades && p.shades.length > 0))
         };
@@ -1173,9 +1176,16 @@ export const StoreProvider = ({ children }) => {
     let docTitle = `${storeInfo.storeName} | Authentic Skincare & Herbal Beauty Solutions`;
 
     if (view === 'shop') {
-      if (payload && payload !== 'all') {
-        path = `/category/${payload}`;
-        docTitle = `${payload.replace(/-/g, ' ').toUpperCase()} | ${storeInfo.storeName}`;
+      const cat = typeof payload === 'object' && payload !== null ? payload.category : payload;
+      const sub = typeof payload === 'object' && payload !== null ? payload.subCategory : (selectedSubCategory !== 'all' ? selectedSubCategory : null);
+      if (cat && cat !== 'all') {
+        if (sub && sub !== 'all') {
+          path = `/category/${slugify(cat)}/${slugify(sub)}`;
+          docTitle = `${sub.replace(/-/g, ' ').toUpperCase()} | ${cat.toUpperCase()} | ${storeInfo.storeName}`;
+        } else {
+          path = `/category/${slugify(cat)}`;
+          docTitle = `${cat.replace(/-/g, ' ').toUpperCase()} | ${storeInfo.storeName}`;
+        }
       } else {
         path = '/shop';
         docTitle = `Shop All Herbal & Whitening Skincare | ${storeInfo.storeName}`;
@@ -1237,7 +1247,8 @@ export const StoreProvider = ({ children }) => {
     const handleLocationChange = () => {
       const parsed = parseUrlPath(window.location.pathname);
       setCurrentView(parsed.view);
-      setSelectedCategory(parsed.category);
+      setSelectedCategory(parsed.category || 'all');
+      setSelectedSubCategory(parsed.subCategory || 'all');
       if (parsed.adminTab) {
         setAdminTab(parsed.adminTab);
       }
@@ -1287,9 +1298,11 @@ export const StoreProvider = ({ children }) => {
   };
 
   const navigateToCategory = (catSlug, subSlug = 'all') => {
-    setSelectedCategory(catSlug);
-    setSelectedSubCategory(subSlug);
-    navigateToView('shop', catSlug);
+    const cleanCat = catSlug || 'all';
+    const cleanSub = subSlug || 'all';
+    setSelectedCategory(cleanCat);
+    setSelectedSubCategory(cleanSub);
+    navigateToView('shop', { category: cleanCat, subCategory: cleanSub });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
