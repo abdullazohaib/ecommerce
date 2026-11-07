@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore, slugify } from '../../context/StoreContext';
 import { categories } from '../../data/categories';
 import { ProductCard } from '../home/ProductCard';
 import { Filter, SlidersHorizontal, ArrowUpDown, X, Search, Sparkles } from 'lucide-react';
@@ -9,6 +9,8 @@ export const ShopPage = () => {
     productsList, 
     selectedCategory, 
     setSelectedCategory,
+    selectedSubCategory,
+    setSelectedSubCategory,
     navigateToCategory,
     setViewWithUrl,
     searchQuery,
@@ -29,7 +31,17 @@ export const ShopPage = () => {
   // Filter products logic
   const filteredProducts = productsList.filter(prod => {
     // Category match
-    const matchCategory = selectedCategory === 'all' || prod.category === selectedCategory;
+    const matchCategory = selectedCategory === 'all' || 
+      prod.category === selectedCategory || 
+      slugify(prod.category) === selectedCategory;
+
+    // Subcategory match
+    const matchSubCategory = !selectedSubCategory || selectedSubCategory === 'all' ||
+      (prod.subCategory && (
+        prod.subCategory.toLowerCase() === selectedSubCategory.toLowerCase() ||
+        slugify(prod.subCategory) === slugify(selectedSubCategory)
+      ));
+
     // Search match
     const matchSearch = !searchQuery.trim() || 
       prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,7 +52,7 @@ export const ShopPage = () => {
     // Rating match
     const matchRating = prod.rating >= minRating;
 
-    return matchCategory && matchSearch && matchPrice && matchRating;
+    return matchCategory && matchSubCategory && matchSearch && matchPrice && matchRating;
   });
 
   // Sort logic
@@ -54,12 +66,13 @@ export const ShopPage = () => {
 
   const clearAllFilters = () => {
     setSelectedCategory('all');
+    setSelectedSubCategory('all');
     setSearchQuery('');
     setPriceFilter(3000);
     setMinRating(0);
   };
 
-  const hasActiveFilters = selectedCategory !== 'all' || searchQuery.trim() !== '' || priceFilter < 3000 || minRating > 0;
+  const hasActiveFilters = selectedCategory !== 'all' || (selectedSubCategory && selectedSubCategory !== 'all') || searchQuery.trim() !== '' || priceFilter < 3000 || minRating > 0;
 
   return (
     <div className="bg-slate-50 min-h-screen py-8">
@@ -109,8 +122,16 @@ export const ShopPage = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 {selectedCategory !== 'all' && (
                   <span className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 text-xs font-bold px-3 py-1.5 rounded-xl border border-rose-200">
-                    Category: {cats.find(c => c.id === selectedCategory)?.name}
-                    <button onClick={() => setSelectedCategory('all')} className="hover:text-rose-900">
+                    Category: {cats.find(c => c.id === selectedCategory)?.name || selectedCategory}
+                    <button onClick={() => { setSelectedCategory('all'); setSelectedSubCategory('all'); }} className="hover:text-rose-900">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {selectedSubCategory && selectedSubCategory !== 'all' && (
+                  <span className="inline-flex items-center gap-1.5 bg-black text-white text-xs font-bold px-3 py-1.5 rounded-xl">
+                    Subcategory: {selectedSubCategory}
+                    <button onClick={() => setSelectedSubCategory('all')} className="hover:text-rose-300">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -169,31 +190,82 @@ export const ShopPage = () => {
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
                   Categories
                 </h3>
-                <div className="space-y-1">
-                  {cats.map(cat => (
-                    <a
-                      key={cat.id}
-                      href={cat.id === 'all' ? '/shop' : `/category/${cat.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigateToCategory(cat.id);
-                      }}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-medium transition-colors text-left cursor-pointer ${
-                        selectedCategory === cat.id
-                          ? 'bg-black text-white font-bold'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                      }`}
-                    >
-                      <span>{cat.name}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                        selectedCategory === cat.id ? 'bg-neutral-800 text-white' : 'text-slate-400 bg-slate-100'
-                      }`}>
-                        {cat.id === 'all' 
-                          ? productsList.length 
-                          : productsList.filter(p => p.category === cat.id || p.category === cat.slug).length}
-                      </span>
-                    </a>
-                  ))}
+                <div className="space-y-1.5">
+                  <a
+                    href="/shop"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToCategory('all', 'all');
+                    }}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs transition-colors text-left cursor-pointer ${
+                      selectedCategory === 'all'
+                        ? 'bg-black text-white font-bold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-black font-semibold'
+                    }`}
+                  >
+                    <span>All Products</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      selectedCategory === 'all' ? 'bg-neutral-800 text-white' : 'text-slate-400 bg-slate-100'
+                    }`}>
+                      {productsList.length}
+                    </span>
+                  </a>
+
+                  {cats.filter(c => c.id !== 'all').map(cat => {
+                    const isSelected = selectedCategory === cat.id || selectedCategory === cat.slug;
+                    return (
+                      <div key={cat.id || cat.slug} className="space-y-1">
+                        <a
+                          href={`/category/${cat.slug || cat.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigateToCategory(cat.slug || cat.id, 'all');
+                          }}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs transition-colors text-left cursor-pointer ${
+                            isSelected && (!selectedSubCategory || selectedSubCategory === 'all')
+                              ? 'bg-black text-white font-bold'
+                              : 'text-slate-800 hover:bg-slate-50 hover:text-black font-semibold'
+                          }`}
+                        >
+                          <span className="uppercase tracking-wider">{cat.name}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                            isSelected && (!selectedSubCategory || selectedSubCategory === 'all') ? 'bg-neutral-800 text-white' : 'text-slate-400 bg-slate-100'
+                          }`}>
+                            {productsList.filter(p => p.category === cat.id || p.category === cat.slug).length}
+                          </span>
+                        </a>
+
+                        {/* Subcategories (Inside this Category) */}
+                        {cat.subcategories && cat.subcategories.length > 0 && isSelected && (
+                          <div className="pl-3 py-1 space-y-1 border-l-2 border-slate-200 ml-2 animate-in slide-in-from-top-1 duration-150">
+                            {cat.subcategories.map(sub => {
+                              const isSubSelected = selectedSubCategory === sub.name || selectedSubCategory === sub.id || selectedSubCategory === sub.slug;
+                              const subCount = productsList.filter(p => 
+                                (p.category === cat.id || p.category === cat.slug) && 
+                                (p.subCategory === sub.name || slugify(p.subCategory) === slugify(sub.slug))
+                              ).length;
+
+                              return (
+                                <button
+                                  key={sub.id || sub.slug}
+                                  type="button"
+                                  onClick={() => navigateToCategory(cat.id, sub.name)}
+                                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors text-left cursor-pointer ${
+                                    isSubSelected
+                                      ? 'bg-slate-900 text-white font-bold'
+                                      : 'text-slate-600 hover:text-black hover:bg-slate-100'
+                                  }`}
+                                >
+                                  <span>{sub.name}</span>
+                                  <span className="text-[10px] text-slate-400 font-mono">({subCount})</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

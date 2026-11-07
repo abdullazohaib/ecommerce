@@ -43,6 +43,7 @@ export const Header = () => {
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
   const [ordersDropdownOpen, setOrdersDropdownOpen] = useState(false);
   const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
@@ -135,39 +136,65 @@ export const Header = () => {
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 ${categoriesDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Dropdown Menu on hover - Dynamically synced with Admin Categories */}
+                {/* Luxury 5-Column Mega Menu - Exactly Matching User's Blueprint */}
                 {categoriesDropdownOpen && (
-                  <div className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
-                    <a
-                      href="/shop"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCategoriesDropdownOpen(false);
-                        navigateToCategory('all');
-                      }}
-                      className="block px-3.5 py-2.5 text-xs font-bold text-slate-900 hover:bg-slate-50 hover:text-black rounded-xl transition-colors"
-                    >
-                      All Formulations & Products
-                    </a>
-                    <div className="h-px bg-slate-100 my-1"></div>
-                    {(categoriesList || []).filter(c => c.id !== 'all').map(cat => {
-                      const count = productsList.filter(p => p.category === cat.id || p.category === cat.slug).length;
-                      return (
-                        <a
-                          key={cat.id || cat.slug}
-                          href={`/category/${cat.slug || cat.id}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCategoriesDropdownOpen(false);
-                            navigateToCategory(cat.slug || cat.id);
-                          }}
-                          className="flex items-center justify-between px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black rounded-xl transition-colors"
-                        >
-                          <span className="truncate">{cat.name}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">({count})</span>
-                        </a>
-                      );
-                    })}
+                  <div className="absolute top-full -left-16 w-[840px] xl:w-[940px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 animate-in fade-in slide-in-from-top-1 duration-150 z-50">
+                    <div className="grid grid-cols-5 gap-6">
+                      {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
+                        <div key={cat.id || cat.slug} className="space-y-3">
+                          {/* Column Parent Category Header (Uppercase Bold) */}
+                          <a
+                            href={`/category/${cat.slug || cat.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCategoriesDropdownOpen(false);
+                              navigateToCategory(cat.slug || cat.id, 'all');
+                            }}
+                            className="block text-[13px] font-black uppercase tracking-wider text-black hover:text-[#ba5d5d] transition-colors pb-2 border-b border-slate-200"
+                          >
+                            {cat.name}
+                          </a>
+
+                          {/* Subcategories (Inside it all products) */}
+                          <div className="space-y-2">
+                            {(cat.subcategories || []).map(sub => (
+                              <a
+                                key={sub.id || sub.slug}
+                                href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCategoriesDropdownOpen(false);
+                                  navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
+                                }}
+                                className="block text-xs font-medium text-slate-600 hover:text-black hover:font-bold hover:translate-x-0.5 transition-all py-0.5"
+                              >
+                                {sub.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bottom Utility Bar */}
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs bg-slate-50/70 -mx-6 -mb-6 px-6 py-3.5 rounded-b-3xl">
+                      <div className="flex items-center gap-2 text-slate-500 font-medium">
+                        <Sparkles className="w-3.5 h-3.5 text-black" />
+                        <span>Curated Luxury Cosmetics & Dermatological Formulations</span>
+                      </div>
+                      <a
+                        href="/shop"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCategoriesDropdownOpen(false);
+                          navigateToCategory('all', 'all');
+                        }}
+                        className="font-bold text-black hover:underline flex items-center gap-1 group"
+                      >
+                        <span>View All Products ({productsList.length})</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>
@@ -473,17 +500,52 @@ export const Header = () => {
             >
               HOME
             </a>
-            <a
-              href="/shop"
-              onClick={(e) => {
-                e.preventDefault();
-                setViewWithUrl('shop');
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black"
-            >
-              CATEGORIES
-            </a>
+            <div>
+              <button
+                type="button"
+                onClick={() => setMobileCategoriesOpen(!mobileCategoriesOpen)}
+                className="flex items-center justify-between w-full text-left py-2 text-xs font-bold text-slate-800 hover:text-black cursor-pointer"
+              >
+                <span>CATEGORIES</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${mobileCategoriesOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileCategoriesOpen && (
+                <div className="pl-3 py-2 space-y-3 bg-slate-50 rounded-xl my-1 border border-slate-100">
+                  {(categoriesList || []).filter(c => c.id !== 'all').map(cat => (
+                    <div key={cat.id || cat.slug} className="space-y-1">
+                      <a
+                        href={`/category/${cat.slug || cat.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigateToCategory(cat.slug || cat.id, 'all');
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block text-xs font-black text-slate-900 uppercase"
+                      >
+                        {cat.name}
+                      </a>
+                      <div className="pl-2 space-y-1">
+                        {(cat.subcategories || []).map(sub => (
+                          <a
+                            key={sub.id || sub.slug}
+                            href={`/category/${cat.slug || cat.id}/${sub.slug || sub.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigateToCategory(cat.slug || cat.id, sub.slug || sub.id);
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block text-[11px] text-slate-600 hover:text-black"
+                          >
+                            • {sub.name}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <a
               href="/shop?sort=bestsellers"
               onClick={(e) => {

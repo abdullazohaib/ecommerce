@@ -117,6 +117,7 @@ export const AdminPage = () => {
   // Products Table States
   const [productSearch, setProductSearch] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [selectedSubCategoryFilter, setSelectedSubCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'Active' | 'Scheduled' | 'Draft'
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -131,7 +132,9 @@ export const AdminPage = () => {
     slug: '',
     description: '',
     bannerImg: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1200&q=80',
-    badge: ''
+    badge: '',
+    subcategories: [],
+    subcategoriesStr: ''
   };
   const [categoryForm, setCategoryForm] = useState(initialCategoryForm);
 
@@ -139,8 +142,8 @@ export const AdminPage = () => {
   const initialProductForm = {
     name: '',
     brand: 'Classic Glow',
-    category: 'skincare',
-    subCategory: 'Skin Care',
+    category: 'lips',
+    subCategory: 'Lip Oil',
     price: '',
     originalPrice: '',
     stock: 75,
@@ -401,17 +404,24 @@ export const AdminPage = () => {
       return;
     }
     const slug = categoryForm.slug ? slugify(categoryForm.slug) : slugify(categoryForm.name);
+    const subcats = categoryForm.subcategories && categoryForm.subcategories.length > 0
+      ? categoryForm.subcategories
+      : (categoryForm.subcategoriesStr
+          ? categoryForm.subcategoriesStr.split(',').map(s => s.trim()).filter(Boolean).map(name => ({ id: slugify(name), name, slug: slugify(name) }))
+          : []);
+
+    const payload = {
+      ...categoryForm,
+      slug,
+      subcategories: subcats
+    };
+    delete payload.subcategoriesStr;
+
     if (editingCategoryId) {
-      updateCategory(editingCategoryId, {
-        ...categoryForm,
-        slug
-      });
+      updateCategory(editingCategoryId, payload);
       setEditingCategoryId(null);
     } else {
-      addCategory({
-        ...categoryForm,
-        slug
-      });
+      addCategory(payload);
     }
     setCategoryForm(initialCategoryForm);
     setIsCategoryModalOpen(false);
@@ -419,12 +429,15 @@ export const AdminPage = () => {
 
   const handleEditCategory = (cat) => {
     setEditingCategoryId(cat.id);
+    const subStr = cat.subcategories ? cat.subcategories.map(s => s.name).join(', ') : '';
     setCategoryForm({
       name: cat.name,
       slug: cat.slug || cat.id,
       description: cat.description || '',
       bannerImg: cat.bannerImg || '',
-      badge: cat.badge || ''
+      badge: cat.badge || '',
+      subcategories: cat.subcategories || [],
+      subcategoriesStr: subStr
     });
     setIsCategoryModalOpen(true);
   };
@@ -537,8 +550,11 @@ export const AdminPage = () => {
     const query = productSearch.trim().toLowerCase();
     const matchesSearch = !query || name.includes(query) || brand.includes(query) || sku.includes(query);
     const matchesCat = selectedCategoryFilter === 'all' || prod.category === selectedCategoryFilter;
+    const matchesSubCat = selectedSubCategoryFilter === 'all' || 
+      prod.subCategory === selectedSubCategoryFilter || 
+      (prod.subCategory && slugify(prod.subCategory) === slugify(selectedSubCategoryFilter));
     const matchesStatus = statusFilter === 'all' || (prod.status || 'Active') === statusFilter;
-    return matchesSearch && matchesCat && matchesStatus;
+    return matchesSearch && matchesCat && matchesSubCat && matchesStatus;
   });
 
   // Filtered Orders
@@ -1107,7 +1123,10 @@ export const AdminPage = () => {
 
                     <select
                       value={selectedCategoryFilter}
-                      onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedCategoryFilter(e.target.value);
+                        setSelectedSubCategoryFilter('all');
+                      }}
                       className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     >
                       <option value="all">All Categories</option>
@@ -1115,6 +1134,25 @@ export const AdminPage = () => {
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
                     </select>
+
+                    {/* Subcategory Filter */}
+                    {(() => {
+                      const activeCat = cats.find(c => c.id === selectedCategoryFilter || c.slug === selectedCategoryFilter);
+                      const subOptions = activeCat?.subcategories || [];
+                      if (subOptions.length === 0) return null;
+                      return (
+                        <select
+                          value={selectedSubCategoryFilter}
+                          onChange={(e) => setSelectedSubCategoryFilter(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-[#5B4DF5] outline-none"
+                        >
+                          <option value="all">All Subcategories</option>
+                          {subOptions.map(sub => (
+                            <option key={sub.id || sub.slug} value={sub.name}>{sub.name}</option>
+                          ))}
+                        </select>
+                      );
+                    })()}
 
                     <select
                       value={statusFilter}
@@ -1210,7 +1248,10 @@ export const AdminPage = () => {
                             </td>
 
                             <td className="py-3.5 px-3 text-slate-600 font-medium capitalize">
-                              {prod.category.replace(/-/g, ' ')}
+                              <span className="font-bold text-slate-900 block">{prod.category.replace(/-/g, ' ')}</span>
+                              {prod.subCategory && (
+                                <span className="text-[11px] text-slate-500 block">{prod.subCategory}</span>
+                              )}
                             </td>
 
                             <td className="py-3.5 px-3 font-semibold text-slate-900">
@@ -1358,6 +1399,16 @@ export const AdminPage = () => {
                           <span className="text-[11px] text-slate-400 font-semibold block mt-1">
                             {prodCount} Products in category
                           </span>
+
+                          {cat.subcategories && cat.subcategories.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2.5">
+                              {cat.subcategories.map(sub => (
+                                <span key={sub.id || sub.slug} className="text-[10px] bg-white border border-slate-200/90 px-2 py-0.5 rounded-md text-slate-700 font-medium shadow-2xs">
+                                  {sub.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -2756,18 +2807,48 @@ export const AdminPage = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="font-bold text-slate-700 block mb-1">Category</label>
                     <select
                       value={productForm.category}
-                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                      onChange={(e) => {
+                        const newCat = e.target.value;
+                        const catObj = cats.find(c => c.id === newCat || c.slug === newCat);
+                        const firstSub = catObj?.subcategories?.[0]?.name || '';
+                        setProductForm({ 
+                          ...productForm, 
+                          category: newCat,
+                          subCategory: firstSub || productForm.subCategory
+                        });
+                      }}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     >
                       {cats.filter(c => c.id !== 'all').map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1">Subcategory</label>
+                    {(() => {
+                      const activeCat = cats.find(c => c.id === productForm.category || c.slug === productForm.category);
+                      const subOptions = activeCat?.subcategories || [];
+
+                      return (
+                        <select
+                          value={productForm.subCategory}
+                          onChange={(e) => setProductForm({ ...productForm, subCategory: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none font-semibold text-slate-800"
+                        >
+                          <option value="">Select Subcategory</option>
+                          {subOptions.map(sub => (
+                            <option key={sub.id || sub.slug} value={sub.name}>{sub.name}</option>
+                          ))}
+                        </select>
+                      );
+                    })()}
                   </div>
 
                   <div>
@@ -2989,6 +3070,34 @@ export const AdminPage = () => {
                     placeholder="Short summary of this collection..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                   ></textarea>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Subcategories (Inside this Category)
+                  </label>
+                  <input
+                    type="text"
+                    value={categoryForm.subcategoriesStr !== undefined ? categoryForm.subcategoriesStr : (categoryForm.subcategories ? categoryForm.subcategories.map(s => s.name).join(', ') : '')}
+                    onChange={(e) => {
+                      const str = e.target.value;
+                      const arr = str.split(',').map(s => s.trim()).filter(Boolean).map(name => ({
+                        id: slugify(name),
+                        name,
+                        slug: slugify(name)
+                      }));
+                      setCategoryForm({
+                        ...categoryForm,
+                        subcategoriesStr: str,
+                        subcategories: arr
+                      });
+                    }}
+                    placeholder="e.g. Lip Oil, Lipsticks & Liners, Liquid Lipsticks, Gloss (comma-separated)"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none text-xs"
+                  />
+                  <span className="text-[10px] text-slate-400 block mt-1">
+                    Separate subcategory names with commas. Products will be organized inside these subcategories.
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-slate-100">

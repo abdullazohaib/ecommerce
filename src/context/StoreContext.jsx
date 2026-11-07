@@ -19,8 +19,10 @@ const parseUrlPath = (pathname = '') => {
     return { view: 'shop', category: 'all', productSlug: null, isAdmin: false, adminTab: 'dashboard' };
   }
   if (clean.startsWith('/category/')) {
-    const cat = clean.replace('/category/', '');
-    return { view: 'shop', category: cat, productSlug: null, isAdmin: false, adminTab: 'dashboard' };
+    const parts = clean.replace('/category/', '').split('/').filter(Boolean);
+    const cat = parts[0] || 'all';
+    const sub = parts[1] || 'all';
+    return { view: 'shop', category: cat, subCategory: sub, productSlug: null, isAdmin: false, adminTab: 'dashboard' };
   }
   // Matches both /product/:slug and /products/:slug (with NO GAPS)
   if (clean.startsWith('/product/') || clean.startsWith('/products/')) {
@@ -232,17 +234,17 @@ export const StoreProvider = ({ children }) => {
     return storeConfig.banners || [];
   });
 
-  // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare)
+  // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare with Subcategories)
   const [categoriesList, setCategoriesList] = useState(() => {
     try {
       const saved = localStorage.getItem('glowbasket_categories');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If stored categories are the old ones (whitening-creams, night-creams), upgrade to new beauty categories
+          // If stored categories are the old ones or lack subcategories, upgrade to new beauty categories
           const hasLegacy = parsed.some(c => c.id === 'whitening-creams' || c.id === 'night-creams');
-          const hasNew = parsed.some(c => ['lips', 'eyes', 'face', 'nails', 'skincare'].includes(c.id));
-          if (!hasLegacy && hasNew) {
+          const hasSubcategories = parsed.some(c => Array.isArray(c.subcategories) && c.subcategories.length > 0);
+          if (!hasLegacy && hasSubcategories) {
             return parsed;
           }
         }
@@ -268,12 +270,13 @@ export const StoreProvider = ({ children }) => {
   // Initial Route parsed synchronously from address bar
   const initialRoute = typeof window !== 'undefined' 
     ? parseUrlPath(window.location.pathname) 
-    : { view: 'home', category: 'all', productSlug: null, isAdmin: false, adminTab: 'dashboard' };
+    : { view: 'home', category: 'all', subCategory: 'all', productSlug: null, isAdmin: false, adminTab: 'dashboard' };
 
   // Navigation / Views
   const [currentView, setCurrentView] = useState(initialRoute.view);
   const [adminTab, setAdminTab] = useState(initialRoute.adminTab || 'dashboard');
   const [selectedCategory, setSelectedCategory] = useState(initialRoute.category);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(initialRoute.subCategory || 'all');
   const [selectedProduct, setSelectedProduct] = useState(() => {
     if (initialRoute.productSlug) {
       let list = initialProducts;
@@ -1234,8 +1237,9 @@ export const StoreProvider = ({ children }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToCategory = (catSlug) => {
+  const navigateToCategory = (catSlug, subSlug = 'all') => {
     setSelectedCategory(catSlug);
+    setSelectedSubCategory(subSlug);
     navigateToView('shop', catSlug);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -1493,6 +1497,8 @@ export const StoreProvider = ({ children }) => {
         setSearchQuery,
         selectedCategory,
         setSelectedCategory,
+        selectedSubCategory,
+        setSelectedSubCategory,
         selectedSort,
         setSelectedSort,
         priceFilter,
