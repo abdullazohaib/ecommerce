@@ -156,35 +156,35 @@ export const storeConfig = {
 };
 
 export const initialAboutSection = {
-  badge: "Our Heritage & Mission",
-  title: "Crafted for Pure Radiance & Authenticity",
-  subtitle: "India's leading destination for authenticated skin whitening treatments, pure glutathione serums, and certified herbal formulations.",
-  storyTitle: "Who We Are",
-  storyParagraph1: "Founded with the vision to bring genuine, dermatologist-endorsed cosmetic solutions to Indian households, our platform bridges the gap between traditional herbal wisdom and modern skincare science.",
-  storyParagraph2: "In an industry where duplicate and unauthorized replicas are rampant, we stand as a fortress of purity. Every jar and serum sold carries our tamper-proof security hologram seal and verifiable batch certification.",
-  storyImage: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1000&q=80",
+  badge: "ABOUT THE BRAND",
+  title: "Empowering Everyday Beauty & Uncompromising Purity",
+  subtitle: "We create high-performance color cosmetics and scientifically backed skincare that enhance your natural glow with pure, certified formulations.",
+  storyTitle: "Our Story",
+  storyParagraph1: "Born out of a passion for high-impact beauty without compromises, Classic Glow brings together rich pigment payoff, velvety textures, and skin-loving active ingredients. From signature peptide lip oils to seamless HD foundations, every formula is designed for real life.",
+  storyParagraph2: "We believe beauty should be genuine, accessible, and safe. That's why every product in our catalog undergoes rigorous batch verification, carrying our security hologram seal so you never have to doubt what touches your skin.",
+  storyImage: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=80",
   establishedYear: "Est. 2018",
   statNumber: "50,000+",
-  statLabel: "Happy Skin Transformations",
+  statLabel: "Happy Customers Across India",
   pillars: [
     {
-      title: "100% Hologram Verified",
-      desc: "Every package is sealed with verifiable batch holographic stickers.",
-      badge: "Purity Guarantee"
+      title: "100% Genuine Certified",
+      desc: "Tamper-evident batch hologram seals ensuring untampered purity.",
+      badge: "Verified Purity"
     },
     {
-      title: "Pan-India Express Dispatch",
-      desc: "Fast 2-4 days express delivery across 25,000+ PIN codes with COD available.",
-      badge: "Fast Shipping"
+      title: "Express Pan-India Delivery",
+      desc: "Swift 2-4 day dispatch with live tracking and Cash On Delivery available.",
+      badge: "Fast Dispatch"
     },
     {
-      title: "50,000+ Verified Buyers",
-      desc: "Consistent 4.9-star satisfaction rate for visible, real skin transformations.",
-      badge: "Customer Trust"
+      title: "Cruelty-Free Formulations",
+      desc: "Thoughtfully crafted formulations that nourish and protect your skin.",
+      badge: "Safe Ingredients"
     }
   ],
-  ctaTitle: "Have questions about our formulations?",
-  ctaSubtitle: "Our skincare advisory team is available on WhatsApp 7 days a week.",
-  ctaButtonText: "Chat with Skincare Specialist"
+  ctaTitle: "Need help finding your perfect shade or routine?",
+  ctaSubtitle: "Our beauty advisors are available on WhatsApp 7 days a week for personalized recommendations.",
+  ctaButtonText: "Chat with Beauty Advisor"
 };
 

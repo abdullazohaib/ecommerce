@@ -2265,7 +2265,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.badge || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, badge: e.target.value })}
-                      placeholder="e.g. Our Heritage & Mission"
+                      placeholder="e.g. ABOUT THE BRAND"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2276,7 +2276,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.title || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, title: e.target.value })}
-                      placeholder="e.g. Crafted for Pure Radiance & Authenticity"
+                      placeholder="e.g. Empowering Everyday Beauty & Uncompromising Purity"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2320,7 +2320,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.statLabel || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, statLabel: e.target.value })}
-                      placeholder="e.g. Happy Skin Transformations"
+                      placeholder="e.g. Happy Customers Across India"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2341,7 +2341,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.storyTitle || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, storyTitle: e.target.value })}
-                      placeholder="e.g. Who We Are"
+                      placeholder="e.g. Our Story"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2444,7 +2444,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.ctaTitle || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, ctaTitle: e.target.value })}
-                      placeholder="e.g. Have questions about our formulations?"
+                      placeholder="e.g. Need help finding your perfect shade or routine?"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2455,7 +2455,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.ctaButtonText || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, ctaButtonText: e.target.value })}
-                      placeholder="e.g. Chat with Skincare Specialist"
+                      placeholder="e.g. Chat with Beauty Advisor"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
@@ -2466,7 +2466,7 @@ export const AdminPage = () => {
                       type="text"
                       value={aboutFormData.ctaSubtitle || ''}
                       onChange={(e) => setAboutFormData({ ...aboutFormData, ctaSubtitle: e.target.value })}
-                      placeholder="e.g. Our skincare advisory team is available on WhatsApp 7 days a week."
+                      placeholder="e.g. Our beauty advisors are available on WhatsApp 7 days a week for personalized recommendations."
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-[#5B4DF5] outline-none"
                     />
                   </div>
