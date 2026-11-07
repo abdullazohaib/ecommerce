@@ -25,16 +25,57 @@ export const CategoryBannersManager = () => {
     categoryBanners, 
     updateCategoryBanner, 
     navigateToCategory,
-    navigateToView 
+    navigateToView,
+    categoriesList = []
   } = useStore();
+
+  const dynamicCategories = React.useMemo(() => {
+    const defaultIcons = {
+      lips: '💄',
+      eyes: '👁️',
+      face: '✨',
+      nails: '💅',
+      skincare: '🌿',
+      all: '🛍️'
+    };
+
+    const source = (Array.isArray(categoriesList) && categoriesList.length > 0)
+      ? categoriesList
+      : CATEGORY_ITEMS;
+
+    const list = source.map(c => {
+      const slug = (c.slug || c.id || '').toLowerCase();
+      return {
+        id: c.id || slug,
+        slug,
+        name: c.name || slug,
+        icon: defaultIcons[slug] || c.icon || '✨',
+        defaultBanner: c.bannerImg || (slug === 'all' ? '/banners/classic-glow-hero-clean.jpg' : '/categories/skin.png'),
+        route: slug === 'all' ? '/shop' : `/category/${slug}`
+      };
+    });
+
+    if (!list.some(c => c.slug === 'all')) {
+      list.push({
+        id: 'all',
+        slug: 'all',
+        name: 'All Products (Shop)',
+        icon: '🛍️',
+        defaultBanner: '/banners/classic-glow-hero-clean.jpg',
+        route: '/shop'
+      });
+    }
+
+    return list;
+  }, [categoriesList]);
 
   const [activeSlug, setActiveSlug] = useState('lips');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const currentCategory = CATEGORY_ITEMS.find(c => c.slug === activeSlug) || CATEGORY_ITEMS[0];
-  const currentBanner = (categoryBanners && categoryBanners[activeSlug]) || currentCategory.defaultBanner;
+  const currentCategory = dynamicCategories.find(c => c.slug === activeSlug) || dynamicCategories[0] || CATEGORY_ITEMS[0];
+  const currentBanner = (categoryBanners && categoryBanners[currentCategory.slug]) || currentCategory.defaultBanner;
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -115,7 +156,7 @@ export const CategoryBannersManager = () => {
           Select Category to Change Banner:
         </label>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {CATEGORY_ITEMS.map((cat) => {
+          {dynamicCategories.map((cat) => {
             const isSelected = cat.slug === activeSlug;
             const hasCustom = categoryBanners && categoryBanners[cat.slug] && categoryBanners[cat.slug] !== cat.defaultBanner;
 
@@ -285,7 +326,7 @@ export const CategoryBannersManager = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {CATEGORY_ITEMS.map((cat) => {
+          {dynamicCategories.map((cat) => {
             const isSelected = cat.slug === activeSlug;
             const bannerUrl = (categoryBanners && categoryBanners[cat.slug]) || cat.defaultBanner;
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { categories } from '../../data/categories';
+import { categories as defaultCategories } from '../../data/categories';
 import { 
   X, 
   Settings, 
@@ -58,8 +58,11 @@ export const AdminModal = () => {
     isAdminAuthenticated, 
     adminLogin, 
     adminLogout, 
+    categoriesList = [],
     addToast 
   } = useStore();
+
+  const cats = (Array.isArray(categoriesList) && categoriesList.length > 0) ? categoriesList : defaultCategories;
 
   const [activeTab, setActiveTab] = useState('orders'); // Default to Orders so admin can immediately manage tracking & returns!
   
@@ -797,8 +800,8 @@ export const AdminModal = () => {
                     className="bg-white border border-slate-200 text-xs font-semibold text-slate-700 py-2 px-3 rounded-xl outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
                   >
                     <option value="all">All Categories</option>
-                    {categories.filter(c => c.id !== 'all').map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    {cats.filter(c => c && c.id !== 'all').map(cat => (
+                      <option key={cat.id || cat.slug} value={cat.id || cat.slug}>{cat.name}</option>
                     ))}
                   </select>
                 </div>
@@ -876,8 +879,8 @@ export const AdminModal = () => {
                           onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-rose-500 outline-none cursor-pointer"
                         >
-                          {categories.filter(c => c.id !== 'all').map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          {cats.filter(c => c && c.id !== 'all').map(cat => (
+                            <option key={cat.id || cat.slug} value={cat.id || cat.slug}>{cat.name}</option>
                           ))}
                         </select>
                       </div>

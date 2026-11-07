@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
-import { categories } from '../../data/categories';
+import { categories as defaultCategories } from '../../data/categories';
 import { Sparkles, Tag, ShieldCheck, Flame, BookOpen, Layers } from 'lucide-react';
 
 export const Navbar = () => {
@@ -8,8 +8,12 @@ export const Navbar = () => {
     selectedCategory, 
     setSelectedCategory, 
     setCurrentView,
-    currentView
+    currentView,
+    categoriesList = [],
+    navigateToCategory
   } = useStore();
+
+  const cats = (Array.isArray(categoriesList) && categoriesList.length > 0) ? categoriesList : defaultCategories;
 
   return (
     <nav className="hidden lg:block bg-white border-b border-slate-100">
@@ -20,8 +24,12 @@ export const Navbar = () => {
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-1">
             <button
               onClick={() => {
-                setSelectedCategory('all');
-                setCurrentView('shop');
+                if (navigateToCategory) {
+                  navigateToCategory('all', 'all');
+                } else {
+                  setSelectedCategory('all');
+                  setCurrentView('shop');
+                }
               }}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all cursor-pointer ${
                 currentView === 'shop' && selectedCategory === 'all'
@@ -33,33 +41,42 @@ export const Navbar = () => {
               <span>All Products</span>
             </button>
 
-            {categories.filter(c => c.id !== 'all').map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setSelectedCategory(cat.id);
-                  setCurrentView('shop');
-                }}
-                className={`relative px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-                  currentView === 'shop' && selectedCategory === cat.id
-                    ? 'bg-rose-50 text-rose-600 font-bold border border-rose-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                <span>{cat.name}</span>
-                {cat.badge && (
-                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-tighter ${
-                    cat.badge === 'Trending' 
-                      ? 'bg-amber-100 text-amber-800' 
-                      : cat.badge === 'Best Seller'
-                      ? 'bg-rose-100 text-rose-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                  }`}>
-                    {cat.badge}
-                  </span>
-                )}
-              </button>
-            ))}
+            {cats.filter(c => c && c.id !== 'all').map(cat => {
+              const catSlug = cat.slug || cat.id;
+              const isCatActive = currentView === 'shop' && (selectedCategory === cat.id || selectedCategory === cat.slug);
+
+              return (
+                <button
+                  key={cat.id || catSlug}
+                  onClick={() => {
+                    if (navigateToCategory) {
+                      navigateToCategory(catSlug, 'all');
+                    } else {
+                      setSelectedCategory(cat.id);
+                      setCurrentView('shop');
+                    }
+                  }}
+                  className={`relative px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                    isCatActive
+                      ? 'bg-rose-50 text-rose-600 font-bold border border-rose-200'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>{cat.name}</span>
+                  {cat.badge && (
+                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-tighter ${
+                      cat.badge === 'Trending' 
+                        ? 'bg-amber-100 text-amber-800' 
+                        : cat.badge === 'Best Seller'
+                        ? 'bg-rose-100 text-rose-800'
+                        : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {cat.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Right Highlights: Flash Deals & Skincare Blog */}

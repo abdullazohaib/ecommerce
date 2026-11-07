@@ -268,7 +268,19 @@ export const StoreProvider = ({ children }) => {
       } catch (e) {}
     });
 
-    // 2. Read glowbasket_category_banners object
+    // 2. Read any dynamic glowbasket_banner_* keys for user-created categories
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('glowbasket_banner_')) {
+          const catSlug = key.replace('glowbasket_banner_', '').toLowerCase();
+          const val = localStorage.getItem(key);
+          if (val) custom[catSlug] = val;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Read glowbasket_category_banners object
     try {
       const saved = localStorage.getItem('glowbasket_category_banners');
       if (saved) {
@@ -279,7 +291,7 @@ export const StoreProvider = ({ children }) => {
       }
     } catch (e) {}
 
-    // 3. Check categories in localStorage for custom uploaded banners
+    // 4. Check categories in localStorage for custom uploaded banners
     try {
       const savedCats = localStorage.getItem('glowbasket_categories');
       if (savedCats) {
@@ -298,46 +310,88 @@ export const StoreProvider = ({ children }) => {
     return { ...defaultCategoryBanners, ...custom };
   });
 
-  // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare with Subcategories)
+  // Categories State (Controlled & Editable from Admin - Lips, Eyes, Face, Nails, Skincare + Custom User Categories)
   const [categoriesList, setCategoriesList] = useState(() => {
     try {
-      const saved = localStorage.getItem('glowbasket_categories');
+      // 1. Collect all custom banners
       let customBanners = {};
       try {
         const savedB = localStorage.getItem('glowbasket_category_banners');
-        if (savedB) customBanners = JSON.parse(savedB);
+        if (savedB) customBanners = JSON.parse(savedB) || {};
       } catch (e) {}
 
-      ['lips', 'eyes', 'face', 'nails', 'skincare', 'all'].forEach(slug => {
-        try {
-          const direct = localStorage.getItem(`glowbasket_banner_${slug}`);
-          if (direct) customBanners[slug] = direct;
-        } catch (e) {}
-      });
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('glowbasket_banner_')) {
+            const catSlug = key.replace('glowbasket_banner_', '').toLowerCase();
+            const val = localStorage.getItem(key);
+            if (val) customBanners[catSlug] = val;
+          }
+        }
+      } catch (e) {}
 
+      // 2. Read explicitly deleted category slugs
+      let deletedSlugs = new Set();
+      try {
+        const d = JSON.parse(localStorage.getItem('glowbasket_deleted_categories') || '[]');
+        if (Array.isArray(d)) deletedSlugs = new Set(d.map(s => (s || '').toLowerCase()));
+      } catch (e) {}
+
+      // 3. Check saved categories in localStorage
+      const saved = localStorage.getItem('glowbasket_categories');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          parsed.forEach(c => {
-            const slug = (c.slug || c.id || '').toLowerCase();
-            if (slug && c.bannerImg) {
-              customBanners[slug] = c.bannerImg;
-            }
+          // Map user categories and ensure valid slug, banner, and subcategories
+          const userCategories = parsed.map(c => {
+            const slug = (c.slug || c.id || slugify(c.name || '')).toLowerCase();
+            const banner = customBanners[slug] || c.bannerImg || '/banners/classic-glow-hero-clean.jpg';
+            return {
+              ...c,
+              id: c.id || slug,
+              slug: slug,
+              name: c.name || slug,
+              description: c.description || 'Premium beauty & skincare collection',
+              bannerImg: banner,
+              badge: c.badge || '',
+              icon: c.icon || 'Sparkles',
+              subcategories: Array.isArray(c.subcategories) ? c.subcategories : []
+            };
           });
+
+          // Ensure any default initial categories that haven't been deleted are preserved
+          const existingSlugs = new Set(userCategories.map(c => (c.slug || c.id || '').toLowerCase()));
+          const missingCore = initialCategories
+            .filter(core => {
+              const s = (core.slug || core.id || '').toLowerCase();
+              return !existingSlugs.has(s) && !deletedSlugs.has(s);
+            })
+            .map(core => {
+              const slug = (core.slug || core.id || '').toLowerCase();
+              return {
+                ...core,
+                bannerImg: customBanners[slug] || core.bannerImg
+              };
+            });
+
+          return [...userCategories, ...missingCore];
         }
       }
 
-      // Always return complete beauty categories with custom uploaded banners preserved
+      // 4. Default: initial categories with custom banners if any
       return initialCategories.map(cat => {
-        const slug = cat.slug || cat.id;
+        const slug = (cat.slug || cat.id || '').toLowerCase();
         const banner = customBanners[slug] || cat.bannerImg;
         return {
           ...cat,
           bannerImg: banner
         };
       });
-    } catch (e) {}
-    return initialCategories;
+    } catch (e) {
+      console.warn('Error restoring categoriesList:', e);
+      return initialCategories;
+    }
   });
 
   // About Us Section State (Controlled & Editable from Admin)
@@ -1132,19 +1186,46 @@ export const StoreProvider = ({ children }) => {
 
   // Categories CRUD Management (Controlled & Editable from Admin)
   const addCategory = (newCat) => {
-    const slug = newCat.slug || slugify(newCat.name);
+    const rawSlug = newCat.slug || slugify(newCat.name);
+    const slug = slugify(rawSlug) || `category-${Date.now()}`;
     const cat = {
+      ...newCat,
       id: slug,
-      name: newCat.name,
-      slug,
-      description: newCat.description || "Certified herbal skincare collection",
-      bannerImg: newCat.bannerImg || "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1200&q=80",
+      slug: slug,
+      name: (newCat.name || '').trim(),
+      description: newCat.description || "Premium beauty & skincare collection",
+      bannerImg: newCat.bannerImg || "/banners/classic-glow-hero-clean.jpg",
       badge: newCat.badge || "",
       icon: newCat.icon || "Sparkles",
+      subcategories: Array.isArray(newCat.subcategories) ? newCat.subcategories : [],
       count: Number(newCat.count) || 0
     };
+
+    // If deleted previously, un-delete it
+    try {
+      const d = JSON.parse(localStorage.getItem('glowbasket_deleted_categories') || '[]');
+      if (Array.isArray(d)) {
+        const filteredD = d.filter(s => (s || '').toLowerCase() !== slug.toLowerCase());
+        localStorage.setItem('glowbasket_deleted_categories', JSON.stringify(filteredD));
+      }
+    } catch (e) {}
+
+    // Save isolated crash-proof banner key for this category
+    if (cat.bannerImg) {
+      try {
+        localStorage.setItem(`glowbasket_banner_${slug}`, cat.bannerImg);
+      } catch (e) {}
+      setCategoryBanners(prev => {
+        const nextB = { ...prev, [slug]: cat.bannerImg };
+        safeStorageSet('glowbasket_category_banners', nextB);
+        return nextB;
+      });
+    }
+
     setCategoriesList(prev => {
-      const next = [...prev, cat];
+      // Prevent duplicate slugs
+      const filtered = prev.filter(c => (c.slug || c.id || '').toLowerCase() !== slug.toLowerCase());
+      const next = [...filtered, cat];
       safeStorageSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
@@ -1157,7 +1238,20 @@ export const StoreProvider = ({ children }) => {
 
   const updateCategory = (catId, updatedFields) => {
     setCategoriesList(prev => {
-      const next = prev.map(c => (c.id === catId ? { ...c, ...updatedFields } : c));
+      const next = prev.map(c => {
+        if (c.id === catId || c.slug === catId) {
+          const updated = { ...c, ...updatedFields };
+          if (updatedFields.slug) updated.slug = slugify(updatedFields.slug);
+          if (updatedFields.bannerImg) {
+            const s = (updated.slug || updated.id).toLowerCase();
+            try {
+              localStorage.setItem(`glowbasket_banner_${s}`, updatedFields.bannerImg);
+            } catch (e) {}
+          }
+          return updated;
+        }
+        return c;
+      });
       safeStorageSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
@@ -1172,14 +1266,25 @@ export const StoreProvider = ({ children }) => {
       addToast(`Default "All Products" category cannot be deleted.`, 'error');
       return;
     }
+    const cleanId = (catId || '').toLowerCase();
+    try {
+      const d = JSON.parse(localStorage.getItem('glowbasket_deleted_categories') || '[]');
+      const setD = new Set(Array.isArray(d) ? d.map(s => (s || '').toLowerCase()) : []);
+      setD.add(cleanId);
+      localStorage.setItem('glowbasket_deleted_categories', JSON.stringify([...setD]));
+    } catch (e) {}
+
     setCategoriesList(prev => {
-      const next = prev.filter(c => c.id !== catId);
+      const next = prev.filter(c => (c.id || '').toLowerCase() !== cleanId && (c.slug || '').toLowerCase() !== cleanId);
       safeStorageSet('glowbasket_categories', next);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('glowbasket_sync', { detail: { key: 'categories', data: next } }));
       }
       return next;
     });
+    try {
+      localStorage.removeItem(`glowbasket_banner_${cleanId}`);
+    } catch (e) {}
     addToast(`Category removed from store.`, 'info');
   };
 
