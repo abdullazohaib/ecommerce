@@ -1,6 +1,6 @@
 import React from 'react';
 import { blogPosts } from '../../data/blogPosts';
-import { BookOpen, ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export const BlogHighlights = () => {
@@ -10,16 +10,9 @@ export const BlogHighlights = () => {
     <section id="skincare-guides" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
         <div>
-          <div className="flex items-center gap-2 text-rose-600 text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Skincare Knowledge Hub</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
-            Tips, Guides & Product Science
+          <h2 className="font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl font-sans">
+            EXPERT BEAUTY & SKINCARE GUIDES.
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Expert advice on nighttime routines, ingredients, and maintaining natural, lasting glow.
-          </p>
         </div>
 
         <a

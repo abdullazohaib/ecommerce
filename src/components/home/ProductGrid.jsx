@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { ProductCard } from './ProductCard';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const ProductGrid = () => {
   const { productsList = [], categoriesList = [], setViewWithUrl } = useStore();
@@ -31,16 +31,9 @@ export const ProductGrid = () => {
       {/* Title & Tabs */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <div className="flex items-center gap-2 text-black text-xs font-black uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Featured Formulations</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
-            Explore Trending Products
+          <h2 className="font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl font-sans">
+            EXPLORE TRENDING PRODUCTS.
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Top rated skin lightening treatments with thousands of verified customer transformations.
-          </p>
         </div>
 
         {/* Tab Buttons */}

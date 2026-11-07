@@ -16,15 +16,9 @@ export const CustomerReviews = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
         <div>
-          <span className="text-xs font-black text-black uppercase tracking-widest">
-            {badge}
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
-            {title}
+          <h2 className="font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl font-sans">
+            {title ? (title.endsWith('.') ? title.toUpperCase() : `${title.toUpperCase()}.`) : 'VERIFIED CUSTOMER REVIEWS.'}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            {subtitle}
-          </p>
         </div>
 
         {/* Aggregate score card */}

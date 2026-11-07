@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { ProductCard } from './ProductCard';
-import { Flame, Clock, Sparkles } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 export const FlashSaleCountdown = () => {
   const { productsList } = useStore();
@@ -37,35 +37,26 @@ export const FlashSaleCountdown = () => {
     <section id="flash-deals" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="bg-neutral-50 rounded-2xl p-6 sm:p-8 border border-neutral-200/90 shadow-xs">
         
-        {/* Header with Countdown timer */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 text-black text-xs font-black uppercase tracking-widest">
-              <Flame className="w-4 h-4 fill-black text-black" />
-              <span>Limited Time Offer</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
-              Deals of the Day
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-              Special daily discounted prices on genuine bestselling skincare essentials.
-            </p>
-          </div>
+        {/* Header with Clean Title & Countdown timer matching reference */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-neutral-200/70">
+          <h2 className="font-extrabold tracking-[0.08em] sm:tracking-[0.14em] text-neutral-900 uppercase text-lg sm:text-xl md:text-2xl font-sans">
+            DEALS OF THE DAY.
+          </h2>
 
           {/* Countdown Clock Display */}
-          <div className="flex items-center gap-2 bg-slate-950 text-white px-5 py-3 rounded-2xl shadow-lg border border-slate-800 self-start md:self-auto">
-            <Clock className="w-4 h-4 text-amber-400 animate-spin" />
-            <span className="text-xs font-semibold text-slate-300 mr-2">Ends In:</span>
-            <div className="flex items-center gap-1.5 font-mono font-bold text-sm">
-              <span className="bg-slate-800 text-amber-300 px-2 py-1 rounded-lg">
+          <div className="flex items-center gap-2.5 bg-black text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-xs self-start sm:self-auto">
+            <Clock className="w-4 h-4 text-amber-400" />
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Ends In:</span>
+            <div className="flex items-center gap-1.5 font-mono font-bold text-xs sm:text-sm">
+              <span className="bg-neutral-800 text-amber-300 px-2 py-0.5 rounded-md">
                 {String(timeLeft.hours).padStart(2, '0')}h
               </span>
-              <span className="text-amber-400">:</span>
-              <span className="bg-slate-800 text-amber-300 px-2 py-1 rounded-lg">
+              <span className="text-amber-400 font-bold">:</span>
+              <span className="bg-neutral-800 text-amber-300 px-2 py-0.5 rounded-md">
                 {String(timeLeft.minutes).padStart(2, '0')}m
               </span>
-              <span className="text-amber-400">:</span>
-              <span className="bg-slate-800 text-amber-300 px-2 py-1 rounded-lg">
+              <span className="text-amber-400 font-bold">:</span>
+              <span className="bg-neutral-800 text-amber-300 px-2 py-0.5 rounded-md">
                 {String(timeLeft.seconds).padStart(2, '0')}s
               </span>
             </div>
