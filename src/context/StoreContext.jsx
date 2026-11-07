@@ -245,7 +245,19 @@ export const StoreProvider = ({ children }) => {
           const hasLegacy = parsed.some(c => c.id === 'whitening-creams' || c.id === 'night-creams');
           const hasSubcategories = parsed.some(c => Array.isArray(c.subcategories) && c.subcategories.length > 0);
           if (!hasLegacy && hasSubcategories) {
-            return parsed;
+            return parsed.map(c => {
+              if (c.bannerImg && c.bannerImg.includes('unsplash.com')) {
+                const map = {
+                  lips: '/categories/lips.png',
+                  eyes: '/categories/eyes.png',
+                  face: '/categories/face.png',
+                  nails: '/categories/nails.png',
+                  skincare: '/categories/skin.png',
+                };
+                if (map[c.id || c.slug]) return { ...c, bannerImg: map[c.id || c.slug] };
+              }
+              return c;
+            });
           }
         }
       }
