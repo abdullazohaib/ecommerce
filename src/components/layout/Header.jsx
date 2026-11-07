@@ -84,6 +84,7 @@ export const Header = () => {
   const renderCategoryStripItem = (catId, displayName, catSlug) => {
     const catData = (categoriesList || []).find(c => c.id === catId || c.slug === catSlug);
     const subList = catData?.subcategories || [];
+    const isActive = currentView === 'category' && (selectedCategory === catSlug || selectedCategory === catId);
 
     return (
       <div key={catId} className="relative group shrink-0">
@@ -93,8 +94,10 @@ export const Header = () => {
             e.preventDefault();
             navigateToCategory(catSlug, 'all');
           }}
-          className={`transition-colors cursor-pointer py-1 block hover:text-black ${
-            currentView === 'category' && selectedCategory === catSlug ? 'text-black font-bold' : 'text-neutral-900'
+          className={`px-2.5 py-0.5 border transition-all cursor-pointer block select-none ${
+            isActive
+              ? 'border-black text-black font-semibold'
+              : 'border-transparent hover:border-black text-black'
           }`}
         >
           {displayName}
@@ -103,7 +106,7 @@ export const Header = () => {
         {/* Hover Dropdown with all subcategories */}
         {subList.length > 0 && (
           <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block z-50">
-            <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-3 min-w-[210px] normal-case tracking-normal font-sans text-left">
+            <div className="bg-white rounded-xl shadow-2xl border border-slate-100 p-2.5 min-w-[200px] normal-case tracking-normal font-sans text-left">
               <a
                 href={`/category/${catSlug}`}
                 onClick={(e) => {
@@ -536,11 +539,11 @@ export const Header = () => {
 
       {/* ============================================================= */}
       {/* LUXURY CATEGORY STRIP: SALE | LIPS | EYES | SKIN | FACE | NAILS */}
-      {/* (Below Search Bar, Before Hero Banner) */}
+      {/* (Centered Geometric Sans Strip Matching User UI Reference) */}
       {/* ============================================================= */}
-      <div className="border-t border-slate-100 bg-white/95 backdrop-blur-xs py-2 sm:py-2.5 shadow-3xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 overflow-x-auto no-scrollbar font-cinzel text-xs sm:text-[13px] font-semibold tracking-[0.18em] uppercase text-neutral-900">
+      <div className="w-full border-t border-b border-slate-100 bg-white py-2.5 sm:py-3 shadow-3xs">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center overflow-x-auto no-scrollbar">
+          <nav className="flex items-center justify-center gap-0 font-sans text-[11px] sm:text-xs font-medium tracking-[0.24em] uppercase text-black shrink-0">
             {/* 1. SALE with Gold A */}
             <a
               href="/shop?sort=bestsellers"
@@ -550,38 +553,38 @@ export const Header = () => {
                 navigateToCategory('all');
                 setViewWithUrl('shop');
               }}
-              className="hover:text-black transition-colors cursor-pointer shrink-0 py-1"
+              className="border border-transparent hover:border-black px-2 sm:px-2.5 py-0.5 transition-all cursor-pointer select-none shrink-0"
               title="Shop Special Sale & Trending Offers"
             >
               S<span className="text-amber-500 font-bold">A</span>LE
             </a>
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
 
             {/* 2. LIPS */}
             {renderCategoryStripItem('lips', 'LIPS', 'lips')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
 
             {/* 3. EYES */}
             {renderCategoryStripItem('eyes', 'EYES', 'eyes')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
 
             {/* 4. SKIN */}
             {renderCategoryStripItem('skincare', 'SKIN', 'skincare')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
 
             {/* 5. FACE */}
             {renderCategoryStripItem('face', 'FACE', 'face')}
 
             {/* Separator */}
-            <span className="text-slate-300 font-light select-none shrink-0 text-xs">|</span>
+            <span className="text-slate-300 font-light select-none mx-3 sm:mx-5 md:mx-7 text-xs shrink-0">|</span>
 
             {/* 6. NAILS */}
             {renderCategoryStripItem('nails', 'NAILS', 'nails')}
