@@ -20,7 +20,8 @@ export const ShopPage = () => {
     priceFilter,
     setPriceFilter,
     categoriesList,
-    storeInfo
+    storeInfo,
+    banners
   } = useStore();
 
   const cats = (categoriesList && categoriesList.length > 0) ? categoriesList : categories;
@@ -37,30 +38,11 @@ export const ShopPage = () => {
     slugify(s.name) === slugify(selectedSubCategory || '')
   );
 
-  // Fallback high-res artwork map for standard beauty categories
-  const artworkFallbackMap = {
-    lips: '/categories/lips.png',
-    eyes: '/categories/eyes.png',
-    face: '/categories/face.png',
-    nails: '/categories/nails.png',
-    skincare: '/categories/skin.png',
-    skin: '/categories/skin.png',
-  };
-
-  const gradientMap = {
-    lips: 'from-[#2b0816] via-[#1a050d] to-[#0d0206]',
-    eyes: 'from-[#190a2c] via-[#0d0417] to-[#06010b]',
-    face: 'from-[#2a130f] via-[#180a08] to-[#0c0504]',
-    nails: 'from-[#2a0814] via-[#18040b] to-[#0c0205]',
-    skincare: 'from-[#281308] via-[#160a04] to-[#0b0402]',
-    skin: 'from-[#281308] via-[#160a04] to-[#0b0402]',
-  };
-
-  const catSlug = currentCat?.slug || currentCat?.id || 'all';
-  const heroGradient = gradientMap[catSlug] || 'from-[#18181b] via-[#09090b] to-[#000000]';
-  const heroArtwork = currentCat?.bannerImg && !currentCat.bannerImg.includes('unsplash.com')
-    ? currentCat.bannerImg
-    : (artworkFallbackMap[catSlug] || currentCat?.bannerImg || '/categories/skin.png');
+  // Single full-size banner for all categories (same size & source as homepage hero banner)
+  const availableBanners = (banners && banners.length > 0) ? banners : (storeInfo?.banners || []);
+  const activeBanners = availableBanners.filter(b => b.active !== false && b.status !== 'Draft');
+  const primaryBanner = activeBanners.length > 0 ? activeBanners[0] : availableBanners[0];
+  const categoryBannerImage = storeInfo?.categoryBannerImage || primaryBanner?.image || "/banners/classic-glow-hero-clean.jpg";
 
   // Filter products logic
   const filteredProducts = productsList.filter(prod => {
@@ -118,17 +100,34 @@ export const ShopPage = () => {
     ? currentSub.name
     : (currentCat ? `${currentCat.name} Collection` : 'Complete Beauty & Skincare Collection');
 
-  const pageDescription = currentSub?.description 
-    || currentCat?.description 
-    || 'Discover our full range of certified high-pigment cosmetics, nourishing lip formulas, HD complexion bases, and dermatologist-tested skincare routines.';
-
   return (
-    <div className="bg-[#FAF9F6] min-h-screen py-6 sm:py-8 font-sans text-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#FAF9F6] min-h-screen font-sans text-slate-800">
+      
+      {/* =============================================================== */}
+      {/* 1. FULL SIZE BANNER (SAME SIZE AS HOMEPAGE BANNER FOR ALL CATS)  */}
+      {/* =============================================================== */}
+      <section className="relative w-full overflow-hidden bg-white border-b border-slate-200/80 shadow-2xs">
+        <div className="w-full relative overflow-hidden">
+          <div className="w-full aspect-[16/9] sm:aspect-[2.2/1] md:aspect-[2.6/1] lg:aspect-[3/1] min-h-[220px] sm:min-h-[360px] md:min-h-[440px] max-h-[620px] bg-neutral-100 flex items-center justify-center overflow-hidden">
+            <img
+              src={categoryBannerImage}
+              alt="Category Collection Banner"
+              className="w-full h-full object-cover object-center"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/banners/classic-glow-hero-clean.jpg";
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* =============================================================== */}
+      {/* 2. MAIN CONTAINER (Breadcrumbs, Subcategory Pills, Products)     */}
+      {/* =============================================================== */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
         
-        {/* =============================================================== */}
-        {/* 1. DYNAMIC BREADCRUMBS (Clickable Multi-Level Navigation)         */}
-        {/* =============================================================== */}
+        {/* Dynamic Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-4">
           <ol className="flex items-center flex-wrap gap-1.5 text-xs text-slate-400 font-semibold">
             <li>
@@ -185,69 +184,22 @@ export const ShopPage = () => {
           </ol>
         </nav>
 
-        {/* =============================================================== */}
-        {/* 2. DEDICATED CATEGORY & SUBCATEGORY HERO BANNER                   */}
-        {/* =============================================================== */}
-        <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-r ${heroGradient} text-white p-6 sm:p-10 mb-8 shadow-sm border border-neutral-800`}>
-          <div className="relative z-10 max-w-2xl">
-            {/* Top Category Badge */}
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-white/90 border border-white/15 px-2.5 py-0.5 rounded-full">
-                {currentSub 
-                  ? `${currentCat?.name || 'CATEGORY'} • ${currentSub.name}` 
-                  : (currentCat?.badge || 'OFFICIAL COLLECTION')}
-              </span>
-              <span className="text-[11px] font-bold text-neutral-400">
-                100% Genuine Certified
-              </span>
-            </div>
-
-            {/* Main Page Title */}
-            <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-white mb-2 font-sans">
+        {/* Category & Subcategory Title Bar */}
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-3 border-b border-slate-200/80">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400 block mb-0.5">
+              {currentSub ? `${currentCat?.name || 'CATEGORY'} • ${currentSub.name}` : (currentCat?.name || 'COLLECTION')}
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-slate-900 font-sans">
               {pageHeading}
             </h1>
-
-            {/* Description */}
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal mb-5 max-w-xl">
-              {pageDescription}
-            </p>
-
-            {/* Trust Highlights */}
-            <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-neutral-300">
-              <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{sortedProducts.length} Items Available</span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-amber-400" />
-                <span>Free Delivery ₹{storeInfo?.freeShippingThreshold || 999}+</span>
-              </span>
-              <span className="text-neutral-600">•</span>
-              <span className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-rose-400" />
-                <span>Hologram Protected</span>
-              </span>
-            </div>
           </div>
-
-          {/* Right Floating Artwork (Desktop) */}
-          {currentCat && (
-            <div className="hidden md:block absolute right-8 top-1/2 -translate-y-1/2 w-48 lg:w-56 h-48 lg:h-56 rounded-full overflow-hidden opacity-85 hover:opacity-100 transition-opacity pointer-events-none">
-              <div className="w-full h-full p-2 bg-white/5 rounded-full border border-white/10 backdrop-blur-xs">
-                <img
-                  src={heroArtwork}
-                  alt={pageHeading}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-            </div>
-          )}
+          <p className="text-xs text-slate-500 font-medium shrink-0">
+            Showing <strong className="text-black font-bold">{sortedProducts.length}</strong> items in this collection
+          </p>
         </div>
 
-        {/* =============================================================== */}
-        {/* 3. HORIZONTAL SUBCATEGORY PILLS SWITCHER (Inside Category)       */}
-        {/* =============================================================== */}
+        {/* Horizontal Subcategory Filter Pills (Inside Category) */}
         {currentCat?.subcategories && currentCat.subcategories.length > 0 && (
           <div className="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-2xs mb-6 overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-2 min-w-max">
@@ -302,9 +254,7 @@ export const ShopPage = () => {
           </div>
         )}
 
-        {/* =============================================================== */}
-        {/* 4. ACTION BAR (Filters Trigger, Active Badges, Sort)              */}
-        {/* =============================================================== */}
+        {/* Action Bar (Filters Trigger, Active Badges, Sort) */}
         <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-2xs mb-6 flex flex-wrap items-center justify-between gap-3">
           
           <div className="flex items-center gap-2 flex-wrap">
@@ -390,9 +340,7 @@ export const ShopPage = () => {
           </div>
         </div>
 
-        {/* =============================================================== */}
-        {/* 5. MAIN CONTENT (Sidebar + Products Grid)                        */}
-        {/* =============================================================== */}
+        {/* Main Grid (Sidebar + Products Grid) */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           {/* Desktop Filter Sidebar (1 col) */}
@@ -585,7 +533,7 @@ export const ShopPage = () => {
       </div>
 
       {/* =============================================================== */}
-      {/* 6. MOBILE FILTER DRAWER                                          */}
+      {/* 3. MOBILE FILTER DRAWER                                          */}
       {/* =============================================================== */}
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex justify-end">
