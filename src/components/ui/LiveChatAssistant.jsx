@@ -603,3 +603,4 @@ export const LiveChatAssistant = () => {
     </div>
   );
 };
+

@@ -595,8 +595,20 @@ export const StoreProvider = ({ children }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState('login'); // 'login' | 'register' | 'admin'
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('glowbasket_user') || localStorage.getItem('auraglow_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('glowbasket_user') || localStorage.getItem('auraglow_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        // Clear mock/stale session if it was placeholder "Valued Customer admin"
+        if (u && (u.emailOrPhone === 'admin' || (u.name === 'Valued Customer' && !u.email))) {
+          localStorage.removeItem('glowbasket_user');
+          localStorage.removeItem('auraglow_user');
+          return null;
+        }
+        return u;
+      }
+    } catch (e) {}
+    return null;
   });
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     return (localStorage.getItem('glowbasket_admin_auth') || localStorage.getItem('auraglow_admin_auth')) === 'true';
@@ -818,13 +830,36 @@ export const StoreProvider = ({ children }) => {
       addToast('Please enter your email/phone and password', 'error');
       return false;
     }
+    const clean = String(emailOrPhone).trim();
+    let existingUser = null;
+    try {
+      const raw = localStorage.getItem('glowbasket_registered_users');
+      if (raw) {
+        const list = JSON.parse(raw);
+        existingUser = list.find(u => 
+          (u.email && u.email.toLowerCase() === clean.toLowerCase()) || 
+          (u.phone && u.phone === clean)
+        );
+      }
+    } catch (e) {}
+
+    const derivedName = clean.includes('@')
+      ? clean.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+      : 'Valued Customer';
+
     const user = {
-      name: emailOrPhone.includes('@') ? emailOrPhone.split('@')[0] : 'Valued Customer',
-      emailOrPhone,
+      id: existingUser?.id || ('user_' + Date.now()),
+      name: existingUser?.name || derivedName,
+      email: clean.includes('@') ? clean : (existingUser?.email || ''),
+      phone: clean.includes('@') ? (existingUser?.phone || '') : clean,
+      emailOrPhone: clean,
+      authProvider: existingUser?.authProvider || 'email',
       role: 'customer',
       loggedInAt: new Date().toISOString()
     };
+
     setCurrentUser(user);
+    safeStorageSet('glowbasket_user', user);
     setIsAuthModalOpen(false);
     addToast(`Welcome back, ${user.name}!`, 'success');
     return true;
@@ -835,22 +870,87 @@ export const StoreProvider = ({ children }) => {
       addToast('Please fill all required fields', 'error');
       return false;
     }
+    const cleanName = String(name).trim();
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanPhone = phone ? String(phone).trim() : '';
+
     const user = {
-      name,
-      email,
-      phone,
+      id: 'user_' + Date.now(),
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      emailOrPhone: cleanEmail,
+      authProvider: 'email',
       role: 'customer',
       loggedInAt: new Date().toISOString()
     };
+
     setCurrentUser(user);
+    safeStorageSet('glowbasket_user', user);
+
+    // Save to persistent customer directory
+    try {
+      const raw = localStorage.getItem('glowbasket_registered_users');
+      const list = raw ? JSON.parse(raw) : [];
+      const idx = list.findIndex(u => u.email === cleanEmail);
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...user };
+      } else {
+        list.push(user);
+      }
+      safeStorageSet('glowbasket_registered_users', list);
+    } catch (e) {}
+
     setIsAuthModalOpen(false);
-    addToast(`Account created! Welcome to ${storeInfo.storeName}, ${name}!`, 'success');
+    addToast(`Account created! Welcome to ${storeInfo.storeName || 'Glow Basket'}, ${cleanName}!`, 'success');
+    return true;
+  };
+
+  const googleLogin = (googleProfile = {}) => {
+    const defaultName = googleProfile.name || 'Google Customer';
+    const defaultEmail = (googleProfile.email || 'customer.google@gmail.com').toLowerCase();
+    const avatar = googleProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+
+    const user = {
+      id: googleProfile.id || ('google_' + Date.now()),
+      name: defaultName,
+      email: defaultEmail,
+      emailOrPhone: defaultEmail,
+      avatar: avatar,
+      authProvider: 'google',
+      isGoogleVerified: true,
+      role: 'customer',
+      loggedInAt: new Date().toISOString()
+    };
+
+    setCurrentUser(user);
+    safeStorageSet('glowbasket_user', user);
+
+    // Sync to registered users list
+    try {
+      const raw = localStorage.getItem('glowbasket_registered_users');
+      const list = raw ? JSON.parse(raw) : [];
+      const idx = list.findIndex(u => u.email === defaultEmail);
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...user };
+      } else {
+        list.push(user);
+      }
+      safeStorageSet('glowbasket_registered_users', list);
+    } catch (e) {}
+
+    setIsAuthModalOpen(false);
+    addToast(`Signed in with Google as ${defaultName}!`, 'success');
     return true;
   };
 
   const customerLogout = () => {
     setCurrentUser(null);
-    addToast('You have been logged out.', 'info');
+    try {
+      localStorage.removeItem('glowbasket_user');
+      localStorage.removeItem('auraglow_user');
+    } catch (e) {}
+    addToast('You have been signed out.', 'info');
   };
 
   const adminLogin = (usernameOrEmail, password) => {
@@ -2002,6 +2102,7 @@ export const StoreProvider = ({ children }) => {
         setCurrentUser,
         customerLogin,
         customerRegister,
+        googleLogin,
         customerLogout,
         banners,
         setBanners,
