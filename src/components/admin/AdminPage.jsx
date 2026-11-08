@@ -29,6 +29,7 @@ import {
   Truck, 
   Printer, 
   MessageCircle, 
+  MessageSquare, 
   RotateCcw, 
   CheckCircle2, 
   Image as ImageIcon, 
@@ -2133,19 +2134,19 @@ export const AdminPage = () => {
                 )}
               </div>
 
-              {/* Floating WhatsApp Live Chat Settings */}
+              {/* Floating Live Chat & AI Auto-Reply Widget Settings */}
               <div className="space-y-4 pb-6 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-emerald-600" />
-                  <h3 className="text-base font-bold text-slate-900">WhatsApp Floating Chat Widget</h3>
+                  <MessageSquare className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-base font-bold text-slate-900">Live Chat & AI Auto-Reply Assistant</h3>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Configure the green WhatsApp support button and speech prompt shown in the bottom right corner.
+                  Configure the on-site floating chat assistant and teaser prompt shown in the bottom right corner (provides instant auto-replies for creams, order tracking, shipping, and FAQs).
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">WhatsApp Phone Number</label>
+                    <label className="font-bold text-slate-700 block mb-1">Customer Support Phone</label>
                     <input
                       type="text"
                       value={brandingForm.whatsappNumber}
@@ -2156,7 +2157,7 @@ export const AdminPage = () => {
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Chat Speech Bubble Text</label>
+                    <label className="font-bold text-slate-700 block mb-1">Chat Bubble Teaser Prompt</label>
                     <input
                       type="text"
                       value={brandingForm.whatsappPromptText}

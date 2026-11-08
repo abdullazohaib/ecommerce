@@ -24,7 +24,7 @@ import { OrderTrackingModal } from './components/tracking/OrderTrackingModal';
 import { AdminPage } from './components/admin/AdminPage';
 import { AuthModal } from './components/auth/AuthModal';
 import { Toast } from './components/ui/Toast';
-import { WhatsAppFloating } from './components/ui/WhatsAppFloating';
+import { LiveChatAssistant } from './components/ui/LiveChatAssistant';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 const MainContent = () => {
@@ -103,7 +103,7 @@ const MainContent = () => {
       <OrderTrackingModal />
       <AuthModal />
       <Toast />
-      <WhatsAppFloating />
+      <LiveChatAssistant />
     </div>
   );
 };
