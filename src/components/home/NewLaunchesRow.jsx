@@ -16,26 +16,17 @@ export const NewLaunchesRow = () => {
   const [addedItems, setAddedItems] = useState({});
 
   // LIVE CONNECTION TO ADMIN PROFILE:
-  // Filter products marked as "isNewLaunch" or with "New Launch / New Arrival" badge in Admin Profile catalog
+  // Filter products explicitly marked as "isNewLaunch" in Admin Profile catalog
   const adminNewLaunches = (productsList || []).filter(
-    p => p && (
-      p.isNewLaunch === true || 
-      (p.badge && (
-        p.badge.toLowerCase().includes('launch') || 
-        p.badge.toLowerCase().includes('new') ||
-        p.badge.toLowerCase().includes('arrival')
-      ))
-    )
+    p => p && Boolean(p.isNewLaunch) && (p.status !== 'Draft')
   );
 
-  // Fallback to recent products if admin hasn't toggled any yet
-  const displayProducts = adminNewLaunches.length > 0
-    ? adminNewLaunches
-    : (productsList || []).slice(0, 8);
-
-  if (displayProducts.length === 0) {
+  // If no products are marked as New Launch by the admin, gracefully hide the section
+  if (adminNewLaunches.length === 0) {
     return null;
   }
+
+  const displayProducts = adminNewLaunches;
 
   // Smooth scroll handler for carousel arrows
   const scroll = (direction) => {
@@ -50,7 +41,12 @@ export const NewLaunchesRow = () => {
 
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
-    addToCart(product, 1);
+    const activeShade = selectedShades[product.id] || 0;
+    const hasShades = hasProductShades(product);
+    const selectedShadeObj = hasShades && Array.isArray(product.shades) ? product.shades[activeShade] : null;
+    const productToAdd = selectedShadeObj ? { ...product, selectedShade: selectedShadeObj } : product;
+
+    addToCart(productToAdd, 1);
     setAddedItems(prev => ({ ...prev, [product.id]: true }));
     if (addToast) addToast(`Added "${product.name}" to cart!`, 'success');
     setTimeout(() => {
@@ -106,16 +102,18 @@ export const NewLaunchesRow = () => {
             className="flex items-stretch gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-1"
           >
             {displayProducts.map((product) => {
+              const pPrice = Number(product.price) || 0;
+              const pOrigPrice = Number(product.originalPrice) || pPrice;
               const discount = product.discountPercentage || 
-                (product.originalPrice && product.originalPrice > product.price 
-                  ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
-                  : 15);
+                (pOrigPrice > pPrice 
+                  ? Math.round(((pOrigPrice - pPrice) / pOrigPrice) * 100) 
+                  : 0);
 
               const activeShade = selectedShades[product.id] || 0;
               const hasShades = hasProductShades(product);
               const shadesList = hasShades ? product.shades : [];
               const isAdded = addedItems[product.id];
-              const reviews = product.reviewsCount || Math.floor(product.price * 1.8) + 120;
+              const reviews = Number(product.reviewsCount) || Math.floor(pPrice * 1.8) + 120;
 
               return (
                 <div
@@ -130,7 +128,7 @@ export const NewLaunchesRow = () => {
                       {/* Stacked Black Badges on Top Left */}
                       <div className="absolute top-0 left-0 flex flex-col items-start gap-1 z-10 pointer-events-none">
                         <span className="bg-black text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 py-0.5 shadow-2xs">
-                          {product.badge && product.badge.toLowerCase().includes('new') ? product.badge : 'NEW LAUNCH'}
+                          {product.badge && product.badge.trim() ? product.badge : 'NEW LAUNCH'}
                         </span>
                         {discount > 0 ? (
                           <span className="bg-black text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 py-0.5 shadow-2xs">
@@ -202,11 +200,11 @@ export const NewLaunchesRow = () => {
                     {/* Price Row: Rs. Price  Rs. OriginalPrice | Discount% Off */}
                     <div className="flex items-baseline gap-1.5 mt-2 flex-wrap text-xs sm:text-sm">
                       <span className="font-bold text-neutral-900">
-                        Rs. {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        Rs. {pPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
-                      {product.originalPrice > product.price && (
+                      {pOrigPrice > pPrice && (
                         <span className="text-slate-400 line-through text-xs">
-                          Rs. {product.originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          Rs. {pOrigPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </span>
                       )}
                       {discount > 0 && (

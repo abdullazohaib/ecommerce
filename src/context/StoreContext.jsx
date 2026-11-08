@@ -202,7 +202,9 @@ export const StoreProvider = ({ children }) => {
           category: cat,
           subCategory: subCategory,
           status: p.status || (p.stock > 10 ? 'Active' : p.stock > 0 ? 'Scheduled' : 'Draft'),
-          hasShades: isSkincare ? false : (p.hasShades !== undefined ? p.hasShades : Boolean(p.shades && p.shades.length > 0))
+          hasShades: isSkincare ? false : (p.hasShades !== undefined ? p.hasShades : Boolean(p.shades && p.shades.length > 0)),
+          isNewLaunch: p.isNewLaunch !== undefined ? Boolean(p.isNewLaunch) : Boolean(initMatch?.isNewLaunch),
+          isBestseller: p.isBestseller !== undefined ? Boolean(p.isBestseller) : Boolean(p.featured || initMatch?.isBestseller)
         };
       });
 
@@ -1670,10 +1672,15 @@ export const StoreProvider = ({ children }) => {
       rating: Number(newProductData.rating) || 4.9,
       reviewsCount: Number(newProductData.reviewsCount) || 12,
       stock: Number(newProductData.stock) || 20,
-      badge: newProductData.badge || "New Arrival",
+      badge: newProductData.badge || (newProductData.isNewLaunch ? "New Launch" : ""),
       status: newProductData.status || 'Active',
-      featured: Boolean(newProductData.featured),
+      featured: Boolean(newProductData.featured || newProductData.isBestseller),
+      isBestseller: Boolean(newProductData.isBestseller || newProductData.featured),
+      isNewLaunch: Boolean(newProductData.isNewLaunch),
       isDealOfDay: Boolean(newProductData.isDealOfDay),
+      hasShades: Boolean(newProductData.hasShades),
+      shades: Array.isArray(newProductData.shades) ? newProductData.shades : [],
+      shadeCountText: newProductData.shadeCountText || '',
       images: Array.isArray(newProductData.images) && newProductData.images.length > 0 
         ? newProductData.images 
         : [mainImg],

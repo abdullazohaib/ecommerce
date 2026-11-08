@@ -156,13 +156,13 @@ export const AdminPage = () => {
     originalPrice: '',
     stock: 75,
     status: 'Active',
-    badge: 'New Arrival',
+    badge: '',
     imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80',
     images: [],
     shortDescription: 'Advanced herbal formulation for illuminated and radiant glowing skin.',
     size: '50g',
-    featured: true,
-    isBestseller: true,
+    featured: false,
+    isBestseller: false,
     isDealOfDay: false,
     isNewLaunch: false,
     hasShades: false,
@@ -369,6 +369,7 @@ export const AdminPage = () => {
       isDealOfDay: Boolean(productForm.isDealOfDay),
       isBestseller: Boolean(productForm.isBestseller),
       isNewLaunch: Boolean(productForm.isNewLaunch),
+      badge: productForm.badge || (productForm.isNewLaunch ? 'New Launch' : ''),
       hasShades: Boolean(productForm.hasShades),
       shades: productForm.hasShades && Array.isArray(productForm.shades) ? productForm.shades : [],
       shadeCountText: productForm.hasShades ? (productForm.shadeCountText || '+6 Shades') : ''
@@ -408,14 +409,7 @@ export const AdminPage = () => {
       featured: Boolean(prod.featured || prod.isBestseller),
       isBestseller: Boolean(prod.isBestseller || prod.featured),
       isDealOfDay: Boolean(prod.isDealOfDay),
-      isNewLaunch: Boolean(
-        prod.isNewLaunch || 
-        (prod.badge && (
-          prod.badge.toLowerCase().includes('new') || 
-          prod.badge.toLowerCase().includes('launch') || 
-          prod.badge.toLowerCase().includes('arrival')
-        ))
-      ),
+      isNewLaunch: Boolean(prod.isNewLaunch),
       hasShades: hasShadesEnabled,
       shades: Array.isArray(prod.shades) ? prod.shades : [],
       shadeCountText: prod.shadeCountText || (prod.shades && prod.shades.length > 0 ? `+${prod.shades.length} Shades` : '+6 Shades')
@@ -634,14 +628,7 @@ export const AdminPage = () => {
       (prod.subCategory && slugify(prod.subCategory) === slugify(selectedSubCategoryFilter));
     const matchesStatus = statusFilter === 'all' || (prod.status || 'Active') === statusFilter;
     const matchesBestseller = bestsellerFilter === 'all' || (bestsellerFilter === 'bestseller' && Boolean(prod.isBestseller || prod.featured));
-    const matchesLaunch = launchFilter === 'all' || (launchFilter === 'launch' && Boolean(
-      prod.isNewLaunch || 
-      (prod.badge && (
-        prod.badge.toLowerCase().includes('new') || 
-        prod.badge.toLowerCase().includes('launch') || 
-        prod.badge.toLowerCase().includes('arrival')
-      ))
-    ));
+    const matchesLaunch = launchFilter === 'all' || (launchFilter === 'launch' && Boolean(prod.isNewLaunch));
     return matchesSearch && matchesCat && matchesSubCat && matchesStatus && matchesBestseller && matchesLaunch;
   });
 
@@ -1307,7 +1294,7 @@ export const AdminPage = () => {
                       <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
                         launchFilter === 'launch' ? 'bg-white text-rose-700' : 'bg-rose-100 text-rose-900'
                       }`}>
-                        {safeProducts.filter(p => p.isNewLaunch || (p.badge && (p.badge.toLowerCase().includes('new') || p.badge.toLowerCase().includes('launch')))).length}
+                        {safeProducts.filter(p => Boolean(p.isNewLaunch)).length}
                       </span>
                     </button>
                   </div>
@@ -1460,18 +1447,12 @@ export const AdminPage = () => {
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const isCurrentLaunch = Boolean(
-                                    prod.isNewLaunch || 
-                                    (prod.badge && (
-                                      prod.badge.toLowerCase().includes('new') || 
-                                      prod.badge.toLowerCase().includes('launch') || 
-                                      prod.badge.toLowerCase().includes('arrival')
-                                    ))
-                                  );
-                                  const updatedLaunch = !isCurrentLaunch;
+                                  const updatedLaunch = !Boolean(prod.isNewLaunch);
                                   updateProduct(prod.id, { 
                                     isNewLaunch: updatedLaunch,
-                                    badge: updatedLaunch ? (prod.badge || 'New Launch') : (prod.badge === 'New Launch' || prod.badge === 'New Arrival' ? '' : prod.badge)
+                                    badge: updatedLaunch 
+                                      ? (prod.badge || 'New Launch') 
+                                      : (prod.badge === 'New Launch' || prod.badge === 'New Arrival' ? '' : prod.badge)
                                   });
                                   addToast(
                                     updatedLaunch 
@@ -1481,14 +1462,14 @@ export const AdminPage = () => {
                                   );
                                 }}
                                 className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1 ${
-                                  prod.isNewLaunch || (prod.badge && (prod.badge.toLowerCase().includes('new') || prod.badge.toLowerCase().includes('launch')))
+                                  Boolean(prod.isNewLaunch)
                                     ? 'bg-rose-100 text-rose-900 border border-rose-300 hover:bg-rose-200 shadow-2xs'
                                     : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
                                 }`}
-                                title={prod.isNewLaunch ? 'Featured in New Launches row on homepage. Click to remove.' : 'Click to feature in New Launches row on homepage'}
+                                title={Boolean(prod.isNewLaunch) ? 'Featured in New Launches row on homepage. Click to remove.' : 'Click to feature in New Launches row on homepage'}
                               >
                                 <span>🚀</span>
-                                <span>{prod.isNewLaunch || (prod.badge && (prod.badge.toLowerCase().includes('new') || prod.badge.toLowerCase().includes('launch'))) ? 'New Launch' : '+ Launch'}</span>
+                                <span>{Boolean(prod.isNewLaunch) ? 'New Launch' : '+ Launch'}</span>
                               </button>
                             </td>
 
@@ -3805,11 +3786,16 @@ export const AdminPage = () => {
                     <input
                       type="checkbox"
                       checked={Boolean(productForm.isNewLaunch)}
-                      onChange={(e) => setProductForm({ 
-                        ...productForm, 
-                        isNewLaunch: e.target.checked,
-                        badge: e.target.checked ? (productForm.badge || 'New Launch') : productForm.badge
-                      })}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        setProductForm(prev => ({ 
+                          ...prev, 
+                          isNewLaunch: isChecked,
+                          badge: isChecked 
+                            ? (prev.badge || 'New Launch') 
+                            : (prev.badge === 'New Launch' || prev.badge === 'New Arrival' ? '' : prev.badge)
+                        }));
+                      }}
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
