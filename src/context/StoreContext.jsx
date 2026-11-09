@@ -101,7 +101,7 @@ export const StoreProvider = ({ children }) => {
         try {
           const res = JSON.parse(saved);
           if (res && typeof res === 'object') parsed = res;
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // Respect user's explicit saved choices first, fallback to backup keys, then storeConfig
@@ -154,7 +154,7 @@ export const StoreProvider = ({ children }) => {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    } catch (e) {}
+    } catch (e) { }
     return initialReviews;
   });
 
@@ -165,7 +165,7 @@ export const StoreProvider = ({ children }) => {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') return parsed;
       }
-    } catch (e) {}
+    } catch (e) { }
     return {
       badge: "Verified Experiences",
       title: "Real Transformations, Real Stories",
@@ -232,7 +232,7 @@ export const StoreProvider = ({ children }) => {
       try {
         const d = JSON.parse(localStorage.getItem('glowbasket_deleted_banners') || '[]');
         if (Array.isArray(d)) deletedBannerIds = new Set(d);
-      } catch (e) {}
+      } catch (e) { }
 
       // 2. Read individual guaranteed home banner keys (crash-proof persistence)
       const customImages = {};
@@ -245,7 +245,7 @@ export const StoreProvider = ({ children }) => {
             if (val) customImages[bId] = val;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const saved = localStorage.getItem('glowbasket_banners');
       if (saved) {
@@ -301,7 +301,7 @@ export const StoreProvider = ({ children }) => {
       try {
         const val = localStorage.getItem(`glowbasket_banner_${slug}`);
         if (val) custom[slug] = val;
-      } catch (e) {}
+      } catch (e) { }
     });
 
     // 2. Read any dynamic glowbasket_banner_* keys for user-created categories
@@ -314,7 +314,7 @@ export const StoreProvider = ({ children }) => {
           if (val) custom[catSlug] = val;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 3. Read glowbasket_category_banners object
     try {
@@ -325,7 +325,7 @@ export const StoreProvider = ({ children }) => {
           Object.assign(custom, parsed);
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 4. Check categories in localStorage for custom uploaded banners
     try {
@@ -341,7 +341,7 @@ export const StoreProvider = ({ children }) => {
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     return { ...defaultCategoryBanners, ...custom };
   });
@@ -354,7 +354,7 @@ export const StoreProvider = ({ children }) => {
       try {
         const savedB = localStorage.getItem('glowbasket_category_banners');
         if (savedB) customBanners = JSON.parse(savedB) || {};
-      } catch (e) {}
+      } catch (e) { }
 
       try {
         for (let i = 0; i < localStorage.length; i++) {
@@ -365,14 +365,14 @@ export const StoreProvider = ({ children }) => {
             if (val) customBanners[catSlug] = val;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       // 2. Read explicitly deleted category slugs
       let deletedSlugs = new Set();
       try {
         const d = JSON.parse(localStorage.getItem('glowbasket_deleted_categories') || '[]');
         if (Array.isArray(d)) deletedSlugs = new Set(d.map(s => (s || '').toLowerCase()));
-      } catch (e) {}
+      } catch (e) { }
 
       // 3. Check saved categories in localStorage
       const saved = localStorage.getItem('glowbasket_categories');
@@ -440,7 +440,7 @@ export const StoreProvider = ({ children }) => {
           return { ...initialAboutSection, ...parsed };
         }
       }
-    } catch (e) {}
+    } catch (e) { }
     return initialAboutSection;
   });
 
@@ -459,13 +459,13 @@ export const StoreProvider = ({ children }) => {
           };
         }
       }
-    } catch (e) {}
+    } catch (e) { }
     return initialPolicies;
   });
 
   // Initial Route parsed synchronously from address bar
-  const initialRoute = typeof window !== 'undefined' 
-    ? parseUrlPath(window.location.pathname) 
+  const initialRoute = typeof window !== 'undefined'
+    ? parseUrlPath(window.location.pathname)
     : { view: 'home', category: 'all', subCategory: 'all', productSlug: null, isAdmin: false, adminTab: 'dashboard' };
 
   // Navigation / Views
@@ -479,11 +479,11 @@ export const StoreProvider = ({ children }) => {
       try {
         const saved = localStorage.getItem('glowbasket_products') || localStorage.getItem('auraglow_products');
         if (saved) list = JSON.parse(saved);
-      } catch (e) {}
+      } catch (e) { }
       const found = list.find(
-        p => p.slug === initialRoute.productSlug || 
-             slugify(p.name) === initialRoute.productSlug || 
-             p.id === initialRoute.productSlug
+        p => p.slug === initialRoute.productSlug ||
+          slugify(p.name) === initialRoute.productSlug ||
+          p.id === initialRoute.productSlug
       );
       return found || null;
     }
@@ -607,7 +607,7 @@ export const StoreProvider = ({ children }) => {
         }
         return u;
       }
-    } catch (e) {}
+    } catch (e) { }
     return null;
   });
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
@@ -662,7 +662,7 @@ export const StoreProvider = ({ children }) => {
         if (url && typeof url === 'string') {
           try {
             localStorage.setItem(`glowbasket_banner_${slug}`, url);
-          } catch (e) {}
+          } catch (e) { }
         }
       });
     }
@@ -836,12 +836,12 @@ export const StoreProvider = ({ children }) => {
       const raw = localStorage.getItem('glowbasket_registered_users');
       if (raw) {
         const list = JSON.parse(raw);
-        existingUser = list.find(u => 
-          (u.email && u.email.toLowerCase() === clean.toLowerCase()) || 
+        existingUser = list.find(u =>
+          (u.email && u.email.toLowerCase() === clean.toLowerCase()) ||
           (u.phone && u.phone === clean)
         );
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const derivedName = clean.includes('@')
       ? clean.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -899,7 +899,7 @@ export const StoreProvider = ({ children }) => {
         list.push(user);
       }
       safeStorageSet('glowbasket_registered_users', list);
-    } catch (e) {}
+    } catch (e) { }
 
     setIsAuthModalOpen(false);
     addToast(`Account created! Welcome to ${storeInfo.storeName || 'Glow Basket'}, ${cleanName}!`, 'success');
@@ -937,7 +937,7 @@ export const StoreProvider = ({ children }) => {
         list.push(user);
       }
       safeStorageSet('glowbasket_registered_users', list);
-    } catch (e) {}
+    } catch (e) { }
 
     setIsAuthModalOpen(false);
     addToast(`Signed in with Google as ${defaultName}!`, 'success');
@@ -949,7 +949,7 @@ export const StoreProvider = ({ children }) => {
     try {
       localStorage.removeItem('glowbasket_user');
       localStorage.removeItem('auraglow_user');
-    } catch (e) {}
+    } catch (e) { }
     addToast('You have been signed out.', 'info');
   };
 
@@ -1136,8 +1136,8 @@ export const StoreProvider = ({ children }) => {
   // Find order by ID or phone
   const searchOrder = (query) => {
     const clean = query.trim().toLowerCase();
-    return orders.find(o => 
-      o.orderId.toLowerCase() === clean || 
+    return orders.find(o =>
+      o.orderId.toLowerCase() === clean ||
       o.customer.phone.replace(/\D/g, '').includes(clean.replace(/\D/g, '')) ||
       (o.trackingNumber && o.trackingNumber.toLowerCase() === clean)
     );
@@ -1149,14 +1149,14 @@ export const StoreProvider = ({ children }) => {
       prev.map(order => {
         if (order.orderId === orderId) {
           const currentTime = new Date().toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
-          
+
           // Update timeline based on status
           const updatedTimeline = order.timeline.map(t => {
             if (newStatus === 'Packed' && (t.title.includes('Packed') || t.title.includes('Placed'))) {
               return { ...t, completed: true, time: t.time === 'In Progress' ? currentTime : t.time };
             }
-            if ((newStatus === 'Dispatched' || newStatus === 'In Transit') && 
-                (t.title.includes('Placed') || t.title.includes('Packed') || t.title.includes('Dispatched'))) {
+            if ((newStatus === 'Dispatched' || newStatus === 'In Transit') &&
+              (t.title.includes('Placed') || t.title.includes('Packed') || t.title.includes('Dispatched'))) {
               return { ...t, completed: true, time: t.time.includes('Expected') ? currentTime : t.time };
             }
             if (newStatus === 'Out for Delivery' && !t.title.includes('Delivered')) {
@@ -1174,10 +1174,10 @@ export const StoreProvider = ({ children }) => {
           }
 
           if (newStatus.toLowerCase().includes('return')) {
-            updatedTimeline.push({ 
-              title: `Return Processed: ${newStatus}`, 
-              time: currentTime, 
-              completed: true 
+            updatedTimeline.push({
+              title: `Return Processed: ${newStatus}`,
+              time: currentTime,
+              completed: true
             });
           }
 
@@ -1330,7 +1330,7 @@ export const StoreProvider = ({ children }) => {
     };
 
     if (banner.image) {
-      try { localStorage.setItem(`glowbasket_home_banner_${id}`, banner.image); } catch (e) {}
+      try { localStorage.setItem(`glowbasket_home_banner_${id}`, banner.image); } catch (e) { }
       idbSet(`glowbasket_home_banner_${id}`, banner.image);
     }
 
@@ -1348,7 +1348,7 @@ export const StoreProvider = ({ children }) => {
 
   const updateBanner = (bannerId, updatedFields) => {
     if (updatedFields.image) {
-      try { localStorage.setItem(`glowbasket_home_banner_${bannerId}`, updatedFields.image); } catch (e) {}
+      try { localStorage.setItem(`glowbasket_home_banner_${bannerId}`, updatedFields.image); } catch (e) { }
       idbSet(`glowbasket_home_banner_${bannerId}`, updatedFields.image);
     }
 
@@ -1371,8 +1371,8 @@ export const StoreProvider = ({ children }) => {
         localStorage.setItem('glowbasket_deleted_banners', JSON.stringify(savedDeleted));
         idbSet('glowbasket_deleted_banners', savedDeleted);
       }
-    } catch (e) {}
-    try { localStorage.removeItem(`glowbasket_home_banner_${bannerId}`); } catch (e) {}
+    } catch (e) { }
+    try { localStorage.removeItem(`glowbasket_home_banner_${bannerId}`); } catch (e) { }
     idbDelete(`glowbasket_home_banner_${bannerId}`);
 
     setBanners(prev => {
@@ -1450,13 +1450,13 @@ export const StoreProvider = ({ children }) => {
         const filteredD = d.filter(s => (s || '').toLowerCase() !== slug.toLowerCase());
         localStorage.setItem('glowbasket_deleted_categories', JSON.stringify(filteredD));
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Save isolated crash-proof banner key for this category
     if (cat.bannerImg) {
       try {
         localStorage.setItem(`glowbasket_banner_${slug}`, cat.bannerImg);
-      } catch (e) {}
+      } catch (e) { }
       idbSet(`glowbasket_banner_${slug}`, cat.bannerImg);
       setCategoryBanners(prev => {
         const nextB = { ...prev, [slug]: cat.bannerImg };
@@ -1491,7 +1491,7 @@ export const StoreProvider = ({ children }) => {
             const s = (updated.slug || updated.id).toLowerCase();
             try {
               localStorage.setItem(`glowbasket_banner_${s}`, updatedFields.bannerImg);
-            } catch (e) {}
+            } catch (e) { }
             idbSet(`glowbasket_banner_${s}`, updatedFields.bannerImg);
           }
           return updated;
@@ -1519,7 +1519,7 @@ export const StoreProvider = ({ children }) => {
       const setD = new Set(Array.isArray(d) ? d.map(s => (s || '').toLowerCase()) : []);
       setD.add(cleanId);
       localStorage.setItem('glowbasket_deleted_categories', JSON.stringify([...setD]));
-    } catch (e) {}
+    } catch (e) { }
 
     setCategoriesList(prev => {
       const next = prev.filter(c => (c.id || '').toLowerCase() !== cleanId && (c.slug || '').toLowerCase() !== cleanId);
@@ -1532,7 +1532,7 @@ export const StoreProvider = ({ children }) => {
     });
     try {
       localStorage.removeItem(`glowbasket_banner_${cleanId}`);
-    } catch (e) {}
+    } catch (e) { }
     idbDelete(`glowbasket_banner_${cleanId}`);
     addToast(`Category removed from store.`, 'info');
   };
@@ -1595,7 +1595,7 @@ export const StoreProvider = ({ children }) => {
           window.history.pushState({ view: 'admin', adminTab: targetTab }, '', path);
         }
         document.title = docTitle;
-      } catch (e) {}
+      } catch (e) { }
     }
   };
 
@@ -1686,9 +1686,9 @@ export const StoreProvider = ({ children }) => {
       }
       if (parsed.productSlug) {
         const found = productsList.find(
-          p => p.slug === parsed.productSlug || 
-               slugify(p.name) === parsed.productSlug || 
-               p.id === parsed.productSlug
+          p => p.slug === parsed.productSlug ||
+            slugify(p.name) === parsed.productSlug ||
+            p.id === parsed.productSlug
         );
         if (found) {
           setSelectedProduct(found);
@@ -1781,19 +1781,19 @@ export const StoreProvider = ({ children }) => {
       hasShades: Boolean(newProductData.hasShades),
       shades: Array.isArray(newProductData.shades) ? newProductData.shades : [],
       shadeCountText: newProductData.shadeCountText || '',
-      images: Array.isArray(newProductData.images) && newProductData.images.length > 0 
-        ? newProductData.images 
+      images: Array.isArray(newProductData.images) && newProductData.images.length > 0
+        ? newProductData.images
         : [mainImg],
       shortDescription: newProductData.shortDescription || "Pure authentic herbal formulation for glowing, radiant and even skin tone.",
       description: newProductData.description || (newProductData.shortDescription || "Certified formulation for radiant, spot-free, illuminated skin."),
       benefits: Array.isArray(newProductData.benefits) && newProductData.benefits.length > 0
         ? newProductData.benefits
         : [
-            "Fades hyperpigmentation, melasma, and stubborn dark spots",
-            "Infused with bioactive herbal whitening complexes",
-            "Deep nourishment and skin texture softening",
-            "100% original formulation with tamper-proof seal"
-          ],
+          "Fades hyperpigmentation, melasma, and stubborn dark spots",
+          "Infused with bioactive herbal whitening complexes",
+          "Deep nourishment and skin texture softening",
+          "100% original formulation with tamper-proof seal"
+        ],
       ingredients: newProductData.ingredients || "L-Glutathione, Kojic Acid Dipalmitate, Alpha Arbutin, Vitamin C, Sandalwood Oil, Almond Oil, Beeswax, Aqua Base.",
       howToUse: newProductData.howToUse || "Wash face thoroughly. Gently apply a small amount before sleep in upward circular motions.",
       size: newProductData.size || "50g",
@@ -1882,7 +1882,7 @@ export const StoreProvider = ({ children }) => {
 
   const updateCategoryBanner = (categorySlug, bannerUrl) => {
     const slug = (categorySlug || 'all').toLowerCase();
-    
+
     // Guaranteed isolated persistent key per category (never lost on refresh)
     try {
       localStorage.setItem(`glowbasket_banner_${slug}`, bannerUrl);
@@ -1891,7 +1891,7 @@ export const StoreProvider = ({ children }) => {
         localStorage.removeItem('auraglow_products');
         localStorage.removeItem('glowbasket_cart');
         localStorage.setItem(`glowbasket_banner_${slug}`, bannerUrl);
-      } catch (e2) {}
+      } catch (e2) { }
     }
 
     setCategoryBanners(prev => {
